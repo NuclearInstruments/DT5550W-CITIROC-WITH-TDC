@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7k160tffg676-2" LaunchTime="1647531183">
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <File Type="BG-DRC" Name="TOP_CitirocRedoutFullV.drc"/>
+  <File Type="BG-BGN" Name="TOP_CitirocRedoutFullV.bgn"/>
+  <File Type="BITSTR-SYSDEF" Name="TOP_CitirocRedoutFullV.sysdef"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="TOP_CitirocRedoutFullV.ltx"/>
+  <File Type="BITSTR-MMI" Name="TOP_CitirocRedoutFullV.mmi"/>
+  <File Type="BITSTR-BMM" Name="TOP_CitirocRedoutFullV_bd.bmm"/>
+  <File Type="BITSTR-NKY" Name="TOP_CitirocRedoutFullV.nky"/>
+  <File Type="BITSTR-RBT" Name="TOP_CitirocRedoutFullV.rbt"/>
+  <File Type="BITSTR-MSK" Name="TOP_CitirocRedoutFullV.msk"/>
+  <File Type="BG-BIN" Name="TOP_CitirocRedoutFullV.bin"/>
+  <File Type="BG-BIT" Name="TOP_CitirocRedoutFullV.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="TOP_CitirocRedoutFullV_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="TOP_CitirocRedoutFullV_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="TOP_CitirocRedoutFullV_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="TOP_CitirocRedoutFullV_postroute_physopt.dcp"/>
+  <File Type="ROUTE-CLK" Name="TOP_CitirocRedoutFullV_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-SIMILARITY" Name="TOP_CitirocRedoutFullV_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-TIMING-RPX" Name="TOP_CitirocRedoutFullV_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-TIMING-PB" Name="TOP_CitirocRedoutFullV_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="TOP_CitirocRedoutFullV_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-STATUS-PB" Name="TOP_CitirocRedoutFullV_route_status.pb"/>
+  <File Type="ROUTE-STATUS" Name="TOP_CitirocRedoutFullV_route_status.rpt"/>
+  <File Type="ROUTE-PWR-RPX" Name="TOP_CitirocRedoutFullV_power_routed.rpx"/>
+  <File Type="INIT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_init.rpt"/>
+  <File Type="OPT-DRC" Name="TOP_CitirocRedoutFullV_drc_opted.rpt"/>
+  <File Type="OPT-DCP" Name="TOP_CitirocRedoutFullV_opt.dcp"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="TOP_CitirocRedoutFullV_methodology_drc_opted.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="TOP_CitirocRedoutFullV_incremental_reuse_pre_placed.rpt"/>
+  <File Type="OPT-HWDEF" Name="TOP_CitirocRedoutFullV.hwdef"/>
+  <File Type="OPT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_opted.rpt"/>
+  <File Type="REPORTS-TCL" Name="TOP_CitirocRedoutFullV_reports.tcl"/>
+  <File Type="PWROPT-DCP" Name="TOP_CitirocRedoutFullV_pwropt.dcp"/>
+  <File Type="PWROPT-DRC" Name="TOP_CitirocRedoutFullV_drc_pwropted.rpt"/>
+  <File Type="RDI-RDI" Name="TOP_CitirocRedoutFullV.vdi"/>
+  <File Type="PWROPT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_pwropted.rpt"/>
+  <File Type="PLACE-IO" Name="TOP_CitirocRedoutFullV_io_placed.rpt"/>
+  <File Type="PA-TCL" Name="TOP_CitirocRedoutFullV.tcl"/>
+  <File Type="PLACE-DCP" Name="TOP_CitirocRedoutFullV_placed.dcp"/>
+  <File Type="PLACE-CLK" Name="TOP_CitirocRedoutFullV_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_placed.rpt"/>
+  <File Type="PLACE-UTIL" Name="TOP_CitirocRedoutFullV_utilization_placed.rpt"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="PLACE-UTIL-PB" Name="TOP_CitirocRedoutFullV_utilization_placed.pb"/>
+  <File Type="PHYSOPT-TIMING" Name="TOP_CitirocRedoutFullV_timing_summary_physopted.rpt"/>
+  <File Type="PLACE-CTRL" Name="TOP_CitirocRedoutFullV_control_sets_placed.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="TOP_CitirocRedoutFullV_incremental_reuse_placed.rpt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="TOP_CitirocRedoutFullV_postplace_pwropt.dcp"/>
+  <File Type="PHYSOPT-DCP" Name="TOP_CitirocRedoutFullV_physopt.dcp"/>
+  <File Type="PHYSOPT-DRC" Name="TOP_CitirocRedoutFullV_drc_physopted.rpt"/>
+  <File Type="ROUTE-ERROR-DCP" Name="TOP_CitirocRedoutFullV_routed_error.dcp"/>
+  <File Type="ROUTE-DCP" Name="TOP_CitirocRedoutFullV_routed.dcp"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="TOP_CitirocRedoutFullV_routed_bb.dcp"/>
+  <File Type="ROUTE-DRC" Name="TOP_CitirocRedoutFullV_drc_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="TOP_CitirocRedoutFullV_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-DRC-PB" Name="TOP_CitirocRedoutFullV_drc_routed.pb"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="TOP_CitirocRedoutFullV_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-DRC-RPX" Name="TOP_CitirocRedoutFullV_drc_routed.rpx"/>
+  <File Type="ROUTE-PWR" Name="TOP_CitirocRedoutFullV_power_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="TOP_CitirocRedoutFullV_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-PWR-SUM" Name="TOP_CitirocRedoutFullV_power_summary_routed.pb"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/ADC1.v">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/ADC1.v"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/ADC_FRAME_S.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/ADC_FRAME_S.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/CitirocAnalogReadoutV2.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/CitirocAnalogReadoutV2.vhd"/>
+        <Attr Name="ImportTime" Val="1647530724"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/CitirocFrameTransferV2.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/CitirocFrameTransferV2.vhd"/>
+        <Attr Name="ImportTime" Val="1647530725"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/CitirocSlowControl.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/CitirocSlowControl.vhd"/>
+        <Attr Name="ImportTime" Val="1647530713"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/DT5550W_iic.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/DT5550W_iic.vhd"/>
+        <Attr Name="ImportTime" Val="1647530725"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/FlashController.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/FlashController.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/MCRateMeter.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/MCRateMeter.vhd"/>
+        <Attr Name="ImportTime" Val="1647530736"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/PULSE_GENERATOR.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/PULSE_GENERATOR.vhd"/>
+        <Attr Name="ImportTime" Val="1647530721"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/TimestampGenerator.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/TimestampGenerator.vhd"/>
+        <Attr Name="ImportTime" Val="1647530739"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/U447_custompacket.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/U447_custompacket.vhd"/>
+        <Attr Name="ImportTime" Val="1647530721"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/adc_interface.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/adc_interface.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/adc_sync.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/adc_sync.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/adcs_top.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/adcs_top.vhd"/>
+        <Attr Name="ImportTime" Val="1647251732"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/chronoenable.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/chronoenable.vhd"/>
+        <Attr Name="ImportTime" Val="1552575603"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/comparator.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/comparator.vhd"/>
+        <Attr Name="ImportTime" Val="1647530720"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/counter_rising.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/counter_rising.vhd"/>
+        <Attr Name="ImportTime" Val="1548430387"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/d_latch.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/d_latch.vhd"/>
+        <Attr Name="ImportTime" Val="1647530768"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/edge_pos.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/edge_pos.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/ff_sr.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/ff_sr.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/flash_prog.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/flash_prog.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/frequency_meter.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/frequency_meter.vhd"/>
+        <Attr Name="ImportTime" Val="1548430387"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/ft600_fifo245_core.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/ft600_fifo245_core.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/ft600_fifo245_wrapper.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/ft600_fifo245_wrapper.vhd"/>
+        <Attr Name="ImportTime" Val="1647530743"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/init_clock_gen.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/init_clock_gen.vhd"/>
+        <Attr Name="ImportTime" Val="1647251732"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/pulseshaper.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/pulseshaper.vhd"/>
+        <Attr Name="ImportTime" Val="1647530742"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/security.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/security.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/spi32bit_master_write.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/spi32bit_master_write.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/spi93lc56_16bit.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/spi93lc56_16bit.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/spi_timing_module.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/spi_timing_module.vhd"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/subpage_Framing.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/subpage_Framing.vhd"/>
+        <Attr Name="ImportTime" Val="1647530767"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/subpage_Timer64.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/subpage_Timer64.vhd"/>
+        <Attr Name="ImportTime" Val="1647530760"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/subpage_TriggerLogic.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/subpage_TriggerLogic.vhd"/>
+        <Attr Name="ImportTime" Val="1647530760"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/subpage_frameproc.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/subpage_frameproc.vhd"/>
+        <Attr Name="ImportTime" Val="1647530768"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/tdc_sync_nofifo.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/tdc_sync_nofifo.vhd"/>
+        <Attr Name="ImportTime" Val="1647530724"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/xlx_oscilloscope_sync.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/xlx_oscilloscope_sync.vhd"/>
+        <Attr Name="ImportTime" Val="1647530737"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/xlx_soft_gd.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/xlx_soft_gd.vhd"/>
+        <Attr Name="ImportTime" Val="1565024769"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/top_CitirocRedoutFullV.vhd">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/top_CitirocRedoutFullV.vhd"/>
+        <Attr Name="ImportTime" Val="1647530743"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/imports/HDL/pcores/iic_master_andrea.vhd">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/iic_master_andrea.vhd"/>
+        <Attr Name="ImportTime" Val="1647530725"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="TOP_CitirocRedoutFullV"/>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <File Path="$PSRCDIR/constrs_1/imports/HDL/dt555w_constraints.xdc">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/dt555w_constraints.xdc"/>
+        <Attr Name="ImportTime" Val="1647251733"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2017"/>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream">
+      <Option Id="BinFile">1</Option>
+    </Step>
+  </Strategy>
+  <BlockFileSet Type="BlockSrcs" Name="fast_clock"/>
+  <BlockFileSet Type="BlockSrcs" Name="FlashPageMemory"/>
+  <BlockFileSet Type="BlockSrcs" Name="TestBram"/>
+  <BlockFileSet Type="BlockSrcs" Name="clk_wiz_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="DTClockGenerator"/>
+  <BlockFileSet Type="BlockSrcs" Name="FTDI_FIFO_AW"/>
+  <BlockFileSet Type="BlockSrcs" Name="fifo_generator_0"/>
+  <BlockFileSet Type="BlockSrcs" Name="tdc_05ns_pll"/>
+  <BlockFileSet Type="BlockSrcs" Name="FTDI_FIFOs"/>
+</GenRun>

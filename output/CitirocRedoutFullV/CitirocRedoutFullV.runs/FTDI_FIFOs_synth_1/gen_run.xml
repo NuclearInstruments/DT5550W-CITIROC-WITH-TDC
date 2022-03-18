@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="FTDI_FIFOs_synth_1" LaunchPart="xc7k160tffg676-2" LaunchTime="1647531182">
+  <File Type="VDS-TIMING-PB" Name="FTDI_FIFOs_timing_summary_synth.pb"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="FTDI_FIFOs_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="FTDI_FIFOs.dcp"/>
+  <File Type="REPORTS-TCL" Name="FTDI_FIFOs_reports.tcl"/>
+  <File Type="PA-TCL" Name="FTDI_FIFOs.tcl"/>
+  <File Type="RDS-RDS" Name="FTDI_FIFOs.vds"/>
+  <File Type="RDS-PROPCONSTRS" Name="FTDI_FIFOs_drc_synth.rpt"/>
+  <File Type="RDS-UTIL" Name="FTDI_FIFOs_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="FTDI_FIFOs_utilization_synth.pb"/>
+  <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FTDI_FIFOs">
+    <File Path="$PSRCDIR/sources_1/ip/FTDI_FIFOs/FTDI_FIFOs.xci">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/FTDI_FIFOs.xci"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="FTDI_FIFOs"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/FTDI_FIFOs">
+    <File Path="$PSRCDIR/sources_1/ip/FTDI_FIFOs/FTDI_FIFOs.xci">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/FTDI_FIFOs.xci"/>
+        <Attr Name="ImportTime" Val="1548430386"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="FTDI_FIFOs"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
+      <Desc>Vivado Synthesis Defaults</Desc>
+    </StratHandle>
+    <Step Id="synth_design"/>
+  </Strategy>
+</GenRun>

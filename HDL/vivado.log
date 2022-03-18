@@ -1,0 +1,239 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Thu Mar 17 16:26:09 2022
+# Process ID: 28460
+# Current directory: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL
+# Command line: vivado.exe -mode batch -source C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/CitirocRedoutFullV.tcl
+# Log file: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/vivado.log
+# Journal file: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL\vivado.jou
+#-----------------------------------------------------------
+source C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/CitirocRedoutFullV.tcl
+# set outputDir C:/OpenHardware/UserProject/CitirocRedoutFullV/output/CitirocRedoutFullV
+# file mkdir $outputDir
+# create_project CitirocRedoutFullV C:/OpenHardware/UserProject/CitirocRedoutFullV/output/CitirocRedoutFullV -part XC7K160TFFG676-2 -force
+# set_property source_mgmt_mode None [current_project]
+# set_property target_language VHDL [current_project]
+# set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY XPM_FIFO} [current_project]
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/clk_wiz_0.xcix
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'C:/Xilinx/Vivado/2017.4/data/ip'.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/clk_wiz_0.xcix
+CRITICAL WARNING: [Vivado 12-1462] The source file is already part of the fileset 'sources_1'. Requested source 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/clk_wiz_0.xcix' will not be added.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/DTClockGenerator.xci
+WARNING: [IP_Flow 19-2162] IP 'DTClockGenerator' is locked:
+* IP 'DTClockGenerator' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/fast_clock.xci
+WARNING: [IP_Flow 19-2162] IP 'fast_clock' is locked:
+* IP 'fast_clock' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/fifo_generator_0.xcix
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/fifo_generator_0.xcix
+CRITICAL WARNING: [Vivado 12-1462] The source file is already part of the fileset 'sources_1'. Requested source 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/fifo_generator_0.xcix' will not be added.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FlashPageMemory.xci
+INFO: [Device 21-403] Loading part xc7k160tffg676-2
+WARNING: [IP_Flow 19-2162] IP 'FlashPageMemory' is locked:
+* IP 'FlashPageMemory' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+add_files: Time (s): cpu = 00:00:06 ; elapsed = 00:00:08 . Memory (MB): peak = 567.707 ; gain = 116.176
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FTDI_FIFOs.xci
+WARNING: [IP_Flow 19-2162] IP 'FTDI_FIFOs' is locked:
+* IP 'FTDI_FIFOs' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FTDI_FIFO_AW.xci
+WARNING: [IP_Flow 19-2162] IP 'FTDI_FIFO_AW' is locked:
+* IP 'FTDI_FIFO_AW' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/tdc_05ns_pll.xci
+WARNING: [IP_Flow 19-2162] IP 'tdc_05ns_pll' is locked:
+* IP 'tdc_05ns_pll' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/TestBram.xci
+WARNING: [IP_Flow 19-2162] IP 'TestBram' is locked:
+* IP 'TestBram' shares a common output directory with other IP. It is recommended that each IP be placed in its own directory.
+Please select 'Report IP Status' from the 'Tools/Report' menu or run Tcl command 'report_ip_status' for more information.
+add_files: Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 586.504 ; gain = 18.797
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/subpage_frameproc.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/subpage_Framing.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/subpage_Timer64.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/subpage_TriggerLogic.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/top_CitirocRedoutFullV.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ADC1.v
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adcs_top.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adcs_top.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adcs_top.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ADC_FRAME_S.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ADC_FRAME_S.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ADC_FRAME_S.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_interface.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_interface.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_interface.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_sync.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_sync.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/adc_sync.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/chronoenable.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/chronoenable.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/chronoenable.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocAnalogReadoutV2.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocAnalogReadoutV2.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocAnalogReadoutV2.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocFrameTransferV2.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocFrameTransferV2.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocFrameTransferV2.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocSlowControl.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocSlowControl.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/CitirocSlowControl.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/comparator.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/comparator.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/comparator.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/counter_rising.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/counter_rising.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/counter_rising.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/DT5550W_iic.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/DT5550W_iic.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/DT5550W_iic.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/d_latch.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/d_latch.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/d_latch.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/edge_pos.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/edge_pos.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/edge_pos.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ff_sr.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ff_sr.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ff_sr.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FlashController.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FlashController.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/FlashController.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/flash_prog.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/flash_prog.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/flash_prog.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/frequency_meter.vhd
+CRITICAL WARNING: [Vivado 12-3645] Please note that adding or importing multiple files, one at a time, can be performance intensive.  Both add_files and import_files commands accept multiple files as input, and passing a collection of multiple files to a single add_files or import_files commands can offer significant performance improvement.
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/frequency_meter.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/frequency_meter.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_core.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_core.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_core.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_wrapper.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_wrapper.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/ft600_fifo245_wrapper.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/iic_master_andrea.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/iic_master_andrea.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/iic_master_andrea.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/init_clock_gen.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/init_clock_gen.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/init_clock_gen.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/MCRateMeter.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/MCRateMeter.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/MCRateMeter.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/pulseshaper.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/pulseshaper.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/pulseshaper.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/PULSE_GENERATOR.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/PULSE_GENERATOR.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/PULSE_GENERATOR.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/security.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/security.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/security.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi32bit_master_write.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi32bit_master_write.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi32bit_master_write.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi93lc56_16bit.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi93lc56_16bit.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi93lc56_16bit.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi_timing_module.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi_timing_module.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/spi_timing_module.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/tdc_sync_nofifo.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/tdc_sync_nofifo.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/tdc_sync_nofifo.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/TimestampGenerator.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/TimestampGenerator.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/TimestampGenerator.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/U447_custompacket.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/U447_custompacket.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/U447_custompacket.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_oscilloscope_sync.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_oscilloscope_sync.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_oscilloscope_sync.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_soft_gd.vhd
+# add_files -force C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_soft_gd.vhd
+WARNING: [filemgmt 56-12] File 'C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/pcores/xlx_soft_gd.vhd' cannot be added to the project because it already exists in the project, skipping this file
+# add_files -force -fileset constrs_1 C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/dt555w_constraints.xdc
+# import_files -force -norecurse
+INFO: [filemgmt 20-348] Importing the appropriate files for fileset: 'constrs_1'
+INFO: [filemgmt 20-348] Importing the appropriate files for fileset: 'sources_1'
+# import_files -fileset constrs_1 -force -norecurse C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/dt555w_constraints.xdc
+# foreach ip [get_ips] {
+# upgrade_ip [get_ips $ip]
+# set ip_filename [get_property IP_FILE $ip]
+# set ip_dcp [file rootname $ip_filename]
+# append ip_dcp ".dcp"
+# set ip_xml [file rootname $ip_filename]
+# append ip_xml ".xml"
+# if {([file exists $ip_dcp] == 0) || [expr {[file mtime $ip_filename ] > [file mtime $ip_dcp ]}]} {
+# reset_target all $ip
+# file delete $ip_xml
+# generate_target all $ip
+# }
+# }
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'DTClockGenerator'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'DTClockGenerator'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'DTClockGenerator'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'DTClockGenerator'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'DTClockGenerator'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'FTDI_FIFO_AW'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'FTDI_FIFO_AW'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'FTDI_FIFO_AW'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'FTDI_FIFO_AW'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'FTDI_FIFOs'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'FTDI_FIFOs'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'FTDI_FIFOs'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'FTDI_FIFOs'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'FlashPageMemory'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'FlashPageMemory'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'FlashPageMemory'...
+INFO: [IP_Flow 19-1686] Generating 'Miscellaneous' target for IP 'FlashPageMemory'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'FlashPageMemory'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'TestBram'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'TestBram'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'TestBram'...
+INFO: [IP_Flow 19-1686] Generating 'Miscellaneous' target for IP 'TestBram'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'TestBram'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'clk_wiz_0'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'clk_wiz_0'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'clk_wiz_0'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'clk_wiz_0'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'clk_wiz_0'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'fast_clock'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'fast_clock'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'fast_clock'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'fast_clock'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'fast_clock'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'fifo_generator_0'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'fifo_generator_0'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'fifo_generator_0'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'fifo_generator_0'...
+WARNING: [Coretcl 2-1042] No IP was identified for upgrade.
+INFO: [IP_Flow 19-1686] Generating 'Instantiation Template' target for IP 'tdc_05ns_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'tdc_05ns_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'tdc_05ns_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Implementation' target for IP 'tdc_05ns_pll'...
+INFO: [IP_Flow 19-1686] Generating 'Change Log' target for IP 'tdc_05ns_pll'...
+# set_property Top top_CitirocRedoutFullV [current_fileset]
+# set obj [get_runs impl_1]
+# set obj_s [get_runs synth_1]
+# set_property -name "steps.write_bitstream.args.bin_file" -value "1" -objects $obj
+# exit
+INFO: [Common 17-206] Exiting Vivado at Thu Mar 17 16:26:53 2022...

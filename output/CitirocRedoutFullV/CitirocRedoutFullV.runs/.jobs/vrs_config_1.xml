@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<Runs Version="1" Minor="0">
+	<Run Id="TestBram_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/TestBram_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="clk_wiz_0_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/clk_wiz_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="DTClockGenerator_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/DTClockGenerator_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="tdc_05ns_pll_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/tdc_05ns_pll_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="FTDI_FIFO_AW_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FTDI_FIFO_AW_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="FTDI_FIFOs_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FTDI_FIFOs_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="FlashPageMemory_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FlashPageMemory_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="fifo_generator_0_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/fifo_generator_0_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="fast_clock_synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/fast_clock_synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado"/>
+	<Run Id="synth_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/synth_1" FlowId="Vivado_Synthesis" FromStepId="vivado" ToStepId="vivado">
+		<Parent Id="TestBram_synth_1"/>
+		<Parent Id="clk_wiz_0_synth_1"/>
+		<Parent Id="DTClockGenerator_synth_1"/>
+		<Parent Id="tdc_05ns_pll_synth_1"/>
+		<Parent Id="FTDI_FIFO_AW_synth_1"/>
+		<Parent Id="FTDI_FIFOs_synth_1"/>
+		<Parent Id="FlashPageMemory_synth_1"/>
+		<Parent Id="fifo_generator_0_synth_1"/>
+		<Parent Id="fast_clock_synth_1"/>
+	</Run>
+	<Run Id="impl_1" LaunchDir="/home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/impl_1" FlowId="Vivado_Implementation" FromStepId="init_design" ToStepId="write_bitstream">
+		<Parent Id="synth_1"/>
+		<Parent Id="TestBram_synth_1"/>
+		<Parent Id="clk_wiz_0_synth_1"/>
+		<Parent Id="DTClockGenerator_synth_1"/>
+		<Parent Id="tdc_05ns_pll_synth_1"/>
+		<Parent Id="FTDI_FIFO_AW_synth_1"/>
+		<Parent Id="FTDI_FIFOs_synth_1"/>
+		<Parent Id="FlashPageMemory_synth_1"/>
+		<Parent Id="fifo_generator_0_synth_1"/>
+		<Parent Id="fast_clock_synth_1"/>
+	</Run>
+</Runs>
+

@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Thu Mar 17 16:26:09 2022
+# Process ID: 28460
+# Current directory: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL
+# Command line: vivado.exe -mode batch -source C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/CitirocRedoutFullV.tcl
+# Log file: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/vivado.log
+# Journal file: C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL\vivado.jou
+#-----------------------------------------------------------
+source C:/OpenHardware/UserProject/CitirocRedoutFullV/HDL/CitirocRedoutFullV.tcl

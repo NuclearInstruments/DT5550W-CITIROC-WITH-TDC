@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:54:30 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Thu Mar 17 16:33:04 2022
+# Process ID: 15389
+# Current directory: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FTDI_FIFO_AW_synth_1
+# Command line: vivado -log FTDI_FIFO_AW.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source FTDI_FIFO_AW.tcl
+# Log file: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FTDI_FIFO_AW_synth_1/FTDI_FIFO_AW.vds
+# Journal file: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/FTDI_FIFO_AW_synth_1/vivado.jou
+#-----------------------------------------------------------
+source FTDI_FIFO_AW.tcl -notrace

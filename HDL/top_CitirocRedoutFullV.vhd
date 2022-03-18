@@ -1,0 +1,8586 @@
+----------------------------------------------------------------------------------
+-- Company: 	Nuclear Instruments SRL
+-- Engineer: 	Andrea Abba
+-- 
+-- Create Date: 05.05.2017 17:29:18
+-- Design Name: Citiroc Readout System for DT5550W
+-- Module Name: TOP_CitirocRedoutFullV
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+-- http://www.nuclearinstruments.eu
+-- Nuclear Instruments SRL, via lecco 16, Lambrugo (CO), ITALY
+-- info@nuclearinstruments.eu
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use ieee.std_logic_misc.all;
+use ieee.math_real.all;
+library UNISIM;
+use UNISIM.VComponents.all;
+
+Library xpm;
+use xpm.vcomponents.all;
+    
+entity TOP_CitirocRedoutFullV is
+    Port (  
+		    
+			  
+			--security eeprom			  
+			EEMOSI : out STD_LOGIC;
+			EEMISO : in STD_LOGIC;
+			EECLK : out STD_LOGIC;
+			EECS : out STD_LOGIC;	
+
+			--CDCE clock generator
+			CK_SPI_LE : out  STD_LOGIC;
+			CK_SPI_CLK : out  STD_LOGIC;
+			CK_SPI_MOSI : out  STD_LOGIC;
+			CK_SPI_NSYNC : out  STD_LOGIC;
+
+			--FLASH Direct Access
+			FLASH_SPI_CS : out std_logic;
+			FLASH_SPI_DIN : in std_logic;
+			FLASH_SPI_DOUT : out std_logic;	
+			
+			--AUX CLOCK OUT
+			CLK_AUX_OUT_25 : out std_logic;	
+
+			--LEMO IO
+			LEMO0 : inout STD_LOGIC;
+			LEMO1 : inout STD_LOGIC;
+			LEMO2 : inout STD_LOGIC;
+			LEMO3 : inout STD_LOGIC;
+					 
+			LEMO4 : inout STD_LOGIC;
+			LEMO5 : inout STD_LOGIC;
+			LEMO6 : inout STD_LOGIC;
+			LEMO7 : inout STD_LOGIC;
+
+			LEMO01_dir : out STD_LOGIC;
+			LEMO23_dir : out STD_LOGIC;
+			LEMO45_dir : out STD_LOGIC;
+			LEMO67_dir : out STD_LOGIC;		
+			
+			--FTDI INTERFACE
+			FTDI_CLK : in  STD_LOGIC;
+			FTDI_ADBUS : inout  STD_LOGIC_VECTOR (31 downto 0);
+			FTDI_BE : inout  STD_LOGIC_VECTOR (3 downto 0);
+			FTDI_RXFN : in  STD_LOGIC;
+			FTDI_TXEN : in  STD_LOGIC;
+			FTDI_TXN : out  STD_LOGIC;
+			FTDI_SIWU : out  STD_LOGIC;
+			FTDI_RDN : out  STD_LOGIC;
+			FTDI_OEN : out  STD_LOGIC;
+
+			
+			--CITIROC A slow control
+			A_RESETB_SR : out STD_LOGIC;
+			A_SR_CK : out STD_LOGIC;
+			A_SR_IN : out STD_LOGIC;
+			A_SRLOAD : out STD_LOGIC;
+			A_SELECT : out STD_LOGIC;           
+
+			--CITIROC B slow control
+			B_RESETB_SR : out STD_LOGIC;
+            B_SR_CK : out STD_LOGIC;
+            B_SR_IN : out STD_LOGIC;
+            B_SRLOAD : out STD_LOGIC;
+            B_SELECT : out STD_LOGIC;          
+
+			--CITIROC C slow control
+			C_RESETB_SR : out STD_LOGIC;
+            C_SR_CK : out STD_LOGIC;
+            C_SR_IN : out STD_LOGIC;
+            C_SRLOAD : out STD_LOGIC;
+            C_SELECT : out STD_LOGIC;          
+
+			--CITIROC D slow control
+			D_RESETB_SR : out STD_LOGIC;
+            D_SR_CK : out STD_LOGIC;
+            D_SR_IN : out STD_LOGIC;
+            D_SRLOAD : out STD_LOGIC;
+            D_SELECT : out STD_LOGIC; 
+
+			--CITIROC EVENT VALIDATION
+			A_VAL_EVT_P : out STD_LOGIC;
+			A_VAL_EVT_N : out STD_LOGIC;
+			B_VAL_EVT_P : out STD_LOGIC;
+			B_VAL_EVT_N : out STD_LOGIC;
+			C_VAL_EVT_P : out STD_LOGIC;
+			C_VAL_EVT_N : out STD_LOGIC;
+			D_VAL_EVT_P : out STD_LOGIC;
+			D_VAL_EVT_N : out STD_LOGIC;
+
+			--CITIROC LATCH RESET
+			A_RAZ_CHN_P : out STD_LOGIC;
+			A_RAZ_CHN_N : out STD_LOGIC;
+			B_RAZ_CHN_P : out STD_LOGIC;
+			B_RAZ_CHN_N : out STD_LOGIC;
+			C_RAZ_CHN_P : out STD_LOGIC;
+			C_RAZ_CHN_N : out STD_LOGIC;
+			D_RAZ_CHN_P : out STD_LOGIC;
+			D_RAZ_CHN_N : out STD_LOGIC;
+
+			--CITIROC EXTERNAL TEST TRIGGER 
+			A_TRIG_EXT : out STD_LOGIC;
+			C_TRIG_EXT : out STD_LOGIC;
+			B_TRIG_EXT : out STD_LOGIC;
+			D_TRIG_EXT : out STD_LOGIC;
+			
+			--CITIROC EXTERNAL TEST TRIGGER 
+            A_RESETB_READ : out STD_LOGIC;
+            B_RESETB_READ : out STD_LOGIC;
+            C_RESETB_READ : out STD_LOGIC;
+            D_RESETB_READ : out STD_LOGIC;			
+
+			--CITIROC RSTV_PSC
+			A_RESETB_PSC : out STD_LOGIC;
+			B_RESETB_PSC : out STD_LOGIC;
+			C_RESETB_PSC : out STD_LOGIC;
+			D_RESETB_PSC : out STD_LOGIC;
+
+			--CITIROC RSTV_PA
+			A_RESETB_PA : out STD_LOGIC;
+			B_RESETB_PA : out STD_LOGIC;
+			C_RESETB_PA : out STD_LOGIC;
+			D_RESETB_PA : out STD_LOGIC;
+
+			
+			--125 MHz CLOCK
+			D_LVDS_DCLK_P :  in STD_LOGIC;
+			D_LVDS_DCLK_N :  in STD_LOGIC;
+
+
+			--CITIROC TRIGGER OUT
+			A_TRG : in STD_LOGIC_VECTOR(31 downto 0);          
+			B_TRG : in STD_LOGIC_VECTOR(31 downto 0);
+			C_TRG : in STD_LOGIC_VECTOR(31 downto 0);          
+			D_TRG : in STD_LOGIC_VECTOR(31 downto 0);
+
+			--CITIROC SR_IN
+			A_ANALOG_DIN : out STD_LOGIC;
+			B_ANALOG_DIN : out STD_LOGIC;
+			C_ANALOG_DIN : out STD_LOGIC;
+			D_ANALOG_DIN : out STD_LOGIC;
+
+			--CITIROC SR_CLK
+			A_ANALOG_CLK : out STD_LOGIC;
+			B_ANALOG_CLK : out STD_LOGIC;
+			C_ANALOG_CLK : out STD_LOGIC;
+			D_ANALOG_CLK : out STD_LOGIC;
+
+			--CITIROC OR32_CHARGE
+			A_NOR_CHARGE : in STD_LOGIC;
+			B_NOR_CHARGE : in STD_LOGIC;
+			C_NOR_CHARGE : in STD_LOGIC;
+			D_NOR_CHARGE : in STD_LOGIC;
+			
+			--CITIROC OR32_CHARGE
+            A_OR32 : in STD_LOGIC;
+            B_OR32 : in STD_LOGIC;
+            C_OR32 : in STD_LOGIC;
+            D_OR32 : in STD_LOGIC;			
+
+			-- --CITIROC OR32_TIME
+			A_NOR_TIME : in STD_LOGIC;
+            B_NOR_TIME : in STD_LOGIC;
+            C_NOR_TIME : in STD_LOGIC;
+            D_NOR_TIME : in STD_LOGIC;
+			
+			--CITIROC DIGITAL PROBE
+			A_DIG_PROBE : in STD_LOGIC;
+			B_DIG_PROBE : in STD_LOGIC;
+			C_DIG_PROBE : in STD_LOGIC;
+			D_DIG_PROBE : in STD_LOGIC;   
+
+			--CITIROC TRIGB_MUX
+			A_DIG_OUT : in STD_LOGIC;
+			B_DIG_OUT : in STD_LOGIC;
+			C_DIG_OUT : in STD_LOGIC;
+			D_DIG_OUT : in STD_LOGIC;   
+
+            A_HOLD_LG : out std_logic;
+            A_HOLD_HG : out std_logic;
+            B_HOLD_LG : out std_logic;
+            B_HOLD_HG : out std_logic;
+            C_HOLD_LG : out std_logic;
+            C_HOLD_HG : out std_logic;
+            D_HOLD_LG : out std_logic;
+            D_HOLD_HG : out std_logic;
+            
+			--ANALOG INTERFACE
+			SMADC_1_RESET : out STD_LOGIC;
+			ADC_1_CLK_A_P : in STD_LOGIC;
+			ADC_1_CLK_A_N : in STD_LOGIC;
+			ADC_1_FRAME_A_P : in STD_LOGIC;
+			ADC_1_FRAME_A_N : in STD_LOGIC;
+			ADC_1_DATA_A_P: in STD_LOGIC_VECTOR(7 downto 0);
+			ADC_1_DATA_A_N: in STD_LOGIC_VECTOR(7 downto 0);
+			ADC_1_DATA_B_P: in STD_LOGIC_VECTOR(7 downto 0);
+			ADC_1_DATA_B_N: in STD_LOGIC_VECTOR(7 downto 0);
+			SMADC_1_CSA : out std_logic;
+			SMADC_1_CLK : out std_logic;
+			SMADC_1_MOSI : out std_logic;
+			SMADC_1_PD : out std_logic;
+
+			--i2c
+			iic_scl : inout std_logic;
+			iic_sda : inout std_logic;
+        UART_TTL_TX : out STD_LOGIC;
+        UART_TTL_RX : out STD_LOGIC;
+			--SERVICE CLOCK
+			clk_100 : in std_logic
+                              
+                              
+			  ); 
+end TOP_CitirocRedoutFullV;
+
+architecture Behavioral of TOP_CitirocRedoutFullV is
+	attribute keep : string;     
+    
+    component ft600_fifo245_wrapper is
+    Port ( 
+	
+          --EEPROM SICUREZZE
+          EEMOSI : out STD_LOGIC;
+          EEMISO : in STD_LOGIC;
+          EECLK : out STD_LOGIC;
+          EECS : out STD_LOGIC;
+          license_ok : out std_logic;
+		  
+          FTDI_ADBUS : inout STD_LOGIC_VECTOR (31 downto 0);
+          FTDI_BE     : inout STD_LOGIC_VECTOR (3 downto 0);
+          FTDI_RXFN : in STD_LOGIC;            --EMPTY
+          FTDI_TXEN : in STD_LOGIC;         --FULL
+          FTDI_RDN    : out STD_LOGIC;        --READ ENABLE
+          FTDI_TXN    : out STD_LOGIC;        --WRITE ENABLE
+          FTDI_CLK    : in STD_LOGIC;            --FTDI CLOCK
+          FTDI_OEN    : out STD_LOGIC;        --OUTPUT ENABLE NEGATO LATO FTDI
+          FTDI_SIWU : out STD_LOGIC;        --COMMIT A PACKET IMMEDIATLY
+    
+          
+			-- Register interface          
+					REG_TRIG_A_SEL_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_A_SEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_A_SEL_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_A_SEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VET_A_EN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VET_A_EN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VET_A_EN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VET_A_EN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VET_B_EN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VET_B_EN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VET_B_EN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VET_B_EN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VET_C_EN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VET_C_EN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VET_C_EN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VET_C_EN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VET_D_EN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VET_D_EN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VET_D_EN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VET_D_EN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_SW_VET_A_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_SW_VET_A_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_SW_VET_A_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_SW_VET_A_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_SW_VET_B_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_SW_VET_B_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_SW_VET_B_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_SW_VET_B_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_SW_VET_C_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_SW_VET_C_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_SW_VET_C_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_SW_VET_C_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_SW_VET_D_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_SW_VET_D_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_SW_VET_D_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_SW_VET_D_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIG_GBL_SEL_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_GBL_SEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_GBL_SEL_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_GBL_SEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_EXT_DELAY_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_EXT_DELAY_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_EXT_DELAY_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_EXT_DELAY_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_SW_TRIG_FREQ_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_SW_TRIG_FREQ_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_SW_TRIG_FREQ_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_SW_TRIG_FREQ_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_A_RATE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_A_RATE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_A_RATE_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_A_RATE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_B_RATE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_B_RATE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_B_RATE_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_B_RATE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_C_RATE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_C_RATE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_C_RATE_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_C_RATE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_D_RATE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_D_RATE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_D_RATE_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_D_RATE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T0_COUNT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T0_COUNT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T0_COUNT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T0_COUNT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_A_TRG_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_A_TRG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_A_TRG_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_A_TRG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_B_TRG_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_B_TRG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_B_TRG_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_B_TRG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_C_TRG_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_C_TRG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_C_TRG_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_C_TRG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_D_TRG_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_D_TRG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_D_TRG_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_D_TRG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_RUNSTART_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_RUNSTART_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_RUNSTART_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_RUNSTART_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_RUN_TIME_LSB_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_RUN_TIME_LSB_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_RUN_TIME_LSB_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_RUN_TIME_LSB_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_RUN_TIME_MSB_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_RUN_TIME_MSB_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_RUN_TIME_MSB_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_RUN_TIME_MSB_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_DEAD_TIME_LSB_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_DEAD_TIME_LSB_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_DEAD_TIME_LSB_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_DEAD_TIME_LSB_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_DEAD_TIME_MSB_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_DEAD_TIME_MSB_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_DEAD_TIME_MSB_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_DEAD_TIME_MSB_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_A_LOST_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_A_LOST_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_A_LOST_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_A_LOST_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_B_LOST_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_B_LOST_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_B_LOST_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_B_LOST_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_C_LOST_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_C_LOST_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_C_LOST_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_C_LOST_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_D_LOST_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_D_LOST_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_D_LOST_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_D_LOST_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg1_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg1_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg1_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg1_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg1_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg1_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg1_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg2_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg2_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg2_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg2_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg2_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg2_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg2_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg3_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg3_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg3_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg3_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg3_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg3_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg3_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocCfg0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocCfg0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG0_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG3_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG4_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG5_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG6_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG7_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG8_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG9_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG10_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG11_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG12_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG13_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG14_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG15_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG16_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG17_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG18_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG19_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG20_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG21_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG22_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG23_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG24_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG25_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG26_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG27_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG28_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG29_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG30_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG31_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG32_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG33_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG34_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_REG_CFG35_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocCfg0_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocCfg0_START_REG_CFG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T0_SOFT_FREQ_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T0_SOFT_FREQ_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T0_SOFT_FREQ_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T0_SOFT_FREQ_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T0_SEL_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T0_SEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T0_SEL_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T0_SEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HOLD_TIME_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HOLD_TIME_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HOLD_TIME_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HOLD_TIME_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_IFP_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_IFP_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_IFP_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_IFP_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_LIMIT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_LIMIT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_LIMIT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_LIMIT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_IFP2_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_IFP2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_IFP2_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_IFP2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_MODE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_MODE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_MODE_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_MODE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_DBG1_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_DBG1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_DBG1_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_DBG1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_FR_DBG2_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_FR_DBG2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_FR_DBG2_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_FR_DBG2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CP_0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CP_0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CP_0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CP_0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CP_0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CP_0_READ_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CP_0_READ_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CP_0_READ_VALID_WORDS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CP_0_READ_VALID_WORDS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CP_0_CONFIG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CP_0_CONFIG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocFrame0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocFrame0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_CitirocFrame0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocFrame0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_CitirocFrame0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocFrame0_CONTROL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocFrame0_CONTROL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_CitirocFrame0_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_CitirocFrame0_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_DTWC_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_DTWC_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_DTWC_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_DTWC_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_DTWC_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VALIDATION_CFG_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VALIDATION_CFG_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VALIDATION_CFG_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VALIDATION_CFG_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_ON_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_ON_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_ON_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_ON_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_EMERGENCY_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_EMERGENCY_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_EMERGENCY_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_EMERGENCY_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_VOUT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_VOUT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_VOUT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_VOUT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_ENTCOMP_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_ENTCOMP_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_ENTCOMP_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_ENTCOMP_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_TM_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_TM_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_TM_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_TM_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_TQ_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_TQ_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_TQ_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_TQ_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_TCOEF_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_TCOEF_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_TCOEF_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_TCOEF_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_IMAX_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_IMAX_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_IMAX_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_IMAX_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_RAMP_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_RAMP_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_RAMP_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_RAMP_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_VMAX_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_VMAX_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_VMAX_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_VMAX_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MSTATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MSTATUS_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MSTATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MSTATUS_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MVOUT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MVOUT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MVOUT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MVOUT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MTEMP_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MTEMP_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MTEMP_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MTEMP_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MVTARGET_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MVTARGET_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MVTARGET_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MVTARGET_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MAVTARGET_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MAVTARGET_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MAVTARGET_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MAVTARGET_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T_SENS1_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T_SENS1_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T_SENS1_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T_SENS1_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T_SENS2_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T_SENS2_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T_SENS2_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T_SENS2_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_HV_MIOUT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_HV_MIOUT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_HV_MIOUT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_HV_MIOUT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIGGER_OUT_W_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIGGER_OUT_W_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIGGER_OUT_W_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIGGER_OUT_W_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_2_READ_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+	BUS_RateMeter_2_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_2_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_2_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_2_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_2_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_3_READ_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+	BUS_RateMeter_3_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_3_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_3_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_3_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_3_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_0_READ_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+	BUS_RateMeter_0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_1_READ_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+	BUS_RateMeter_1_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_1_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_RateMeter_1_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_1_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_RateMeter_1_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T0SW_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T0SW_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T0SW_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T0SW_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_GTS_RESSEL_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_GTS_RESSEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_GTS_RESSEL_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_GTS_RESSEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIG_MASK_A_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_MASK_A_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_MASK_A_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_MASK_A_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIG_MASK_B_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_MASK_B_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_MASK_B_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_MASK_B_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIG_MASK_C_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_MASK_C_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_MASK_C_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_MASK_C_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRIG_MASK_D_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRIG_MASK_D_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRIG_MASK_D_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRIG_MASK_D_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_0_READ_ADDRESS : OUT STD_LOGIC_VECTOR(10 downto 0); 
+	BUS_Oscilloscope_0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_READ_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_READ_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_READ_POSITION_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_READ_POSITION_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_0_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_0_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_1_READ_ADDRESS : OUT STD_LOGIC_VECTOR(10 downto 0); 
+	BUS_Oscilloscope_1_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_1_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_1_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_1_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_1_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_READ_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_READ_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_READ_POSITION_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_READ_POSITION_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_1_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_1_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_2_READ_ADDRESS : OUT STD_LOGIC_VECTOR(10 downto 0); 
+	BUS_Oscilloscope_2_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_2_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_2_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_2_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_2_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_READ_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_READ_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_READ_POSITION_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_READ_POSITION_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_2_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_2_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_3_READ_ADDRESS : OUT STD_LOGIC_VECTOR(10 downto 0); 
+	BUS_Oscilloscope_3_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_3_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	BUS_Oscilloscope_3_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_3_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+	BUS_Oscilloscope_3_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_READ_STATUS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_READ_STATUS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_READ_POSITION_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_READ_POSITION_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_CONFIG_PRETRIGGER_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_CONFIG_ARM_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_Oscilloscope_3_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_Oscilloscope_3_CONFIG_DECIMATOR_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_T0_RESET_ON_START_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_T0_RESET_ON_START_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_T0_RESET_ON_START_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_T0_RESET_ON_START_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_ISRUNNING_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_ISRUNNING_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_ISRUNNING_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_ISRUNNING_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_VETO_WAIT_RUN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_VETO_WAIT_RUN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_VETO_WAIT_RUN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_VETO_WAIT_RUN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_GBL_EN_VETO_EXT_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_GBL_EN_VETO_EXT_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_GBL_EN_VETO_EXT_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_GBL_EN_VETO_EXT_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_INVETO_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_INVETO_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_INVETO_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_INVETO_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_TRG_OUT_MONOSTABLE_EN_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_TRG_OUT_MONOSTABLE_EN_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+		INT_TRG_OUT_MONOSTABLE_EN_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		INT_TRG_OUT_MONOSTABLE_EN_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+		REG_UNIQUE_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+		REG_UNIQUE_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+	
+
+			REG_Fiforeset_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+			REG_Fiforeset_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+			INT_Fiforeset_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			INT_Fiforeset_WR : OUT STD_LOGIC_VECTOR(0 downto 0); 
+
+
+			--FLASH CONTROLLER   
+			BUS_Flash_0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0);
+			BUS_Flash_0_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+			BUS_Flash_0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+			BUS_Flash_0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			BUS_Flash_0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			BUS_Flash_0_VLD : IN STD_LOGIC_VECTOR(0 downto 0); 
+
+			REG_FLASH_CNTR_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+			REG_FLASH_CNTR_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+			INT_FLASH_CNTR_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			INT_FLASH_CNTR_WR : OUT STD_LOGIC_VECTOR(0 downto 0);               
+
+			REG_FLASH_ADDRESS_RD : IN STD_LOGIC_VECTOR(31 downto 0); 
+			REG_FLASH_ADDRESS_WR : OUT STD_LOGIC_VECTOR(31 downto 0); 
+			INT_FLASH_ADDRESS_RD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			INT_FLASH_ADDRESS_WR : OUT STD_LOGIC_VECTOR(0 downto 0);     
+
+
+			--test
+			BUS_Test_0_READ_DATA : IN STD_LOGIC_VECTOR(31 downto 0);
+			BUS_Test_0_ADDRESS : OUT STD_LOGIC_VECTOR(15 downto 0); 
+			BUS_Test_0_WRITE_DATA : OUT STD_LOGIC_VECTOR(31 downto 0); 
+			BUS_Test_0_W_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			BUS_Test_0_R_INT : OUT STD_LOGIC_VECTOR(0 downto 0); 
+			BUS_Test_0_VLD : IN STD_LOGIC_VECTOR(0 downto 0);   			
+
+
+			REG_FIRMWARE_BUILD : IN STD_LOGIC_VECTOR(31 downto 0);
+			
+			PGB_EEPROM_KEY                             : IN    STD_LOGIC_VECTOR (31 DOWNTO 0);
+			PGB_REG_MODEL                              : IN    STD_LOGIC_VECTOR (31 DOWNTO 0);
+			PGB_BOARD_SN                               : IN    STD_LOGIC_VECTOR (31 DOWNTO 0);
+			PGB_ASIC_COUNT                             : IN    STD_LOGIC_VECTOR (31 DOWNTO 0);
+			INT_EEPROM_WR 	    					   : out std_logic_vector (0 downto 0);		
+			REG_EEPROM_WR               			   : out std_logic_vector (31 downto 0);
+			REG_IIC_STATUS							   : in std_logic_vector (31 downto 0);	
+			--LATO FPGA
+			f_CLK : IN STD_LOGIC;
+			f_RESET : IN STD_LOGIC
+                        
+                  
+    );
+    
+    end component;
+    
+    
+    component adcs_top is
+       Generic (test_mode :  STD_LOGIC := '0');
+       Port (  
+             Reset : in std_logic;
+             sCLK_100 : in std_logic;
+             
+             SMADC_1_RESET : out STD_LOGIC;
+             
+             ADC_1_CLK_A_P : in STD_LOGIC;
+             ADC_1_CLK_A_N : in STD_LOGIC;
+             
+             ADC_1_FRAME_A_P : in STD_LOGIC;
+             ADC_1_FRAME_A_N : in STD_LOGIC;
+             
+             ADC_1_DATA_A_P: in STD_LOGIC_VECTOR(7 downto 0);
+             ADC_1_DATA_A_N: in STD_LOGIC_VECTOR(7 downto 0);
+             
+             ADC_1_DATA_B_P: in STD_LOGIC_VECTOR(7 downto 0);
+             ADC_1_DATA_B_N: in STD_LOGIC_VECTOR(7 downto 0);
+             
+             SMADC_1_CSA : out std_logic;
+             SMADC_1_CSB : out std_logic;
+             SMADC_1_CLK : out std_logic;
+             SMADC_1_MOSI : out std_logic;
+             
+             READOUT_CLK : in STD_LOGIC;
+             ADC_CLK_OUT : out STD_LOGIC;
+             
+             CH0 : out std_logic_vector (15 downto 0);
+             CH1 : out std_logic_vector (15 downto 0);
+             CH2 : out std_logic_vector (15 downto 0);
+             CH3 : out std_logic_vector (15 downto 0);                                            
+             CH4 : out std_logic_vector (15 downto 0);
+             CH5 : out std_logic_vector (15 downto 0);
+             CH6 : out std_logic_vector (15 downto 0);
+             CH7 : out std_logic_vector (15 downto 0);
+             
+             CHv0_7 : out STD_LOGIC;
+            
+             inversion : in std_logic_vector(7 downto 0);
+             
+             ADC_STATUS : out STD_LOGIC_VECTOR(11 downto 0);
+             ADC_READY : out STD_LOGIC
+                     
+             );
+    end component;    
+    
+	
+    
+    component init_clock_gen is
+        Generic (ComponentBaseAddress : std_logic_vector(15 downto 0));
+		PORT (
+			clk            : IN  STD_LOGIC;
+			   CK_SPI_LE : out  STD_LOGIC;
+               CK_SPI_CLK : out  STD_LOGIC;
+               CK_SPI_MOSI : out  STD_LOGIC;
+               CK_PD : out  STD_LOGIC;
+               CK_LOCK : in  STD_LOGIC;
+               CK_CONFIG_DONE : OUT  STD_LOGIC:='0';
+               reset : in  STD_LOGIC;
+               reset_out : out  STD_LOGIC;
+               REG_addr : in STD_LOGIC_VECTOR (15 downto 0);
+               REG_din : in STD_LOGIC_VECTOR (31 downto 0);
+               REG_wrint : in STD_LOGIC
+               );
+    end component;
+    
+
+    
+    component FlashController is
+        Port (
+                clk : in STD_LOGIC;
+                BUS_Flash_0_READ_DATA : OUT STD_LOGIC_VECTOR(31 downto 0);
+                BUS_Flash_0_ADDRESS : IN STD_LOGIC_VECTOR(15 downto 0); 
+                BUS_Flash_0_WRITE_DATA : IN STD_LOGIC_VECTOR(31 downto 0); 
+                BUS_Flash_0_W_INT : IN STD_LOGIC_VECTOR(0 downto 0); 
+                BUS_Flash_0_R_INT : IN STD_LOGIC_VECTOR(0 downto 0); 
+                BUS_Flash_0_VLD : OUT STD_LOGIC_VECTOR(0 downto 0); 
+                
+                REG_FLASH_CNTR_RD : OUT STD_LOGIC_VECTOR(31 downto 0); 
+                REG_FLASH_CNTR_WR : IN STD_LOGIC_VECTOR(31 downto 0); 
+                INT_FLASH_CNTR_RD : IN STD_LOGIC_VECTOR(0 downto 0); 
+                INT_FLASH_CNTR_WR : IN STD_LOGIC_VECTOR(0 downto 0);  
+                    
+                REG_FLASH_ADDRESS_RD : OUT STD_LOGIC_VECTOR(31 downto 0); 
+                REG_FLASH_ADDRESS_WR : IN STD_LOGIC_VECTOR(31 downto 0); 
+                INT_FLASH_ADDRESS_RD : IN STD_LOGIC_VECTOR(0 downto 0); 
+                INT_FLASH_ADDRESS_WR : IN STD_LOGIC_VECTOR(0 downto 0);                 
+                
+                
+                SPI_CS : out  STD_LOGIC;
+                SPI_DIN : in  STD_LOGIC;
+                SPI_DOUT : out  STD_LOGIC;
+                SPI_CLK : out  STD_LOGIC 
+        );
+    end component;    
+	
+	component TestBram IS
+         PORT (
+           clka : IN STD_LOGIC;
+           wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+           addra : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
+           dina : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+           douta : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+         );
+       END component;
+       	
+        
+    component DTClockGenerator
+    port
+    (  
+     signal clk_out1 : out std_logic;
+     signal clk_out2 : out std_logic;
+     signal clk_out3 : out std_logic;
+     signal clk_out4 : out std_logic;
+	 signal clk_out5 : out std_logic;
+     signal locked : out std_logic;
+     signal clk_in1  :  in std_logic
+    );
+    end component;
+
+	COMPONENT TDC_05NS_PLL
+		PORT (
+			clk_out1 : OUT STD_LOGIC;
+			clk_out2 : OUT STD_LOGIC;
+			clk_out3 : OUT STD_LOGIC;
+			clk_out4 : OUT STD_LOGIC;
+			clk_out5 : OUT STD_LOGIC;
+			clk_out6 : OUT STD_LOGIC;
+			locked   : OUT STD_LOGIC;
+			clk_in1  : IN  STD_LOGIC
+		);
+	END COMPONENT;
+	component fast_clock is
+	port (
+		clk_100 : out  STD_LOGIC;
+		clk_200 : out  STD_LOGIC;
+		clk_250 : out  STD_LOGIC;
+		clk_250_90 : out  STD_LOGIC;
+		clk_500 : out  STD_LOGIC;
+		clk_500_90 : out  STD_LOGIC;
+					
+		reset : in  STD_LOGIC;
+		locked : out  STD_LOGIC;
+		clk_in1 : in  STD_LOGIC
+	);
+	end component;
+
+	SIGNAL TDC_SYNC_CLK 	 	  : std_logic_vector (5 downto 0);
+	
+	signal license_ok : std_logic;
+    signal BUS_CLK     	 : STD_LOGIC_VECTOR(0 downto 0);								--CLOCK BUS
+    signal CK_CONFIG_DONE :  STD_LOGIC:='0';
+   
+    signal sys_reset : std_LOGIC;
+	
+	signal D_LVDS_DCLK : STD_LOGIC;
+    signal iD_LVDS_DCLK : STD_LOGIC;
+     
+    signal fifo_reset : std_logic_VECTOR(0 DOWNTO 0) := "0";
+    signal cFiforeset : std_logic :='0';    
+	signal REG_Fiforeset : std_logic_vector (31 downto 0) := (others => '0');
+	
+    signal CLK_80 : std_logic_vector(0 downto 0); 
+    signal CLK_40 :  std_logic_vector(0 downto 0); 
+    signal CLK_160 :  std_logic_vector(0 downto 0);   
+    signal CLK_320 : std_logic_vector(0 downto 0); 
+	signal CLK_125 : std_logic_vector(0 downto 0);
+	signal FAST_CLK_100 : std_logic_vector (0 downto 0) := "0";
+	signal FAST_CLK_200 : std_logic_vector (0 downto 0) := "0";
+	signal FAST_CLK_250 : std_logic_vector (0 downto 0) := "0";
+	signal FAST_CLK_250_90 : std_logic_vector (0 downto 0) := "0";
+	signal FAST_CLK_500 : std_logic_vector (0 downto 0) := "0";
+	signal FAST_CLK_500_90 : std_logic_vector (0 downto 0) := "0";
+    
+    signal async_clk : std_logic_vector (0 downto 0) := "0";
+	signal GlobalClock : std_logic_vector (0 downto 0) := "0";
+	
+    signal GlobalReset : std_logic_vector (0 downto 0) := "0";
+    signal GlobalDCMLock : std_logic; 
+    signal CLK_ACQ : std_logic_vector (0 downto 0) := "0";
+	
+	signal itimecode_clock : std_logic;
+	signal timecode_clock : std_logic;
+    
+    signal a_val_evt : std_logic := '0';
+    signal a_val_evti : std_logic := '0';
+    signal b_val_evt : std_logic := '0';
+    signal c_val_evt : std_logic := '0'; 
+    signal c_val_evti : std_logic := '0';
+    signal d_val_evt : std_logic := '0';
+        
+    signal a_raz_chn : std_logic := '0';
+    signal b_raz_chn : std_logic := '0';
+    signal b_raz_chn_i : std_logic := '0';
+    signal c_raz_chn : std_logic := '0';
+    signal d_raz_chn : std_logic := '1';
+    signal raz_chn_f : std_logic := '1';
+    signal d_raz_chn_i : std_logic := '0';
+    
+    signal A_LVDS_DOUT : STD_LOGIC;
+    signal B_LVDS_DOUT : STD_LOGIC;
+    signal D_LVDS_DOUT : STD_LOGIC;
+    signal D_LVDS_DOUTn : STD_LOGIC;        
+    signal C_LVDS_DOUT : STD_LOGIC;
+    signal C_LVDS_DOUTn : STD_LOGIC;
+           
+
+
+	signal A_STARTB_ADC_EXT_s : std_logic_vector (0 downto 0) := "0"; 
+	signal B_STARTB_ADC_EXT_s : std_logic_vector (0 downto 0) := "0"; 
+	signal C_STARTB_ADC_EXT_s : std_logic_vector (0 downto 0) := "0"; 
+	signal D_STARTB_ADC_EXT_s : std_logic_vector (0 downto 0) := "0"; 	
+
+	signal A_VAL_EVT_s : std_logic_vector (0 downto 0) := "1"; 
+	signal B_VAL_EVT_s : std_logic_vector (0 downto 0) := "1"; 
+	signal C_VAL_EVT_s : std_logic_vector (0 downto 0) := "1"; 
+	signal D_VAL_EVT_s : std_logic_vector (0 downto 0) := "1"; 	
+
+	signal A_RAZ_CHN_s : std_logic_vector (0 downto 0) := "1"; 
+	signal B_RAZ_CHN_s : std_logic_vector (0 downto 0) := "1"; 
+	signal C_RAZ_CHN_s : std_logic_vector (0 downto 0) := "1"; 
+	signal D_RAZ_CHN_s : std_logic_vector (0 downto 0) := "1"; 	
+		
+
+    signal CITIROC_A_SRIN_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_B_SRIN_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_C_SRIN_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_D_SRIN_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+	signal CITIROC_A_SCLK_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_B_SCLK_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_C_SCLK_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_D_SCLK_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+	signal CITIROC_A_CHARGE_HIT_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_B_CHARGE_HIT_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_C_CHARGE_HIT_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_D_CHARGE_HIT_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+	signal CITIROC_A_RESET_READ_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_B_RESET_READ_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_C_RESET_READ_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal CITIROC_D_RESET_READ_s:  STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+	
+
+    signal CITIROC_A_ADC_ENERGY_LG : std_logic_vector(15 downto 0);
+    signal CITIROC_B_ADC_ENERGY_LG : std_logic_vector(15 downto 0);
+    signal CITIROC_C_ADC_ENERGY_LG : std_logic_vector(15 downto 0);
+    signal CITIROC_D_ADC_ENERGY_LG : std_logic_vector(15 downto 0);
+
+    signal CITIROC_A_ADC_ENERGY_HG : std_logic_vector(15 downto 0);
+    signal CITIROC_B_ADC_ENERGY_HG : std_logic_vector(15 downto 0);
+    signal CITIROC_C_ADC_ENERGY_HG : std_logic_vector(15 downto 0);
+    signal CITIROC_D_ADC_ENERGY_HG : std_logic_vector(15 downto 0);
+    
+	signal TRIGGER_EXT_A_s : STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal TRIGGER_EXT_B_s : STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal TRIGGER_EXT_C_s : STD_LOGIC_VECTOR(0 downto 0) := "0";
+	signal TRIGGER_EXT_D_s : STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+	
+    signal A_RESETB_SR_s :  STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal A_SR_CK_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal A_SR_IN_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal A_SRLOAD_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal A_SELECT_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";           
+
+    --CITIROC B slow control
+    signal B_RESETB_SR_s :  STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal B_SR_CK_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal B_SR_IN_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal B_SRLOAD_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal B_SELECT_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";   
+
+    --CITIROC C slow control
+    signal C_RESETB_SR_s :  STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal C_SR_CK_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal C_SR_IN_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal C_SRLOAD_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal C_SELECT_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+
+    --CITIROC D slow control
+    signal D_RESETB_SR_s :  STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal D_SR_CK_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal D_SR_IN_s :      STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal D_SRLOAD_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+    signal D_SELECT_s :     STD_LOGIC_VECTOR(0 downto 0) := "0";
+	
+    signal A_HOLD_LG_s : std_logic_vector(0 downto 0) := "0";
+    signal A_HOLD_HG_s : std_logic_vector(0 downto 0) := "0";         
+    signal B_HOLD_LG_s : std_logic_vector(0 downto 0) := "0";
+    signal B_HOLD_HG_s : std_logic_vector(0 downto 0) := "0";         
+    signal C_HOLD_LG_s : std_logic_vector(0 downto 0) := "0";
+    signal C_HOLD_HG_s : std_logic_vector(0 downto 0) := "0";         
+    signal D_HOLD_LG_s : std_logic_vector(0 downto 0) := "0";
+    signal D_HOLD_HG_s : std_logic_vector(0 downto 0) := "0";         
+	
+	
+	signal A_TRIG0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG1 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG2 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG3 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG4 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG5 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG6 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG7 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG8 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG9 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG10 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG11 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG12 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG13 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG14 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG15 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG16 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG17 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG18 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG19 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG20 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG21 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG22 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG23 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG24 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG25 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG26 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG27 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG28 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG29 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG30 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIG31 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal A_TRIGs : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+	signal B_TRIG0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG1 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG2 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG3 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG4 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG5 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG6 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG7 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG8 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG9 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG10 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG11 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG12 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG13 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG14 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG15 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG16 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG17 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG18 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG19 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG20 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG21 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG22 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG23 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG24 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG25 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG26 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG27 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG28 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG29 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG30 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIG31 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_TRIGs : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";	
+	signal C_TRIG0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG1 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG2 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG3 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG4 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG5 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG6 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG7 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG8 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG9 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG10 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG11 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG12 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG13 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG14 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG15 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG16 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG17 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG18 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG19 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG20 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG21 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG22 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG23 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG24 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG25 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG26 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG27 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG28 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG29 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG30 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIG31 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_TRIGs : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";	
+	signal D_TRIG0 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG1 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG2 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG3 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG4 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG5 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG6 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG7 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG8 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG9 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG10 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG11 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG12 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG13 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG14 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG15 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG16 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG17 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG18 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG19 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG20 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG21 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG22 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG23 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG24 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG25 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG26 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG27 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG28 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG29 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG30 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIG31 : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_TRIGs : STD_LOGIC_VECTOR (31 downto 0) := x"00000000";
+	
+	signal A_OR_CHARGE : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_OR_CHARGE : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_OR_CHARGE : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_OR_CHARGE : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	
+	signal A_OR_TIME : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_OR_TIME : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_OR_TIME : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_OR_TIME : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	
+	signal A_NOR_C : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_NOR_C : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_NOR_C : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_NOR_C : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	
+	signal A_NOR_T : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal B_NOR_T : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal C_NOR_T : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	signal D_NOR_T : STD_LOGIC_VECTOR (0 downto 0) := "0";
+	
+		
+	signal LEMO_0_1_A_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_0_1_A_IN : std_logic_vector(0 downto 0);
+    signal LEMO_0_1_B_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_0_1_B_IN : std_logic_vector(0 downto 0);
+	signal LEMO_2_3_A_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_2_3_A_IN : std_logic_vector(0 downto 0);
+    signal LEMO_2_3_B_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_2_3_B_IN : std_logic_vector(0 downto 0);
+	signal LEMO_4_5_A_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_4_5_A_IN : std_logic_vector(0 downto 0);
+    signal LEMO_4_5_B_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_4_5_B_IN : std_logic_vector(0 downto 0);
+	signal LEMO_6_7_A_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_6_7_A_IN : std_logic_vector(0 downto 0);
+    signal LEMO_6_7_B_OUT : std_logic_vector(0 downto 0);
+    signal LEMO_6_7_B_IN : std_logic_vector(0 downto 0);
+
+    signal LEMO_0_1_DIRECTION : std_logic_vector(0 downto 0) := "0";
+    signal LEMO_2_3_DIRECTION : std_logic_vector(0 downto 0) := "0";
+    signal LEMO_4_5_DIRECTION : std_logic_vector(0 downto 0) := "0";
+    signal LEMO_6_7_DIRECTION : std_logic_vector(0 downto 0) := "0";	
+     	          
+    signal ADC_A0 : std_logic_vector(15 downto 0);
+    signal ADC_A1 : std_logic_vector(15 downto 0);
+    signal ADC_A2 : std_logic_vector(15 downto 0);
+    signal ADC_A3 : std_logic_vector(15 downto 0);
+    signal ADC_A4 : std_logic_vector(15 downto 0);
+    signal ADC_A5 : std_logic_vector(15 downto 0);
+    signal ADC_A6 : std_logic_vector(15 downto 0);
+    signal ADC_A7 : std_logic_vector(15 downto 0);
+
+    signal ANALOG_INPUT_INVERSION : std_logic_vector(7 downto 0) := x"00";
+    
+    signal ADCreset :  std_logic := '0';
+    signal EXT_READY : std_logic;
+    
+    attribute keep of ADC_A0: signal is "true";
+    attribute keep of ADC_A1: signal is "true";
+    attribute keep of ADC_A2: signal is "true";
+    attribute keep of ADC_A3: signal is "true";
+    attribute keep of ADC_A4: signal is "true";
+    attribute keep of ADC_A5: signal is "true";
+    attribute keep of ADC_A6: signal is "true";
+    attribute keep of ADC_A7: signal is "true";
+    
+    
+    signal BUS_Flash_0_READ_DATA :  STD_LOGIC_VECTOR(31 downto 0);
+    signal BUS_Flash_0_ADDRESS :  STD_LOGIC_VECTOR(15 downto 0); 
+    signal BUS_Flash_0_WRITE_DATA :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal BUS_Flash_0_W_INT :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal BUS_Flash_0_R_INT :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal BUS_Flash_0_VLD :  STD_LOGIC_VECTOR(0 downto 0);   
+    
+    signal REG_FLASH_CNTR_RD :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal REG_FLASH_CNTR_WR :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal INT_FLASH_CNTR_RD :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal INT_FLASH_CNTR_WR :  STD_LOGIC_VECTOR(0 downto 0); 
+    
+    signal REG_FLASH_ADDRESS_RD :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal REG_FLASH_ADDRESS_WR :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal INT_FLASH_ADDRESS_RD :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal INT_FLASH_ADDRESS_WR :  STD_LOGIC_VECTOR(0 downto 0);         
+    
+	signal BUS_Test_0_READ_DATA :  STD_LOGIC_VECTOR(31 downto 0);
+    signal BUS_Test_0_ADDRESS :  STD_LOGIC_VECTOR(15 downto 0); 
+    signal BUS_Test_0_WRITE_DATA :  STD_LOGIC_VECTOR(31 downto 0); 
+    signal BUS_Test_0_W_INT :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal BUS_Test_0_R_INT :  STD_LOGIC_VECTOR(0 downto 0); 
+    signal BUS_Test_0_VLD :  STD_LOGIC_VECTOR(0 downto 0) := "1";  
+	
+    signal FLASH_SPI_CLK : std_logic;
+               
+    signal clock_prog_mux_out : std_logic;
+    signal done_sig : std_logic;
+    signal cfg_clk : std_logic;
+    
+  
+    signal RESET_DCM2 : std_logic;
+    signal LOCKED_DCM2 : std_logic;
+	
+	
+	SIGNAL TRIGGER_MASK_A : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"00000000";
+	SIGNAL TRIGGER_MASK_B : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"00000000";	
+	SIGNAL TRIGGER_MASK_C : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"00000000";	
+	SIGNAL TRIGGER_MASK_D : STD_LOGIC_VECTOR(31 DOWNTO 0) := X"00000000";
+	
+	SIGNAL PGB_EEPROM_KEY         : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	SIGNAL PGB_REG_MODEL          : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	SIGNAL PGB_BOARD_SN           : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	SIGNAL PGB_ASIC_COUNT         : STD_LOGIC_VECTOR (31 DOWNTO 0);
+	
+	SIGNAL INT_EEPROM_WR 	    					  : std_logic_vector (0 downto 0);		
+	SIGNAL REG_EEPROM_WR               			      : std_logic_vector (31 downto 0);
+	SIGNAL REG_IIC_STATUS							  : std_logic_vector (31 downto 0);		
+	
+	COMPONENT CitirocSlowControl
+  GENERIC( 
+	CfgDefault : STD_LOGIC_VECTOR(1143 downto 0) := "1110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110110111111111111111111111111111111111111111111011111100111111101111001111011100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000111111110100101100010010110011111111111111011";
+	CfgMonitorDefault : STD_LOGIC_VECTOR(255 downto 0) := "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+	DoStartupSetup : STD_LOGIC_VECTOR(0 downto 0) := "1" );
+PORT( 
+	ASIC_CONFIGURATION : in STD_LOGIC_VECTOR(1143 downto 0);
+	ASIC_MONITOR_CONFIGURATION : in STD_LOGIC_VECTOR(255 downto 0);
+	LOAD_CFG : in STD_LOGIC_VECTOR(0 downto 0);
+	LOAD_MONITOR : in STD_LOGIC_VECTOR(0 downto 0);
+	START_CFG : in STD_LOGIC_VECTOR(0 downto 0);
+	START_MONITOR : in STD_LOGIC_VECTOR(0 downto 0);
+	BUSY : out STD_LOGIC_VECTOR(0 downto 0);
+	Citiroc_CLK : out STD_LOGIC;
+	Citiroc_MOSI : out STD_LOGIC;
+	Citiroc_SLOAD : out STD_LOGIC;
+	Citiroc_RESETB : out STD_LOGIC;
+	Citiroc_SELECT : out STD_LOGIC;
+	reset : in STD_LOGIC;
+	clk : in STD_LOGIC;
+	REG_CFG0 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG1 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG2 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG3 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG4 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG5 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG6 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG7 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG8 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG9 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG10 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG11 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG12 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG13 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG14 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG15 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG16 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG17 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG18 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG19 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG20 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG21 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG22 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG23 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG24 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG25 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG26 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG27 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG28 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG29 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG30 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG31 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG32 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG33 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG34 : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_CFG35 : in STD_LOGIC_VECTOR(31 downto 0);
+	START_REG_CFG : in STD_LOGIC_VECTOR(31 downto 0) );
+END COMPONENT;
+signal variable_A_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal variable_A_FRAME_DV : std_logic_vector (0 downto 0); 
+signal variable_B_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal variable_B_FRAME_DV : std_logic_vector (0 downto 0); 
+signal variable_C_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal variable_C_FRAME_DV : std_logic_vector (0 downto 0); 
+signal variable_D_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal variable_D_FRAME_DV : std_logic_vector (0 downto 0); 
+signal variable_A_TRIG_T : std_logic_vector (0 downto 0); 
+signal variable_A_TRIG_C : std_logic_vector (0 downto 0); 
+signal variable_B_TRIG_T : std_logic_vector (0 downto 0); 
+signal variable_B_TRIG_C : std_logic_vector (0 downto 0); 
+signal variable_C_TRIG_T : std_logic_vector (0 downto 0); 
+signal variable_C_TRIG_C : std_logic_vector (0 downto 0); 
+signal variable_D_TRIG_T : std_logic_vector (0 downto 0); 
+signal variable_D_TRIG_C : std_logic_vector (0 downto 0); 
+signal U18_EXT_TRIG : std_logic_vector (0 downto 0); 
+signal U19_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U20_A_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal U21_B_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal U22_C_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal U23_D_FRAME_DATA : std_logic_vector (1023 downto 0); 
+signal U24_A_FRAME_DV : std_logic_vector (0 downto 0); 
+signal U25_B_FRAME_DV : std_logic_vector (0 downto 0); 
+signal U26_C_FRAME_DV : std_logic_vector (0 downto 0); 
+signal U27_D_FRAME_DV : std_logic_vector (0 downto 0); 
+signal U28_G_TS0 : std_logic_vector (31 downto 0); 
+signal U29_G_TS : std_logic_vector (63 downto 0); 
+signal U30_G_TS0 : std_logic_vector (31 downto 0); 
+signal U31_G_TS : std_logic_vector (63 downto 0); 
+signal U32_G_TS0 : std_logic_vector (31 downto 0); 
+signal U33_G_TS : std_logic_vector (63 downto 0); 
+signal U34_G_TS0 : std_logic_vector (31 downto 0); 
+signal U35_G_TS : std_logic_vector (63 downto 0); 
+signal variable_A_TS : std_logic_vector (63 downto 0); 
+signal variable_A_TS0 : std_logic_vector (31 downto 0); 
+signal variable_B_TS : std_logic_vector (63 downto 0); 
+signal variable_B_TS0 : std_logic_vector (31 downto 0); 
+signal variable_C_TS : std_logic_vector (63 downto 0); 
+signal variable_C_TS0 : std_logic_vector (31 downto 0); 
+signal variable_D_TS : std_logic_vector (63 downto 0); 
+signal variable_D_TS0 : std_logic_vector (31 downto 0); 
+signal U44_A_TS : std_logic_vector (63 downto 0); 
+signal U45_A_TS0 : std_logic_vector (31 downto 0); 
+signal U46_B_TS : std_logic_vector (63 downto 0); 
+signal U47_B_TS0 : std_logic_vector (31 downto 0); 
+signal U48_C_TS : std_logic_vector (63 downto 0); 
+signal U49_C_TS0 : std_logic_vector (31 downto 0); 
+signal U50_D_TS : std_logic_vector (63 downto 0); 
+signal U51_D_TS0 : std_logic_vector (31 downto 0); 
+signal U52_SELF_TRIG : std_logic_vector (0 downto 0); 
+signal U53_out_0 : std_logic_vector(2 downto 0);
+signal U54_EXT_VETO : std_logic_vector (0 downto 0); 
+signal U55_EXT_TRIG : std_logic_vector (0 downto 0); 
+signal U56_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U57_SELF_TRIG : std_logic_vector (0 downto 0); 
+signal U58_EXT_VETO : std_logic_vector (0 downto 0); 
+signal U59_EXT_TRIG : std_logic_vector (0 downto 0); 
+signal U60_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U61_SELF_TRIG : std_logic_vector (0 downto 0); 
+signal U62_EXT_VETO : std_logic_vector (0 downto 0); 
+signal U63_EXT_TRIG : std_logic_vector (0 downto 0); 
+signal U64_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U65_SELF_TRIG : std_logic_vector (0 downto 0); 
+signal U66_EXT_VETO : std_logic_vector (0 downto 0); 
+signal U67_out_0 : std_logic_vector(2 downto 0);
+signal U68_out_0 : std_logic_vector(2 downto 0);
+signal U69_out_0 : std_logic_vector(2 downto 0);
+signal U70_out_0 : std_logic_vector(0 downto 0);
+signal U71_out_0 : std_logic_vector(0 downto 0);
+signal U72_out_0 : std_logic_vector(0 downto 0);
+signal U73_out_0 : std_logic_vector(0 downto 0);
+signal U74_out_0 : std_logic_vector(0 downto 0);
+signal U75_out_0 : std_logic_vector(0 downto 0);
+signal U76_out_0 : std_logic_vector(0 downto 0);
+signal U77_out_0 : std_logic_vector(0 downto 0);
+signal U78_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U79_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U80_out : std_logic_vector(0 downto 0);
+signal variable_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U82_out_0 : std_logic_vector(0 downto 0);
+signal U83_LEMO_4_5_A_OUT : std_logic_vector(0 downto 0) := "0";
+signal U83_LEMO_4_5_B_OUT : std_logic_vector(0 downto 0) := "0";
+signal  U84_const_bin : std_logic_vector(0 downto 0) := "1";
+
+COMPONENT SW_GATE_AND_DELAY
+Generic (	maxDelay : integer := 16);
+PORT(
+    RESET: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    CLK: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    PORT_IN: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    DELAY: IN INTEGER; 
+    GATE: IN INTEGER; 
+    PORT_OUT: OUT STD_LOGIC_VECTOR(0 DOWNTO 0)); 
+END COMPONENT;
+signal U85_out : std_logic_vector(0 downto 0) := (others => '0');
+signal U86_out_0 : integer;
+signal U87_CONST : INTEGER := 0;
+signal variable_EXT_TRIG : std_logic_vector (0 downto 0); 
+signal U90_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT d_latch
+  GENERIC( 
+	IN_SIZE : INTEGER := 1;
+	EDGE : STRING := "rising" );
+PORT( 
+	a : in STD_LOGIC_VECTOR(IN_SIZE-1 downto 0);
+	CE : in STD_LOGIC;
+	clk : in STD_LOGIC;
+	reset : in STD_LOGIC;
+	reset_val : in STD_LOGIC_VECTOR(IN_SIZE-1 downto 0);
+	b : out STD_LOGIC_VECTOR(IN_SIZE-1 downto 0) );
+END COMPONENT;
+signal U91_PULSE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT PULSE_GENERATOR
+PORT( 
+	PULSE_OUT : out STD_LOGIC_VECTOR(0 downto 0);
+	PULSE_PERIOD : in STD_LOGIC_VECTOR(31 downto 0);
+	PULSE_WIDTH : in STD_LOGIC_VECTOR(31 downto 0);
+	CE : in STD_LOGIC_VECTOR(0 downto 0);
+	CLK : in STD_LOGIC_VECTOR(0 downto 0);
+	RESET : in STD_LOGIC_VECTOR(0 downto 0) );
+END COMPONENT;
+signal U92_out_0 : std_logic_vector(31 downto 0);
+signal U93_CONST : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+signal variable_SELF_TRIG : std_logic_vector (0 downto 0); 
+signal variable_A_M_LG : std_logic_vector (15 downto 0); 
+signal variable_A_M_HG : std_logic_vector (15 downto 0); 
+signal variable_A_M_CLK : std_logic_vector (0 downto 0); 
+signal variable_A_M_SR : std_logic_vector (0 downto 0); 
+signal variable_B_M_LG : std_logic_vector (15 downto 0); 
+signal variable_B_M_HG : std_logic_vector (15 downto 0); 
+signal variable_B_M_CLK : std_logic_vector (0 downto 0); 
+signal variable_B_M_SR : std_logic_vector (0 downto 0); 
+signal variable_C_M_LG : std_logic_vector (15 downto 0); 
+signal variable_C_M_HG : std_logic_vector (15 downto 0); 
+signal variable_C_M_CLK : std_logic_vector (0 downto 0); 
+signal variable_C_M_SR : std_logic_vector (0 downto 0); 
+signal variable_D_M_LG : std_logic_vector (15 downto 0); 
+signal variable_D_M_HG : std_logic_vector (15 downto 0); 
+signal variable_D_M_CLK : std_logic_vector (0 downto 0); 
+signal variable_D_M_SR : std_logic_vector (0 downto 0); 
+signal U111_A_M_LG : std_logic_vector (15 downto 0); 
+signal U112_A_M_HG : std_logic_vector (15 downto 0); 
+signal U113_A_M_CLK : std_logic_vector (0 downto 0); 
+signal U114_A_M_SR : std_logic_vector (0 downto 0); 
+signal U115_B_M_LG : std_logic_vector (15 downto 0); 
+signal U116_B_M_HG : std_logic_vector (15 downto 0); 
+signal U117_B_M_CLK : std_logic_vector (0 downto 0); 
+signal U118_B_M_SR : std_logic_vector (0 downto 0); 
+signal U119_C_M_LG : std_logic_vector (15 downto 0); 
+signal U120_C_M_HG : std_logic_vector (15 downto 0); 
+signal U121_C_M_CLK : std_logic_vector (0 downto 0); 
+signal U122_C_M_SR : std_logic_vector (0 downto 0); 
+signal U123_D_M_LG : std_logic_vector (15 downto 0); 
+signal U124_D_M_HG : std_logic_vector (15 downto 0); 
+signal U125_D_M_CLK : std_logic_vector (0 downto 0); 
+signal U126_D_M_SR : std_logic_vector (0 downto 0); 
+signal variable_LEMO_TRG_EXT : std_logic_vector (0 downto 0); 
+signal U128_LEMO_TRG_EXT : std_logic_vector (0 downto 0); 
+signal U129_LEMO_VET_EXT : std_logic_vector (0 downto 0); 
+signal U130_LEMO_TRG_EXT : std_logic_vector (0 downto 0); 
+signal U131_LEMO_VET_EXT : std_logic_vector (0 downto 0); 
+signal U132_LEMO_TRG_EXT : std_logic_vector (0 downto 0); 
+signal U133_LEMO_VET_EXT : std_logic_vector (0 downto 0); 
+signal U134_LEMO_TRG_EXT : std_logic_vector (0 downto 0); 
+signal U135_LEMO_VET_EXT : std_logic_vector (0 downto 0); 
+signal U136_A_TRIG_T : std_logic_vector (0 downto 0); 
+signal U137_B_TRIG_T : std_logic_vector (0 downto 0); 
+signal U138_D_TRIG_T : std_logic_vector (0 downto 0); 
+signal U139_A_TRIG_C : std_logic_vector (0 downto 0); 
+signal U140_B_TRIG_C : std_logic_vector (0 downto 0); 
+signal U141_C_TRIG_C : std_logic_vector (0 downto 0); 
+signal U142_D_TRIG_C : std_logic_vector (0 downto 0); 
+signal variable_A_TRG : std_logic_vector (0 downto 0); 
+signal variable_B_TRG : std_logic_vector (0 downto 0); 
+signal variable_C_TRG : std_logic_vector (0 downto 0); 
+signal variable_D_TRG : std_logic_vector (0 downto 0); 
+signal U147_A_TRG : std_logic_vector (0 downto 0); 
+signal U148_B_TRG : std_logic_vector (0 downto 0); 
+signal U149_C_TRG : std_logic_vector (0 downto 0); 
+signal U150_D_TRG : std_logic_vector (0 downto 0); 
+signal U151_C_TRIG_T : std_logic_vector (0 downto 0); 
+Component FREQ_METER Is
+   Generic(bitSize : Integer := 1);
+   port(        RESET :  IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        CLK: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        SIGIN : IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        ENABLE : IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        FREQ: OUT STD_LOGIC_VECTOR (31 downto 0);
+        INTTIME: IN INTEGER
+        );
+End component;
+signal U152_freq : std_logic_vector(31 downto 0) := (others => '0');
+signal U153_freq : std_logic_vector(31 downto 0) := (others => '0');
+signal U154_freq : std_logic_vector(31 downto 0) := (others => '0');
+signal U155_freq : std_logic_vector(31 downto 0) := (others => '0');
+signal U156_A_TRG : std_logic_vector (0 downto 0); 
+signal U157_B_TRG : std_logic_vector (0 downto 0); 
+signal U158_C_TRG : std_logic_vector (0 downto 0); 
+signal U159_D_TRG : std_logic_vector (0 downto 0); 
+signal U160_hold : std_logic_vector(31 downto 0);
+signal U161_hold : std_logic_vector(31 downto 0);
+signal U162_hold : std_logic_vector(31 downto 0);
+signal U163_hold : std_logic_vector(31 downto 0);
+signal U164_CONST : INTEGER := 0;
+signal U165_GLOBAL_TRIG : std_logic_vector (0 downto 0); 
+signal U167_TIMESTAMP : STD_LOGIC_VECTOR (63 DOWNTO 0);
+COMPONENT TimestampGenerator
+  GENERIC( 
+	nbits : INTEGER := 64 );
+PORT( 
+	TIMESTAMP : out STD_LOGIC_VECTOR(nbits-1 downto 0);
+	T0 : in STD_LOGIC;
+	CLK_READ : in STD_LOGIC;
+	ClkCounter : in STD_LOGIC );
+END COMPONENT;
+signal variable_G_TS : std_logic_vector (63 downto 0); 
+signal variable_G_TS0 : std_logic_vector (31 downto 0); 
+signal U170_LEMO_6_7_A_OUT : std_logic_vector(0 downto 0) := "0";
+signal U170_LEMO_6_7_B_OUT : std_logic_vector(0 downto 0) := "0";
+signal  U171_const_bin : std_logic_vector(0 downto 0) := "1";
+Component COUNTER_RISING Is
+   Generic(bitSize : Integer := 1);
+   port(        RESET :  IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        CE: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        CLK: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        SIGIN : IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        ENABLE : IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        COUNTER: OUT STD_LOGIC_VECTOR (31 downto 0);
+        OVERFLOW: OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+        );
+End component;
+signal U172_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U173_hold : std_logic_vector(31 downto 0);
+signal U174_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U175_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U176_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U177_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U178_A_TRG : std_logic_vector (0 downto 0); 
+signal U179_B_TRG : std_logic_vector (0 downto 0); 
+signal U180_C_TRG : std_logic_vector (0 downto 0); 
+signal U181_D_TRG : std_logic_vector (0 downto 0); 
+signal U182_hold : std_logic_vector(31 downto 0);
+signal U183_hold : std_logic_vector(31 downto 0);
+signal U184_hold : std_logic_vector(31 downto 0);
+signal U185_hold : std_logic_vector(31 downto 0);
+signal U186_out_0 : std_logic_vector(0 downto 0);
+signal U186_int : std_logic_vector(0 downto 0);
+signal U187_RUN_START : std_logic_vector (0 downto 0); 
+signal U188_RUN_START : std_logic_vector (0 downto 0); 
+signal U189_RUN_START : std_logic_vector (0 downto 0); 
+signal U190_RUN_START : std_logic_vector (0 downto 0); 
+signal U191_RUN_START : std_logic_vector (0 downto 0); 
+signal U192_out : std_logic_vector(0 downto 0) := (others => '0');
+signal U193_CONST : INTEGER := 0;
+signal variable_RUN_START : std_logic_vector (0 downto 0); 
+signal variable_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U197_TIME_LSB : std_logic_vector(31 downto 0);
+signal U197_TIME_MSB : std_logic_vector(31 downto 0);
+
+COMPONENT SUBPAGE_Timer64
+PORT(
+	Enable : IN std_logic_vector(0 downto 0);
+	Reset : IN std_logic_vector(0 downto 0);
+	TIME_LSB : OUT std_logic_vector(31 downto 0);
+	TIME_MSB : OUT std_logic_vector(31 downto 0);
+    GlobalReset: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    CLK_ACQ: in std_logic_vector (0 downto 0); 
+    BUS_CLK: in std_logic_vector (0 downto 0); 
+    CLK_40: in std_logic_vector (0 downto 0); 
+    CLK_50: in std_logic_vector (0 downto 0); 
+    CLK_80: in std_logic_vector (0 downto 0); 
+    clk_160: in std_logic_vector (0 downto 0); 
+    clk_125: in std_logic_vector (0 downto 0); 
+    clk_320: in std_logic_vector (0 downto 0); 
+    FAST_CLK_100: in std_logic_vector (0 downto 0); 
+    FAST_CLK_200: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250_90: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500_90: in std_logic_vector (0 downto 0); 
+    GlobalClock: in std_logic_vector (0 downto 0); 
+    async_clk: IN STD_LOGIC_VECTOR(0 DOWNTO 0)); 
+END COMPONENT;
+signal  U198_const_bin : std_logic_vector(0 downto 0) := "1";
+signal U199_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U200_TIME_LSB : std_logic_vector(31 downto 0);
+signal U200_TIME_MSB : std_logic_vector(31 downto 0);
+signal U201_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U202_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U203_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U204_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U205_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U206_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U207_A_TRG : std_logic_vector (0 downto 0); 
+signal U208_B_TRG : std_logic_vector (0 downto 0); 
+signal U209_C_TRG : std_logic_vector (0 downto 0); 
+signal U210_D_TRG : std_logic_vector (0 downto 0); 
+signal U211_RUN_START : std_logic_vector (0 downto 0); 
+signal U212_RUN_START : std_logic_vector (0 downto 0); 
+signal U213_RUN_START : std_logic_vector (0 downto 0); 
+signal U214_RUN_START : std_logic_vector (0 downto 0); 
+signal U215_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U216_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U217_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U218_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U219_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U220_hold : std_logic_vector(31 downto 0);
+signal U221_hold : std_logic_vector(31 downto 0);
+signal U222_hold : std_logic_vector(31 downto 0);
+signal U223_hold : std_logic_vector(31 downto 0);
+signal U224_hold : std_logic_vector(31 downto 0);
+signal U225_hold : std_logic_vector(31 downto 0);
+signal U226_hold : std_logic_vector(31 downto 0);
+signal U227_hold : std_logic_vector(31 downto 0);
+signal U228_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal variable_A_ABUSY : std_logic_vector (0 downto 0); 
+signal variable_B_ABUSY : std_logic_vector (0 downto 0); 
+signal variable_C_ABUSY : std_logic_vector (0 downto 0); 
+signal variable_D_ABUSY : std_logic_vector (0 downto 0); 
+signal U233_A_ABUSY : std_logic_vector (0 downto 0); 
+signal U234_B_ABUSY : std_logic_vector (0 downto 0); 
+signal U235_C_ABUSY : std_logic_vector (0 downto 0); 
+signal U236_D_ABUSY : std_logic_vector (0 downto 0); 
+signal variable_A_DEAD : std_logic_vector (0 downto 0); 
+signal variable_B_DEAD : std_logic_vector (0 downto 0); 
+signal variable_C_DEAD : std_logic_vector (0 downto 0); 
+signal variable_D_DEAD : std_logic_vector (0 downto 0); 
+signal U241_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U242_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U243_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U244_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U245_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U246_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U247_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U254_A_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal U255_B_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal U256_C_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal U257_D_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal variable_A_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal variable_B_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal variable_C_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal variable_D_FRAME_ACK : std_logic_vector (0 downto 0); 
+signal U262_PULSE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U263_CONST : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+signal U264_out_0 : std_logic_vector(31 downto 0);
+signal variable_A_HIT : std_logic_vector (0 downto 0); 
+signal variable_B_HIT : std_logic_vector (0 downto 0); 
+signal variable_C_HIT : std_logic_vector (0 downto 0); 
+signal variable_D_HIT : std_logic_vector (0 downto 0); 
+signal U269_A_HIT : std_logic_vector (0 downto 0); 
+signal U270_B_HIT : std_logic_vector (0 downto 0); 
+signal U271_C_HIT : std_logic_vector (0 downto 0); 
+signal U272_D_HIT : std_logic_vector (0 downto 0); 
+signal U273_out_0 : std_logic_vector(15 downto 0);
+signal U274_out_0 : std_logic_vector(15 downto 0);
+signal U275_out_0 : std_logic_vector(15 downto 0);
+signal U276_out_0 : std_logic_vector(15 downto 0);
+signal U277_C_0 : std_logic_vector(31 downto 0);
+signal U277_C_1 : std_logic_vector(31 downto 0);
+signal U277_C_2 : std_logic_vector(31 downto 0);
+signal U277_C_3 : std_logic_vector(31 downto 0);
+signal U277_C_4 : std_logic_vector(31 downto 0);
+signal U277_C_5 : std_logic_vector(31 downto 0);
+signal U277_C_6 : std_logic_vector(31 downto 0);
+signal U277_C_7 : std_logic_vector(31 downto 0);
+signal U277_C_8 : std_logic_vector(31 downto 0);
+signal U277_C_9 : std_logic_vector(31 downto 0);
+signal U277_C_10 : std_logic_vector(31 downto 0);
+signal U277_C_11 : std_logic_vector(31 downto 0);
+signal U277_C_12 : std_logic_vector(31 downto 0);
+signal U277_C_13 : std_logic_vector(31 downto 0);
+signal U277_C_14 : std_logic_vector(31 downto 0);
+signal U277_C_15 : std_logic_vector(31 downto 0);
+signal U277_C_16 : std_logic_vector(31 downto 0);
+signal U277_C_17 : std_logic_vector(31 downto 0);
+signal U277_C_18 : std_logic_vector(31 downto 0);
+signal U277_C_19 : std_logic_vector(31 downto 0);
+signal U277_C_20 : std_logic_vector(31 downto 0);
+signal U277_C_21 : std_logic_vector(31 downto 0);
+signal U277_C_22 : std_logic_vector(31 downto 0);
+signal U277_C_23 : std_logic_vector(31 downto 0);
+signal U277_C_24 : std_logic_vector(31 downto 0);
+signal U277_C_25 : std_logic_vector(31 downto 0);
+signal U277_C_26 : std_logic_vector(31 downto 0);
+signal U277_C_27 : std_logic_vector(31 downto 0);
+signal U277_C_28 : std_logic_vector(31 downto 0);
+signal U277_C_29 : std_logic_vector(31 downto 0);
+signal U277_C_30 : std_logic_vector(31 downto 0);
+signal U277_C_31 : std_logic_vector(31 downto 0);
+
+COMPONENT SUBPAGE_Framing
+PORT(
+	T_0 : IN std_logic_vector(0 downto 0);
+	T_1 : IN std_logic_vector(0 downto 0);
+	T_2 : IN std_logic_vector(0 downto 0);
+	T_3 : IN std_logic_vector(0 downto 0);
+	T_4 : IN std_logic_vector(0 downto 0);
+	T_5 : IN std_logic_vector(0 downto 0);
+	T_6 : IN std_logic_vector(0 downto 0);
+	T_7 : IN std_logic_vector(0 downto 0);
+	T_8 : IN std_logic_vector(0 downto 0);
+	T_9 : IN std_logic_vector(0 downto 0);
+	T_10 : IN std_logic_vector(0 downto 0);
+	T_11 : IN std_logic_vector(0 downto 0);
+	T_12 : IN std_logic_vector(0 downto 0);
+	T_13 : IN std_logic_vector(0 downto 0);
+	T_14 : IN std_logic_vector(0 downto 0);
+	T_15 : IN std_logic_vector(0 downto 0);
+	T_16 : IN std_logic_vector(0 downto 0);
+	T_17 : IN std_logic_vector(0 downto 0);
+	T_18 : IN std_logic_vector(0 downto 0);
+	T_19 : IN std_logic_vector(0 downto 0);
+	T_20 : IN std_logic_vector(0 downto 0);
+	T_21 : IN std_logic_vector(0 downto 0);
+	T_22 : IN std_logic_vector(0 downto 0);
+	T_23 : IN std_logic_vector(0 downto 0);
+	T_24 : IN std_logic_vector(0 downto 0);
+	T_25 : IN std_logic_vector(0 downto 0);
+	T_26 : IN std_logic_vector(0 downto 0);
+	T_27 : IN std_logic_vector(0 downto 0);
+	T_28 : IN std_logic_vector(0 downto 0);
+	T_29 : IN std_logic_vector(0 downto 0);
+	T_30 : IN std_logic_vector(0 downto 0);
+	T_31 : IN std_logic_vector(0 downto 0);
+	FRAME : IN std_logic_vector(0 downto 0);
+	C_0 : OUT std_logic_vector(31 downto 0);
+	C_1 : OUT std_logic_vector(31 downto 0);
+	C_2 : OUT std_logic_vector(31 downto 0);
+	C_3 : OUT std_logic_vector(31 downto 0);
+	C_4 : OUT std_logic_vector(31 downto 0);
+	C_5 : OUT std_logic_vector(31 downto 0);
+	C_6 : OUT std_logic_vector(31 downto 0);
+	C_7 : OUT std_logic_vector(31 downto 0);
+	C_8 : OUT std_logic_vector(31 downto 0);
+	C_9 : OUT std_logic_vector(31 downto 0);
+	C_10 : OUT std_logic_vector(31 downto 0);
+	C_11 : OUT std_logic_vector(31 downto 0);
+	C_12 : OUT std_logic_vector(31 downto 0);
+	C_13 : OUT std_logic_vector(31 downto 0);
+	C_14 : OUT std_logic_vector(31 downto 0);
+	C_15 : OUT std_logic_vector(31 downto 0);
+	C_16 : OUT std_logic_vector(31 downto 0);
+	C_17 : OUT std_logic_vector(31 downto 0);
+	C_18 : OUT std_logic_vector(31 downto 0);
+	C_19 : OUT std_logic_vector(31 downto 0);
+	C_20 : OUT std_logic_vector(31 downto 0);
+	C_21 : OUT std_logic_vector(31 downto 0);
+	C_22 : OUT std_logic_vector(31 downto 0);
+	C_23 : OUT std_logic_vector(31 downto 0);
+	C_24 : OUT std_logic_vector(31 downto 0);
+	C_25 : OUT std_logic_vector(31 downto 0);
+	C_26 : OUT std_logic_vector(31 downto 0);
+	C_27 : OUT std_logic_vector(31 downto 0);
+	C_28 : OUT std_logic_vector(31 downto 0);
+	C_29 : OUT std_logic_vector(31 downto 0);
+	C_30 : OUT std_logic_vector(31 downto 0);
+	C_31 : OUT std_logic_vector(31 downto 0);
+    GlobalReset: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    CLK_ACQ: in std_logic_vector (0 downto 0); 
+    BUS_CLK: in std_logic_vector (0 downto 0); 
+    CLK_40: in std_logic_vector (0 downto 0); 
+    CLK_50: in std_logic_vector (0 downto 0); 
+    CLK_80: in std_logic_vector (0 downto 0); 
+    clk_160: in std_logic_vector (0 downto 0); 
+    clk_125: in std_logic_vector (0 downto 0); 
+    clk_320: in std_logic_vector (0 downto 0); 
+    FAST_CLK_100: in std_logic_vector (0 downto 0); 
+    FAST_CLK_200: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250_90: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500_90: in std_logic_vector (0 downto 0); 
+    GlobalClock: in std_logic_vector (0 downto 0); 
+    async_clk: IN STD_LOGIC_VECTOR(0 DOWNTO 0)); 
+END COMPONENT;
+signal U278_C_0 : std_logic_vector(31 downto 0);
+signal U278_C_1 : std_logic_vector(31 downto 0);
+signal U278_C_2 : std_logic_vector(31 downto 0);
+signal U278_C_3 : std_logic_vector(31 downto 0);
+signal U278_C_4 : std_logic_vector(31 downto 0);
+signal U278_C_5 : std_logic_vector(31 downto 0);
+signal U278_C_6 : std_logic_vector(31 downto 0);
+signal U278_C_7 : std_logic_vector(31 downto 0);
+signal U278_C_8 : std_logic_vector(31 downto 0);
+signal U278_C_9 : std_logic_vector(31 downto 0);
+signal U278_C_10 : std_logic_vector(31 downto 0);
+signal U278_C_11 : std_logic_vector(31 downto 0);
+signal U278_C_12 : std_logic_vector(31 downto 0);
+signal U278_C_13 : std_logic_vector(31 downto 0);
+signal U278_C_14 : std_logic_vector(31 downto 0);
+signal U278_C_15 : std_logic_vector(31 downto 0);
+signal U278_C_16 : std_logic_vector(31 downto 0);
+signal U278_C_17 : std_logic_vector(31 downto 0);
+signal U278_C_18 : std_logic_vector(31 downto 0);
+signal U278_C_19 : std_logic_vector(31 downto 0);
+signal U278_C_20 : std_logic_vector(31 downto 0);
+signal U278_C_21 : std_logic_vector(31 downto 0);
+signal U278_C_22 : std_logic_vector(31 downto 0);
+signal U278_C_23 : std_logic_vector(31 downto 0);
+signal U278_C_24 : std_logic_vector(31 downto 0);
+signal U278_C_25 : std_logic_vector(31 downto 0);
+signal U278_C_26 : std_logic_vector(31 downto 0);
+signal U278_C_27 : std_logic_vector(31 downto 0);
+signal U278_C_28 : std_logic_vector(31 downto 0);
+signal U278_C_29 : std_logic_vector(31 downto 0);
+signal U278_C_30 : std_logic_vector(31 downto 0);
+signal U278_C_31 : std_logic_vector(31 downto 0);
+signal U279_C_0 : std_logic_vector(31 downto 0);
+signal U279_C_1 : std_logic_vector(31 downto 0);
+signal U279_C_2 : std_logic_vector(31 downto 0);
+signal U279_C_3 : std_logic_vector(31 downto 0);
+signal U279_C_4 : std_logic_vector(31 downto 0);
+signal U279_C_5 : std_logic_vector(31 downto 0);
+signal U279_C_6 : std_logic_vector(31 downto 0);
+signal U279_C_7 : std_logic_vector(31 downto 0);
+signal U279_C_8 : std_logic_vector(31 downto 0);
+signal U279_C_9 : std_logic_vector(31 downto 0);
+signal U279_C_10 : std_logic_vector(31 downto 0);
+signal U279_C_11 : std_logic_vector(31 downto 0);
+signal U279_C_12 : std_logic_vector(31 downto 0);
+signal U279_C_13 : std_logic_vector(31 downto 0);
+signal U279_C_14 : std_logic_vector(31 downto 0);
+signal U279_C_15 : std_logic_vector(31 downto 0);
+signal U279_C_16 : std_logic_vector(31 downto 0);
+signal U279_C_17 : std_logic_vector(31 downto 0);
+signal U279_C_18 : std_logic_vector(31 downto 0);
+signal U279_C_19 : std_logic_vector(31 downto 0);
+signal U279_C_20 : std_logic_vector(31 downto 0);
+signal U279_C_21 : std_logic_vector(31 downto 0);
+signal U279_C_22 : std_logic_vector(31 downto 0);
+signal U279_C_23 : std_logic_vector(31 downto 0);
+signal U279_C_24 : std_logic_vector(31 downto 0);
+signal U279_C_25 : std_logic_vector(31 downto 0);
+signal U279_C_26 : std_logic_vector(31 downto 0);
+signal U279_C_27 : std_logic_vector(31 downto 0);
+signal U279_C_28 : std_logic_vector(31 downto 0);
+signal U279_C_29 : std_logic_vector(31 downto 0);
+signal U279_C_30 : std_logic_vector(31 downto 0);
+signal U279_C_31 : std_logic_vector(31 downto 0);
+signal U280_C_0 : std_logic_vector(31 downto 0);
+signal U280_C_1 : std_logic_vector(31 downto 0);
+signal U280_C_2 : std_logic_vector(31 downto 0);
+signal U280_C_3 : std_logic_vector(31 downto 0);
+signal U280_C_4 : std_logic_vector(31 downto 0);
+signal U280_C_5 : std_logic_vector(31 downto 0);
+signal U280_C_6 : std_logic_vector(31 downto 0);
+signal U280_C_7 : std_logic_vector(31 downto 0);
+signal U280_C_8 : std_logic_vector(31 downto 0);
+signal U280_C_9 : std_logic_vector(31 downto 0);
+signal U280_C_10 : std_logic_vector(31 downto 0);
+signal U280_C_11 : std_logic_vector(31 downto 0);
+signal U280_C_12 : std_logic_vector(31 downto 0);
+signal U280_C_13 : std_logic_vector(31 downto 0);
+signal U280_C_14 : std_logic_vector(31 downto 0);
+signal U280_C_15 : std_logic_vector(31 downto 0);
+signal U280_C_16 : std_logic_vector(31 downto 0);
+signal U280_C_17 : std_logic_vector(31 downto 0);
+signal U280_C_18 : std_logic_vector(31 downto 0);
+signal U280_C_19 : std_logic_vector(31 downto 0);
+signal U280_C_20 : std_logic_vector(31 downto 0);
+signal U280_C_21 : std_logic_vector(31 downto 0);
+signal U280_C_22 : std_logic_vector(31 downto 0);
+signal U280_C_23 : std_logic_vector(31 downto 0);
+signal U280_C_24 : std_logic_vector(31 downto 0);
+signal U280_C_25 : std_logic_vector(31 downto 0);
+signal U280_C_26 : std_logic_vector(31 downto 0);
+signal U280_C_27 : std_logic_vector(31 downto 0);
+signal U280_C_28 : std_logic_vector(31 downto 0);
+signal U280_C_29 : std_logic_vector(31 downto 0);
+signal U280_C_30 : std_logic_vector(31 downto 0);
+signal U280_C_31 : std_logic_vector(31 downto 0);
+signal U281_A_TRG_0 : std_logic_vector(0 downto 0) := "0";
+signal U282_A_TRG_1 : std_logic_vector(0 downto 0) := "0";
+signal U283_A_TRG_2 : std_logic_vector(0 downto 0) := "0";
+signal U284_A_TRG_3 : std_logic_vector(0 downto 0) := "0";
+signal U285_A_TRG_4 : std_logic_vector(0 downto 0) := "0";
+signal U286_A_TRG_5 : std_logic_vector(0 downto 0) := "0";
+signal U287_A_TRG_6 : std_logic_vector(0 downto 0) := "0";
+signal U288_A_TRG_7 : std_logic_vector(0 downto 0) := "0";
+signal U289_A_TRG_8 : std_logic_vector(0 downto 0) := "0";
+signal U290_A_TRG_9 : std_logic_vector(0 downto 0) := "0";
+signal U291_A_TRG_10 : std_logic_vector(0 downto 0) := "0";
+signal U292_A_TRG_11 : std_logic_vector(0 downto 0) := "0";
+signal U293_A_TRG_12 : std_logic_vector(0 downto 0) := "0";
+signal U294_A_TRG_13 : std_logic_vector(0 downto 0) := "0";
+signal U295_A_TRG_14 : std_logic_vector(0 downto 0) := "0";
+signal U296_A_TRG_15 : std_logic_vector(0 downto 0) := "0";
+signal U297_A_TRG_16 : std_logic_vector(0 downto 0) := "0";
+signal U298_A_TRG_17 : std_logic_vector(0 downto 0) := "0";
+signal U299_A_TRG_18 : std_logic_vector(0 downto 0) := "0";
+signal U300_A_TRG_19 : std_logic_vector(0 downto 0) := "0";
+signal U301_A_TRG_20 : std_logic_vector(0 downto 0) := "0";
+signal U302_A_TRG_21 : std_logic_vector(0 downto 0) := "0";
+signal U303_A_TRG_22 : std_logic_vector(0 downto 0) := "0";
+signal U304_A_TRG_23 : std_logic_vector(0 downto 0) := "0";
+signal U305_A_TRG_24 : std_logic_vector(0 downto 0) := "0";
+signal U306_A_TRG_25 : std_logic_vector(0 downto 0) := "0";
+signal U307_A_TRG_26 : std_logic_vector(0 downto 0) := "0";
+signal U308_A_TRG_27 : std_logic_vector(0 downto 0) := "0";
+signal U309_A_TRG_28 : std_logic_vector(0 downto 0) := "0";
+signal U310_A_TRG_29 : std_logic_vector(0 downto 0) := "0";
+signal U311_A_TRG_30 : std_logic_vector(0 downto 0) := "0";
+signal U312_A_TRG_31 : std_logic_vector(0 downto 0) := "0";
+signal U313_B_TRG_0 : std_logic_vector(0 downto 0) := "0";
+signal U314_B_TRG_1 : std_logic_vector(0 downto 0) := "0";
+signal U315_B_TRG_2 : std_logic_vector(0 downto 0) := "0";
+signal U316_B_TRG_3 : std_logic_vector(0 downto 0) := "0";
+signal U317_B_TRG_4 : std_logic_vector(0 downto 0) := "0";
+signal U318_B_TRG_5 : std_logic_vector(0 downto 0) := "0";
+signal U319_B_TRG_6 : std_logic_vector(0 downto 0) := "0";
+signal U320_B_TRG_7 : std_logic_vector(0 downto 0) := "0";
+signal U321_B_TRG_8 : std_logic_vector(0 downto 0) := "0";
+signal U322_B_TRG_9 : std_logic_vector(0 downto 0) := "0";
+signal U323_B_TRG_10 : std_logic_vector(0 downto 0) := "0";
+signal U324_B_TRG_11 : std_logic_vector(0 downto 0) := "0";
+signal U325_B_TRG_12 : std_logic_vector(0 downto 0) := "0";
+signal U326_B_TRG_13 : std_logic_vector(0 downto 0) := "0";
+signal U327_B_TRG_14 : std_logic_vector(0 downto 0) := "0";
+signal U328_B_TRG_15 : std_logic_vector(0 downto 0) := "0";
+signal U329_B_TRG_16 : std_logic_vector(0 downto 0) := "0";
+signal U330_B_TRG_17 : std_logic_vector(0 downto 0) := "0";
+signal U331_B_TRG_18 : std_logic_vector(0 downto 0) := "0";
+signal U332_B_TRG_19 : std_logic_vector(0 downto 0) := "0";
+signal U333_B_TRG_20 : std_logic_vector(0 downto 0) := "0";
+signal U334_B_TRG_21 : std_logic_vector(0 downto 0) := "0";
+signal U335_B_TRG_22 : std_logic_vector(0 downto 0) := "0";
+signal U336_B_TRG_23 : std_logic_vector(0 downto 0) := "0";
+signal U337_B_TRG_24 : std_logic_vector(0 downto 0) := "0";
+signal U338_B_TRG_25 : std_logic_vector(0 downto 0) := "0";
+signal U339_B_TRG_26 : std_logic_vector(0 downto 0) := "0";
+signal U340_B_TRG_27 : std_logic_vector(0 downto 0) := "0";
+signal U341_B_TRG_28 : std_logic_vector(0 downto 0) := "0";
+signal U342_B_TRG_29 : std_logic_vector(0 downto 0) := "0";
+signal U343_B_TRG_30 : std_logic_vector(0 downto 0) := "0";
+signal U344_B_TRG_31 : std_logic_vector(0 downto 0) := "0";
+signal U345_C_TRG_0 : std_logic_vector(0 downto 0) := "0";
+signal U346_C_TRG_1 : std_logic_vector(0 downto 0) := "0";
+signal U347_C_TRG_2 : std_logic_vector(0 downto 0) := "0";
+signal U348_C_TRG_3 : std_logic_vector(0 downto 0) := "0";
+signal U349_C_TRG_4 : std_logic_vector(0 downto 0) := "0";
+signal U350_C_TRG_5 : std_logic_vector(0 downto 0) := "0";
+signal U351_C_TRG_6 : std_logic_vector(0 downto 0) := "0";
+signal U352_C_TRG_7 : std_logic_vector(0 downto 0) := "0";
+signal U353_C_TRG_8 : std_logic_vector(0 downto 0) := "0";
+signal U354_C_TRG_9 : std_logic_vector(0 downto 0) := "0";
+signal U355_C_TRG_10 : std_logic_vector(0 downto 0) := "0";
+signal U356_C_TRG_11 : std_logic_vector(0 downto 0) := "0";
+signal U357_C_TRG_12 : std_logic_vector(0 downto 0) := "0";
+signal U358_C_TRG_13 : std_logic_vector(0 downto 0) := "0";
+signal U359_C_TRG_14 : std_logic_vector(0 downto 0) := "0";
+signal U360_C_TRG_15 : std_logic_vector(0 downto 0) := "0";
+signal U361_C_TRG_16 : std_logic_vector(0 downto 0) := "0";
+signal U362_C_TRG_17 : std_logic_vector(0 downto 0) := "0";
+signal U363_C_TRG_18 : std_logic_vector(0 downto 0) := "0";
+signal U364_C_TRG_19 : std_logic_vector(0 downto 0) := "0";
+signal U365_C_TRG_20 : std_logic_vector(0 downto 0) := "0";
+signal U366_C_TRG_21 : std_logic_vector(0 downto 0) := "0";
+signal U367_C_TRG_22 : std_logic_vector(0 downto 0) := "0";
+signal U368_C_TRG_23 : std_logic_vector(0 downto 0) := "0";
+signal U369_C_TRG_24 : std_logic_vector(0 downto 0) := "0";
+signal U370_C_TRG_25 : std_logic_vector(0 downto 0) := "0";
+signal U371_C_TRG_26 : std_logic_vector(0 downto 0) := "0";
+signal U372_C_TRG_27 : std_logic_vector(0 downto 0) := "0";
+signal U373_C_TRG_28 : std_logic_vector(0 downto 0) := "0";
+signal U374_C_TRG_29 : std_logic_vector(0 downto 0) := "0";
+signal U375_C_TRG_30 : std_logic_vector(0 downto 0) := "0";
+signal U376_C_TRG_31 : std_logic_vector(0 downto 0) := "0";
+signal U377_D_TRG_0 : std_logic_vector(0 downto 0) := "0";
+signal U378_D_TRG_1 : std_logic_vector(0 downto 0) := "0";
+signal U379_D_TRG_2 : std_logic_vector(0 downto 0) := "0";
+signal U380_D_TRG_3 : std_logic_vector(0 downto 0) := "0";
+signal U381_D_TRG_4 : std_logic_vector(0 downto 0) := "0";
+signal U382_D_TRG_5 : std_logic_vector(0 downto 0) := "0";
+signal U383_D_TRG_6 : std_logic_vector(0 downto 0) := "0";
+signal U384_D_TRG_7 : std_logic_vector(0 downto 0) := "0";
+signal U385_D_TRG_8 : std_logic_vector(0 downto 0) := "0";
+signal U386_D_TRG_9 : std_logic_vector(0 downto 0) := "0";
+signal U387_D_TRG_10 : std_logic_vector(0 downto 0) := "0";
+signal U388_D_TRG_11 : std_logic_vector(0 downto 0) := "0";
+signal U389_D_TRG_12 : std_logic_vector(0 downto 0) := "0";
+signal U390_D_TRG_13 : std_logic_vector(0 downto 0) := "0";
+signal U391_D_TRG_14 : std_logic_vector(0 downto 0) := "0";
+signal U392_D_TRG_15 : std_logic_vector(0 downto 0) := "0";
+signal U393_D_TRG_16 : std_logic_vector(0 downto 0) := "0";
+signal U394_D_TRG_17 : std_logic_vector(0 downto 0) := "0";
+signal U395_D_TRG_18 : std_logic_vector(0 downto 0) := "0";
+signal U396_D_TRG_19 : std_logic_vector(0 downto 0) := "0";
+signal U397_D_TRG_20 : std_logic_vector(0 downto 0) := "0";
+signal U398_D_TRG_21 : std_logic_vector(0 downto 0) := "0";
+signal U399_D_TRG_22 : std_logic_vector(0 downto 0) := "0";
+signal U400_D_TRG_23 : std_logic_vector(0 downto 0) := "0";
+signal U401_D_TRG_24 : std_logic_vector(0 downto 0) := "0";
+signal U402_D_TRG_25 : std_logic_vector(0 downto 0) := "0";
+signal U403_D_TRG_26 : std_logic_vector(0 downto 0) := "0";
+signal U404_D_TRG_27 : std_logic_vector(0 downto 0) := "0";
+signal U405_D_TRG_28 : std_logic_vector(0 downto 0) := "0";
+signal U406_D_TRG_29 : std_logic_vector(0 downto 0) := "0";
+signal U407_D_TRG_30 : std_logic_vector(0 downto 0) := "0";
+signal U408_D_TRG_31 : std_logic_vector(0 downto 0) := "0";
+signal U409_PULSE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U410_out_0 : std_logic_vector(31 downto 0);
+signal U411_CONST : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+signal U412_out : std_logic_vector(0 downto 0);
+signal U413_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+signal U414_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+signal U415_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+signal U416_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+signal U417_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+signal U419_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U420_A_TS : std_logic_vector (63 downto 0); 
+signal variable_FR_FRAME_SIG : std_logic_vector (0 downto 0); 
+Component EDGE_DETECTOR_RE Is
+   Generic(bitSize : Integer := 1);
+   port(        Reset :  IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        CE: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        CLK: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        PORT_IN: IN STD_LOGIC_VECTOR(bitSize-1 DOWNTO 0);
+        PULSE_WIDTH: IN INTEGER;
+        PORT_OUT: OUT STD_LOGIC_VECTOR(bitSize - 1 DOWNTO 0)
+        );
+End component;
+signal U422_out : std_logic_vector(0 downto 0) := (others => '0');
+signal variable_vLEMO_7 : std_logic_vector (0 downto 0); 
+signal U424_vLEMO_7 : std_logic_vector (0 downto 0); 
+signal U425_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U426_out : std_logic_vector(0 downto 0) := (others => '0');
+signal U427_counts : std_logic_vector(31 downto 0) := (others => '0');
+signal U428_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U429_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT comparator
+  GENERIC( 
+	IN_SIZE : INTEGER := 32;
+	IN_SIGN : STRING := "unsigned";
+	REGISTER_OUT : STRING := "false";
+	OPERATION : STRING := "smaller" );
+PORT( 
+	in1 : in STD_LOGIC_VECTOR(IN_SIZE-1 downto 0);
+	in2 : in STD_LOGIC_VECTOR(IN_SIZE-1 downto 0);
+	clk : in STD_LOGIC;
+	comp_out : out STD_LOGIC_VECTOR(0 downto 0) );
+END COMPONENT;
+signal U430_out : std_logic_vector(0 downto 0);
+signal U431_RUN_START : std_logic_vector (0 downto 0); 
+signal U432_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal variable_FT_CNT_EXT : std_logic_vector (31 downto 0); 
+signal variable_FT_CNT_WIN : std_logic_vector (31 downto 0); 
+signal U435_FT_CNT_EXT : std_logic_vector (31 downto 0); 
+signal U436_FT_CNT_WIN : std_logic_vector (31 downto 0); 
+signal U437_out_0 : std_logic_vector(31 downto 0);
+signal U438_out : std_logic_vector(0 downto 0);
+signal U439_PULSE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U440_CONST : STD_LOGIC_VECTOR(31 downto 0) := (others => '0');
+signal U441_out_0 : std_logic_vector(31 downto 0);
+signal U442_out_0 : std_logic_vector(1 downto 0);
+signal U443_hold : std_logic_vector(31 downto 0);
+signal U444_hold : std_logic_vector(31 downto 0);
+signal  U445_const_bin : std_logic_vector(0 downto 0) := "0";
+signal BUS_CP_0_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_CP_0_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_CP_0_READ_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal REG_CP_0_READ_VALID_WORDS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+COMPONENT U447_custompacket
+  GENERIC( 
+	memLength : INTEGER := 32768;
+	wordWidth : INTEGER := 32 );
+PORT( 
+	IN_1 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_2 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_3 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_4 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_5 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_6 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_7 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_8 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_9 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_10 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_11 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_12 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_13 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_14 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_15 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_16 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_17 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_18 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_19 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_20 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_21 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_22 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_23 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_24 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_25 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_26 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_27 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_28 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_29 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_30 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_31 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_32 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_33 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_34 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_35 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_36 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_37 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_38 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_39 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_40 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_41 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_42 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_43 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_44 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_45 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_46 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_47 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_48 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_49 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_50 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_51 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_52 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_53 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_54 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_55 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_56 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_57 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_58 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_59 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_60 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_61 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_62 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_63 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_64 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_65 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_66 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_67 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_68 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_69 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_70 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_71 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_72 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_73 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_74 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_75 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_76 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_77 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_78 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_79 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_80 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_81 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_82 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_83 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_84 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_85 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_86 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_87 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_88 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_89 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_90 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_91 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_92 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_93 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_94 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_95 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_96 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_97 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_98 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_99 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_100 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_101 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_102 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_103 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_104 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_105 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_106 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_107 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_108 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_109 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_110 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_111 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_112 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_113 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_114 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_115 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_116 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_117 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_118 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_119 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_120 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_121 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_122 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_123 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_124 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_125 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_126 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_127 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_128 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_129 : in STD_LOGIC_VECTOR(63 downto 0);
+	IN_130 : in STD_LOGIC_VECTOR(31 downto 0);
+	IN_131 : in STD_LOGIC_VECTOR(31 downto 0);
+	TRIG : in STD_LOGIC_VECTOR(0 downto 0);
+	CLK_WRITE : in STD_LOGIC_VECTOR(0 downto 0);
+	SYNC_TRIG : in STD_LOGIC_VECTOR(0 downto 0);
+	SYNC_RESET : in STD_LOGIC_VECTOR(0 downto 0);
+	SYNC_CLK : in STD_LOGIC_VECTOR(0 downto 0);
+	BUSY : out STD_LOGIC_VECTOR(0 downto 0);
+	FIFO_FULL : out STD_LOGIC_VECTOR(0 downto 0);
+	RESET : in STD_LOGIC_VECTOR(0 downto 0);
+	CLK_READ : in STD_LOGIC_VECTOR(0 downto 0);
+	READ_DATA : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_DATAVALID : out STD_LOGIC_VECTOR(0 downto 0);
+	READ_RD_INT : in STD_LOGIC_VECTOR(0 downto 0);
+	READ_STATUS : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_VALID_WORDS : out STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG : in STD_LOGIC_VECTOR(31 downto 0) );
+END COMPONENT;
+signal U448_TRIG0 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG1 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG2 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG3 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG4 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG5 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG6 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG7 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG8 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG9 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG10 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG11 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG12 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG13 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG14 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG15 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG16 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG17 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG18 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG19 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG20 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG21 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG22 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG23 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG24 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG25 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG26 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG27 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG28 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG29 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG30 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIG31 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_OR_TIME : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_OR_CHARGE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U448_TRIGs : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U449_TRIG0 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG1 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG2 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG3 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG4 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG5 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG6 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG7 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG8 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG9 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG10 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG11 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG12 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG13 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG14 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG15 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG16 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG17 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG18 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG19 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG20 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG21 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG22 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG23 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG24 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG25 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG26 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG27 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG28 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG29 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG30 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIG31 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_OR_TIME : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_OR_CHARGE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U449_TRIGs : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U450_TRIG0 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG1 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG2 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG3 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG4 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG5 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG6 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG7 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG8 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG9 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG10 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG11 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG12 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG13 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG14 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG15 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG16 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG17 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG18 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG19 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG20 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG21 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG22 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG23 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG24 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG25 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG26 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG27 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG28 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG29 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG30 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIG31 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_OR_TIME : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_OR_CHARGE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U450_TRIGs : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U451_TRIG0 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG1 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG2 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG3 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG4 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG5 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG6 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG7 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG8 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG9 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG10 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG11 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG12 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG13 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG14 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG15 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG16 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG17 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG18 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG19 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG20 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG21 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG22 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG23 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG24 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG25 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG26 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG27 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG28 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG29 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG30 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIG31 : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_OR_TIME : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_OR_CHARGE : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U451_TRIGs : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U452_BUSY : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U452_S_HIT : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U452_P_FRAME_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U452_P_FRAME_DATA : STD_LOGIC_VECTOR (1023 DOWNTO 0);
+signal U452_M_ENERGY_HG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U452_M_ENERGY_LG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U452_M_CLK : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U452_M_DIN : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U452_TS_OUT : STD_LOGIC_VECTOR (63 DOWNTO 0);
+signal U452_TS0_OUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U452_CNT_TRIGGER : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U452_CNT_VAL : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U452_FLAGS : STD_LOGIC_VECTOR (31 DOWNTO 0);
+COMPONENT CitirocAnalogReadoutV2
+  GENERIC( 
+	CLKDIV : INTEGER := 25 );
+PORT( 
+	TRIG : in STD_LOGIC;
+	reject_data : in STD_LOGIC;
+	HOLD_WIN_LENGTH : in STD_LOGIC_VECTOR(15 downto 0);
+	BUSY : out STD_LOGIC;
+	S_CHID : out STD_LOGIC_VECTOR(4 downto 0);
+	S_ENERGY_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	S_ENERGY_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	S_HIT : out STD_LOGIC;
+	S_DV : out STD_LOGIC;
+	P_ENERGY_0_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_0_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_0 : out STD_LOGIC;
+	P_ENERGY_1_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_1_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_1 : out STD_LOGIC;
+	P_ENERGY_2_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_2_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_2 : out STD_LOGIC;
+	P_ENERGY_3_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_3_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_3 : out STD_LOGIC;
+	P_ENERGY_4_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_4_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_4 : out STD_LOGIC;
+	P_ENERGY_5_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_5_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_5 : out STD_LOGIC;
+	P_ENERGY_6_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_6_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_6 : out STD_LOGIC;
+	P_ENERGY_7_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_7_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_7 : out STD_LOGIC;
+	P_ENERGY_8_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_8_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_8 : out STD_LOGIC;
+	P_ENERGY_9_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_9_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_9 : out STD_LOGIC;
+	P_ENERGY_10_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_10_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_10 : out STD_LOGIC;
+	P_ENERGY_11_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_11_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_11 : out STD_LOGIC;
+	P_ENERGY_12_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_12_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_12 : out STD_LOGIC;
+	P_ENERGY_13_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_13_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_13 : out STD_LOGIC;
+	P_ENERGY_14_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_14_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_14 : out STD_LOGIC;
+	P_ENERGY_15_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_15_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_15 : out STD_LOGIC;
+	P_ENERGY_16_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_16_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_16 : out STD_LOGIC;
+	P_ENERGY_17_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_17_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_17 : out STD_LOGIC;
+	P_ENERGY_18_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_18_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_18 : out STD_LOGIC;
+	P_ENERGY_19_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_19_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_19 : out STD_LOGIC;
+	P_ENERGY_20_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_20_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_20 : out STD_LOGIC;
+	P_ENERGY_21_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_21_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_21 : out STD_LOGIC;
+	P_ENERGY_22_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_22_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_22 : out STD_LOGIC;
+	P_ENERGY_23_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_23_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_23 : out STD_LOGIC;
+	P_ENERGY_24_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_24_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_24 : out STD_LOGIC;
+	P_ENERGY_25_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_25_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_25 : out STD_LOGIC;
+	P_ENERGY_26_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_26_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_26 : out STD_LOGIC;
+	P_ENERGY_27_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_27_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_27 : out STD_LOGIC;
+	P_ENERGY_28_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_28_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_28 : out STD_LOGIC;
+	P_ENERGY_29_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_29_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_29 : out STD_LOGIC;
+	P_ENERGY_30_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_30_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_30 : out STD_LOGIC;
+	P_ENERGY_31_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_ENERGY_31_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	P_HIT_31 : out STD_LOGIC;
+	P_DV : out STD_LOGIC;
+	P_FRAME_DV : out STD_LOGIC;
+	P_FRAME_ACK : in STD_LOGIC;
+	P_FRAME_DATA : out STD_LOGIC_VECTOR(1023 downto 0);
+	M_ENERGY_HG : out STD_LOGIC_VECTOR(15 downto 0);
+	M_ENERGY_LG : out STD_LOGIC_VECTOR(15 downto 0);
+	M_CLK : out STD_LOGIC_VECTOR(0 downto 0);
+	M_DIN : out STD_LOGIC_VECTOR(0 downto 0);
+	TS_IN : in STD_LOGIC_VECTOR(63 downto 0);
+	TS_OUT : out STD_LOGIC_VECTOR(63 downto 0);
+	TS0_IN : in STD_LOGIC_VECTOR(31 downto 0);
+	TS0_OUT : out STD_LOGIC_VECTOR(31 downto 0);
+	T_OR32 : in STD_LOGIC_VECTOR(0 downto 0);
+	T0 : in STD_LOGIC_VECTOR(0 downto 0);
+	VALIDATION_IN : in STD_LOGIC_VECTOR(0 downto 0);
+	RUNRESET : in STD_LOGIC_VECTOR(0 downto 0);
+	SW_VETO : in STD_LOGIC_VECTOR(0 downto 0);
+	VALIDATION_REG : in STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_TRIGGER : out STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_VALIDATION : out STD_LOGIC_VECTOR(31 downto 0);
+	FLAGS : out STD_LOGIC_VECTOR(31 downto 0);
+	ADC_IN_HG : in STD_LOGIC_VECTOR(15 downto 0);
+	ADC_IN_LG : in STD_LOGIC_VECTOR(15 downto 0);
+	CHARGE_HIT_in : in STD_LOGIC;
+	chrage_srin_a : out STD_LOGIC;
+	chrage_clk_a : out STD_LOGIC;
+	chrage_sr_resetb : out STD_LOGIC;
+	val_evnt : out STD_LOGIC;
+	raz_chn : out STD_LOGIC;
+	hold_hg : out STD_LOGIC;
+	hold_lg : out STD_LOGIC;
+	TDC_CLOCKS : in STD_LOGIC_VECTOR(5 downto 0);
+	clk : in STD_LOGIC;
+	reset : in STD_LOGIC );
+END COMPONENT;
+signal variable_A_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal variable_A_CNT_VALID : std_logic_vector (31 downto 0); 
+signal variable_A_FLAGS : std_logic_vector (31 downto 0); 
+signal U456_BUSY : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U456_S_HIT : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U456_P_FRAME_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U456_P_FRAME_DATA : STD_LOGIC_VECTOR (1023 DOWNTO 0);
+signal U456_M_ENERGY_HG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U456_M_ENERGY_LG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U456_M_CLK : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U456_M_DIN : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U456_TS_OUT : STD_LOGIC_VECTOR (63 DOWNTO 0);
+signal U456_TS0_OUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U456_CNT_TRIGGER : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U456_CNT_VAL : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U456_FLAGS : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal variable_B_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal variable_B_CNT_VALID : std_logic_vector (31 downto 0); 
+signal variable_B_FLAGS : std_logic_vector (31 downto 0); 
+signal U460_BUSY : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U460_S_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U460_P_FRAME_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U460_P_FRAME_DATA : STD_LOGIC_VECTOR (1023 DOWNTO 0);
+signal U460_M_ENERGY_HG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U460_M_ENERGY_LG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U460_M_CLK : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U460_M_DIN : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U460_TS_OUT : STD_LOGIC_VECTOR (63 DOWNTO 0);
+signal U460_TS0_OUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U460_CNT_TRIGGER : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U460_CNT_VAL : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U460_FLAGS : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal variable_C_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal variable_C_CNT_VALID : std_logic_vector (31 downto 0); 
+signal variable_C_FLAGS : std_logic_vector (31 downto 0); 
+signal U464_BUSY : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U464_S_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U464_P_FRAME_DV : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U464_P_FRAME_DATA : STD_LOGIC_VECTOR (1023 DOWNTO 0);
+signal U464_M_ENERGY_HG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U464_M_ENERGY_LG : STD_LOGIC_VECTOR (15 DOWNTO 0);
+signal U464_M_CLK : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U464_M_DIN : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U464_TS_OUT : STD_LOGIC_VECTOR (63 DOWNTO 0);
+signal U464_TS0_OUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U464_CNT_TRIGGER : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U464_CNT_VAL : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U464_FLAGS : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal variable_D_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal variable_D_CNT_VALID : std_logic_vector (31 downto 0); 
+signal variable_D_FLAGS : std_logic_vector (31 downto 0); 
+signal U469_ACK_A : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U469_ACK_B : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U469_ACK_C : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U469_ACK_D : STD_LOGIC_VECTOR(0 downto 0) := "0";
+signal U469_FULL : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U469_BUSY : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_CitirocFrame0_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_CitirocFrame0_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_CitirocFrame0_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT CitirocFrameTransferV2
+  GENERIC( 
+	memLength : INTEGER := 32768 );
+PORT( 
+	DATA_A : in STD_LOGIC_VECTOR(1023 downto 0);
+	TS_T0_A : in STD_LOGIC_VECTOR(31 downto 0);
+	TS_A : in STD_LOGIC_VECTOR(63 downto 0);
+	DV_A : in STD_LOGIC;
+	ACK_A : out STD_LOGIC;
+	COUNTER_TRIGGER_A : in STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_VALIDATION_A : in STD_LOGIC_VECTOR(31 downto 0);
+	FLAGS_A : in STD_LOGIC_VECTOR(31 downto 0);
+	DATA_B : in STD_LOGIC_VECTOR(1023 downto 0);
+	TS_T0_B : in STD_LOGIC_VECTOR(31 downto 0);
+	TS_B : in STD_LOGIC_VECTOR(63 downto 0);
+	DV_B : in STD_LOGIC;
+	ACK_B : out STD_LOGIC;
+	COUNTER_TRIGGER_B : in STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_VALIDATION_B : in STD_LOGIC_VECTOR(31 downto 0);
+	FLAGS_B : in STD_LOGIC_VECTOR(31 downto 0);
+	DATA_C : in STD_LOGIC_VECTOR(1023 downto 0);
+	TS_T0_C : in STD_LOGIC_VECTOR(31 downto 0);
+	TS_C : in STD_LOGIC_VECTOR(63 downto 0);
+	DV_C : in STD_LOGIC;
+	ACK_C : out STD_LOGIC;
+	COUNTER_TRIGGER_C : in STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_VALIDATION_C : in STD_LOGIC_VECTOR(31 downto 0);
+	FLAGS_C : in STD_LOGIC_VECTOR(31 downto 0);
+	DATA_D : in STD_LOGIC_VECTOR(1023 downto 0);
+	TS_T0_D : in STD_LOGIC_VECTOR(31 downto 0);
+	TS_D : in STD_LOGIC_VECTOR(63 downto 0);
+	DV_D : in STD_LOGIC;
+	ACK_D : out STD_LOGIC;
+	COUNTER_TRIGGER_D : in STD_LOGIC_VECTOR(31 downto 0);
+	COUNTER_VALIDATION_D : in STD_LOGIC_VECTOR(31 downto 0);
+	FLAGS_D : in STD_LOGIC_VECTOR(31 downto 0);
+	FIFO_FULL : out STD_LOGIC_VECTOR(0 downto 0);
+	DATA_AVAL : out STD_LOGIC_VECTOR(0 downto 0);
+	BUSY : out STD_LOGIC_VECTOR(0 downto 0);
+	READ_RESET : in STD_LOGIC;
+	VALIDATION_REG : in STD_LOGIC_VECTOR(31 downto 0);
+	READ_CLK : in STD_LOGIC;
+	CLK : in STD_LOGIC;
+	RESET : in STD_LOGIC;
+	CONTROL_REG : in STD_LOGIC_VECTOR(31 downto 0);
+	STATUS_REG : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_DATA : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_DATAVALID : out STD_LOGIC_VECTOR(0 downto 0);
+	READ_RD_INT : in STD_LOGIC_VECTOR(0 downto 0) );
+END COMPONENT;
+signal U470_A_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal U471_B_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal U472_C_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal U473_D_CNT_TRIG : std_logic_vector (31 downto 0); 
+signal U474_A_CNT_VALID : std_logic_vector (31 downto 0); 
+signal U475_B_CNT_VALID : std_logic_vector (31 downto 0); 
+signal U476_C_CNT_VALID : std_logic_vector (31 downto 0); 
+signal U477_D_CNT_VALID : std_logic_vector (31 downto 0); 
+signal U478_A_FLAGS : std_logic_vector (31 downto 0); 
+signal U479_B_FLAGS : std_logic_vector (31 downto 0); 
+signal U480_C_FLAGS : std_logic_vector (31 downto 0); 
+signal U481_D_FLAGS : std_logic_vector (31 downto 0); 
+signal U483_HV_MSTATUS : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_HV_MVOUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_HV_MIOUT : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_HV_MTEMP : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_HV_MVTARGET : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_HV_MAVTARGET : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_T_SENS1 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U483_T_SENS2 : STD_LOGIC_VECTOR (31 DOWNTO 0);
+COMPONENT DT5550W_iic
+PORT( 
+	REG_ON_OFF_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_ON_OFF_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_EMERGENCY : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_EMERGENCY : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_SET_VOLTAGE_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_SET_VOLTAGE_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_ENABLE_TCOMP_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_ENABLE_TCOMP_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_T_M_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_T_M_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_T_Q_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_T_Q_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_TCOMP_COEF_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_TCOMP_COEF_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_MAX_I_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_MAX_I_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_RAMP_SPEED_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_RAMP_SPEED_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_MAX_V_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	INT_HV_MAX_V_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_HV_STATUS_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_HV_OUTV_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_HV_IOUT_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_HV_TEMP_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_HV_VTARGET_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_HV_AVTARGET_RD : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_TEMP_SENS_READ_1 : out STD_LOGIC_VECTOR(31 downto 0);
+	REG_TEMP_SENS_READ_2 : out STD_LOGIC_VECTOR(31 downto 0);
+	i2c_fail : out STD_LOGIC;
+	i2c_busy : out STD_LOGIC;
+	i2c_sda : inout STD_LOGIC;
+	i2c_scl : inout STD_LOGIC;
+	clk : in STD_LOGIC;
+	reset : in STD_LOGIC;
+	PGB_EEPROM_KEY : out STD_LOGIC_VECTOR(31 downto 0);
+	PGB_REG_MODEL : out STD_LOGIC_VECTOR(31 downto 0);
+	PGB_BOARD_SN : out STD_LOGIC_VECTOR(31 downto 0);
+	PGB_ASIC_COUNT : out STD_LOGIC_VECTOR(31 downto 0);
+	INT_EEPROM_WR : in STD_LOGIC_VECTOR(0 downto 0);
+	REG_EEPROM_WR : in STD_LOGIC_VECTOR(31 downto 0);
+	REG_IIC_STATUS : out STD_LOGIC_VECTOR(31 downto 0) );
+END COMPONENT;
+signal U484_out_0 : std_logic_vector(31 downto 0);
+signal U485_out_0 : std_logic_vector(31 downto 0);
+signal U486_out_0 : std_logic_vector(31 downto 0);
+signal U487_out_0 : std_logic_vector(31 downto 0);
+signal U488_out_0 : std_logic_vector(31 downto 0);
+signal U489_CONST : INTEGER := 0;
+signal U490_CONST : INTEGER := 0;
+signal U491_CONST : INTEGER := 0;
+signal U492_CONST : INTEGER := 0;
+signal U493_out_0 : std_logic_vector(31 downto 0);
+signal U493_int : std_logic_vector(0 downto 0);
+signal U494_out_0 : std_logic_vector(31 downto 0);
+signal U494_int : std_logic_vector(0 downto 0);
+signal U495_out_0 : std_logic_vector(31 downto 0);
+signal U495_int : std_logic_vector(0 downto 0);
+signal U496_out_0 : std_logic_vector(31 downto 0);
+signal U496_int : std_logic_vector(0 downto 0);
+signal U497_out_0 : std_logic_vector(31 downto 0);
+signal U497_int : std_logic_vector(0 downto 0);
+signal U498_out_0 : std_logic_vector(31 downto 0);
+signal U498_int : std_logic_vector(0 downto 0);
+signal U499_out_0 : std_logic_vector(31 downto 0);
+signal U499_int : std_logic_vector(0 downto 0);
+signal U500_out_0 : std_logic_vector(31 downto 0);
+signal U500_int : std_logic_vector(0 downto 0);
+signal U501_out_0 : std_logic_vector(31 downto 0);
+signal U501_int : std_logic_vector(0 downto 0);
+signal U502_out_0 : std_logic_vector(31 downto 0);
+signal U502_int : std_logic_vector(0 downto 0);
+signal U503_hold : std_logic_vector(31 downto 0);
+signal U504_hold : std_logic_vector(31 downto 0);
+signal U505_hold : std_logic_vector(31 downto 0);
+signal U506_hold : std_logic_vector(31 downto 0);
+signal U507_hold : std_logic_vector(31 downto 0);
+signal U508_hold : std_logic_vector(31 downto 0);
+signal U509_hold : std_logic_vector(31 downto 0);
+signal U510_hold : std_logic_vector(31 downto 0);
+signal U511_A_TRIG_T : std_logic_vector (0 downto 0); 
+signal U512_A_TRG : std_logic_vector (0 downto 0); 
+signal U513_B_TRG : std_logic_vector (0 downto 0); 
+signal U514_B_TRIG_T : std_logic_vector (0 downto 0); 
+signal U515_C_TRIG_T : std_logic_vector (0 downto 0); 
+signal U516_C_TRG : std_logic_vector (0 downto 0); 
+signal U517_D_TRIG_T : std_logic_vector (0 downto 0); 
+signal U518_D_TRG : std_logic_vector (0 downto 0); 
+signal variable_T0 : std_logic_vector (0 downto 0); 
+signal U520_T0 : std_logic_vector (0 downto 0); 
+signal U521_T0 : std_logic_vector (0 downto 0); 
+signal U522_T0 : std_logic_vector (0 downto 0); 
+signal U523_T0 : std_logic_vector (0 downto 0); 
+signal U524_out_0 : std_logic_vector(31 downto 0);
+signal U525_out : std_logic_vector(0 downto 0) := (others => '0');
+signal variable_VALIDATION_EN : std_logic_vector (0 downto 0); 
+signal U527_out : std_logic_vector(0 downto 0);
+signal variable_EXT_VETO : std_logic_vector (0 downto 0); 
+signal variable_LEMO_VET_EXT : std_logic_vector (0 downto 0); 
+signal U530_VALIDATION_EN : std_logic_vector (0 downto 0); 
+signal  U531_const_bin : std_logic_vector(0 downto 0) := "0";
+signal variable_VALIDATION_IN : std_logic_vector (0 downto 0); 
+signal U533_VALIDATION_IN : std_logic_vector (0 downto 0); 
+signal U534_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U535_out_0 : std_logic_vector(0 downto 0);
+signal U536_out_0 : std_logic_vector(0 downto 0);
+signal U537_out_0 : std_logic_vector(0 downto 0);
+signal U538_out_0 : std_logic_vector(0 downto 0);
+signal U539_VALIDATION_IN : std_logic_vector (0 downto 0); 
+signal U540_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U541_VALIDATION_IN : std_logic_vector (0 downto 0); 
+signal U542_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal U543_VALIDATION_IN : std_logic_vector (0 downto 0); 
+signal U544_FIFO_RESET : std_logic_vector (0 downto 0); 
+signal variable_GLOBAL_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U546_GLOBAL_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal variable_A_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U548_GLOBAL_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal variable_B_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U550_GLOBAL_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal variable_C_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U552_GLOBAL_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal variable_D_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U554_B_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U555_C_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U556_D_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U557_out_0 : std_logic_vector(0 downto 0);
+signal U558_out_0 : std_logic_vector(0 downto 0);
+signal U559_out_0 : std_logic_vector(0 downto 0);
+signal U560_out_0 : std_logic_vector(0 downto 0);
+signal U561_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U562_A_COINC_TRIG : std_logic_vector (0 downto 0); 
+signal U563_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U564_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U565_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U566_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U567_A_TRIG_T : std_logic_vector (0 downto 0); 
+signal U568_B_TRIG_T : std_logic_vector (0 downto 0); 
+signal U569_C_TRIG_T : std_logic_vector (0 downto 0); 
+signal U570_D_TRIG_T : std_logic_vector (0 downto 0); 
+signal U571_out_0 : std_logic_vector(0 downto 0);
+signal U572_out_0 : std_logic_vector(0 downto 0);
+signal U573_out_0 : std_logic_vector(0 downto 0);
+signal U574_out_0 : std_logic_vector(0 downto 0);
+signal U575_A_TRIG_C : std_logic_vector (0 downto 0); 
+signal U576_B_TRIG_C : std_logic_vector (0 downto 0); 
+signal U577_C_TRIG_C : std_logic_vector (0 downto 0); 
+signal U578_D_TRIG_C : std_logic_vector (0 downto 0); 
+signal U579_out_0 : std_logic_vector(0 downto 0);
+signal U580_out_0 : std_logic_vector(0 downto 0);
+signal U581_out_0 : std_logic_vector(0 downto 0);
+signal U582_out_0 : std_logic_vector(0 downto 0);
+signal U583_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U584_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U585_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U586_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U587_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U588_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U589_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U590_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U591_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U592_A_ABUSY : std_logic_vector (0 downto 0); 
+signal U593_B_ABUSY : std_logic_vector (0 downto 0); 
+signal U594_C_ABUSY : std_logic_vector (0 downto 0); 
+signal U595_D_ABUSY : std_logic_vector (0 downto 0); 
+signal U596_A_DEAD : std_logic_vector (0 downto 0); 
+signal U597_B_DEAD : std_logic_vector (0 downto 0); 
+signal U598_C_DEAD : std_logic_vector (0 downto 0); 
+signal U599_D_DEAD : std_logic_vector (0 downto 0); 
+signal U600_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal variable_SYSbusy : std_logic_vector (0 downto 0); 
+signal U602_SYSbusy : std_logic_vector (0 downto 0); 
+signal U604_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT pulseshaper
+  GENERIC( 
+	EDGE : STRING := "rising";
+	NO_DELAY : STRING := "true" );
+PORT( 
+	a : in STD_LOGIC_VECTOR(0 downto 0);
+	CE : in STD_LOGIC;
+	clk : in STD_LOGIC;
+	reset : in STD_LOGIC;
+	width : in INTEGER;
+	delay : in INTEGER;
+	b : out STD_LOGIC_VECTOR(0 downto 0) );
+END COMPONENT;
+signal U606_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U607_out_0 : std_logic_vector(31 downto 0);
+signal U608_int : integer range 0 to 2147483647 := 0;
+signal U609_out : std_logic_vector(0 downto 0);
+signal BUS_RateMeter_1_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_RateMeter_1_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+COMPONENT MCRateMeter
+  GENERIC( 
+	CHANNEL_COUNT : INTEGER := 32;
+	CLK_FREQ : INTEGER := 125000000 );
+PORT( 
+	trigger : in STD_LOGIC_VECTOR(CHANNEL_COUNT-1 downto 0);
+	VETO : in STD_LOGIC;
+	START : in STD_LOGIC;
+	CLK : in STD_LOGIC;
+	CLK_READ : in STD_LOGIC_VECTOR(0 downto 0);
+	READ_ADDRESS : in STD_LOGIC_VECTOR(15 downto 0);
+	READ_DATA : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_DATAVALID : out STD_LOGIC_VECTOR(0 downto 0) );
+END COMPONENT;
+signal BUS_RateMeter_0_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_RateMeter_0_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal BUS_RateMeter_2_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_RateMeter_2_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal BUS_RateMeter_3_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_RateMeter_3_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U618_out_0 : std_logic_vector(1 downto 0);
+signal U619_out : std_logic_vector(0 downto 0);
+signal  U620_const_bin : std_logic_vector(0 downto 0) := "0";
+signal U621_out_0 : std_logic_vector(0 downto 0);
+signal U622_RUN_START : std_logic_vector (0 downto 0); 
+signal U623_TRIG_OUT : std_logic_vector(0 downto 0);
+signal U623_TRIG_EXT_OUT : std_logic_vector(0 downto 0);
+signal U623_COINC_TRIG : std_logic_vector(0 downto 0);
+
+COMPONENT SUBPAGE_TriggerLogic
+PORT(
+	TRIG_T : IN std_logic_vector(0 downto 0);
+	TRIG_C : IN std_logic_vector(0 downto 0);
+	EXT_TRIG : IN std_logic_vector(0 downto 0);
+	GLB_TRIG : IN std_logic_vector(0 downto 0);
+	SELF_TRIG : IN std_logic_vector(0 downto 0);
+	GBL_COINC : IN std_logic_vector(0 downto 0);
+	SEL_TRIG : IN std_logic_vector(2 downto 0);
+	EN_VETO : IN std_logic_vector(0 downto 0);
+	EXT_VETO : IN std_logic_vector(0 downto 0);
+	SW_VETO : IN std_logic_vector(0 downto 0);
+	TRIGs : IN std_logic_vector(31 downto 0);
+	TRIG_OUT : OUT std_logic_vector(0 downto 0);
+	TRIG_EXT_OUT : OUT std_logic_vector(0 downto 0);
+	COINC_TRIG : OUT std_logic_vector(0 downto 0);
+    GlobalReset: IN STD_LOGIC_VECTOR(0 DOWNTO 0); 
+    CLK_ACQ: in std_logic_vector (0 downto 0); 
+    BUS_CLK: in std_logic_vector (0 downto 0); 
+    CLK_40: in std_logic_vector (0 downto 0); 
+    CLK_50: in std_logic_vector (0 downto 0); 
+    CLK_80: in std_logic_vector (0 downto 0); 
+    clk_160: in std_logic_vector (0 downto 0); 
+    clk_125: in std_logic_vector (0 downto 0); 
+    clk_320: in std_logic_vector (0 downto 0); 
+    FAST_CLK_100: in std_logic_vector (0 downto 0); 
+    FAST_CLK_200: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250: in std_logic_vector (0 downto 0); 
+    FAST_CLK_250_90: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500: in std_logic_vector (0 downto 0); 
+    FAST_CLK_500_90: in std_logic_vector (0 downto 0); 
+    GlobalClock: in std_logic_vector (0 downto 0); 
+    async_clk: IN STD_LOGIC_VECTOR(0 DOWNTO 0)); 
+END COMPONENT;
+signal U624_TRIG_OUT : std_logic_vector(0 downto 0);
+signal U624_TRIG_EXT_OUT : std_logic_vector(0 downto 0);
+signal U624_COINC_TRIG : std_logic_vector(0 downto 0);
+signal U625_TRIG_OUT : std_logic_vector(0 downto 0);
+signal U625_TRIG_EXT_OUT : std_logic_vector(0 downto 0);
+signal U625_COINC_TRIG : std_logic_vector(0 downto 0);
+signal U626_TRIG_OUT : std_logic_vector(0 downto 0);
+signal U626_TRIG_EXT_OUT : std_logic_vector(0 downto 0);
+signal U626_COINC_TRIG : std_logic_vector(0 downto 0);
+signal variable_DEAD_SIG : std_logic_vector (0 downto 0); 
+signal U628_out_0 : std_logic_vector(31 downto 0);
+signal U629_out_0 : std_logic_vector(31 downto 0);
+signal U630_out_0 : std_logic_vector(31 downto 0);
+signal U631_out_0 : std_logic_vector(31 downto 0);
+signal BUS_Oscilloscope_0_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_0_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_Oscilloscope_0_READ_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal REG_Oscilloscope_0_READ_POSITION_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+COMPONENT xlx_oscilloscope_sync
+  GENERIC( 
+	channels : INTEGER := 2;
+	memLength : INTEGER := 1024;
+	wordWidth : INTEGER := 16 );
+PORT( 
+	ANALOG : in STD_LOGIC_VECTOR((wordWidth*channels)-1 downto 0);
+	D0 : in STD_LOGIC_VECTOR(channels-1 downto 0);
+	D1 : in STD_LOGIC_VECTOR(channels-1 downto 0);
+	D2 : in STD_LOGIC_VECTOR(channels-1 downto 0);
+	D3 : in STD_LOGIC_VECTOR(channels-1 downto 0);
+	TRIG : in STD_LOGIC_VECTOR(0 downto 0);
+	BUSY : out STD_LOGIC_VECTOR(0 downto 0);
+	CE : in STD_LOGIC_VECTOR(0 downto 0);
+	CLK_WRITE : in STD_LOGIC_VECTOR(0 downto 0);
+	RESET : in STD_LOGIC_VECTOR(0 downto 0);
+	CLK_READ : in STD_LOGIC_VECTOR(0 downto 0);
+	READ_ADDRESS : in STD_LOGIC_VECTOR(integer(ceil(log2(real(memLength*channels))))-1 downto 0);
+	READ_DATA : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_DATAVALID : out STD_LOGIC_VECTOR(0 downto 0);
+	READ_STATUS : out STD_LOGIC_VECTOR(31 downto 0);
+	READ_POSITION : out STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG_TRIGGER_MODE : in STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG_TRIGGER_LEVEL : in STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG_PRETRIGGER : in STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG_DECIMATOR : in STD_LOGIC_VECTOR(31 downto 0);
+	CONFIG_ARM : in STD_LOGIC_VECTOR(31 downto 0) );
+END COMPONENT;
+signal BUS_Oscilloscope_1_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_1_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_Oscilloscope_1_READ_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal REG_Oscilloscope_1_READ_POSITION_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_2_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_2_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_Oscilloscope_2_READ_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal REG_Oscilloscope_2_READ_POSITION_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_3_READ_DATA : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal BUS_Oscilloscope_3_VLD : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal REG_Oscilloscope_3_READ_STATUS_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal REG_Oscilloscope_3_READ_POSITION_RD : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U640_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U641_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U642_RUN_START : std_logic_vector (0 downto 0); 
+signal U643_out_0 : std_logic_vector(0 downto 0);
+signal U644_TIMESTAMP : STD_LOGIC_VECTOR (31 DOWNTO 0);
+signal U645_out : std_logic_vector(0 downto 0);
+Component FF_SR Is
+   port(        CE: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        RESET :  IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        SET: IN STD_LOGIC_VECTOR (0 DOWNTO 0);
+        PORT_OUT: OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+        );
+End component;
+signal U646_out : std_logic_vector(0 downto 0) := (others => '0');
+signal U647_out_0 : std_logic_vector(1 downto 0);
+signal  U648_const_bin : std_logic_vector(0 downto 0) := "0";
+signal U649_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal variable_ISRUNNING : std_logic_vector (0 downto 0); 
+signal U651_hold : std_logic_vector(31 downto 0);
+signal U652_out_0 : std_logic_vector(0 downto 0);
+signal U653_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U654_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U655_ISRUNNING : std_logic_vector (0 downto 0); 
+signal U656_out : std_logic_vector(0 downto 0);
+signal U657_out_0 : std_logic_vector(1 downto 0);
+signal U659_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U660_CONST : INTEGER := 0;
+signal  U661_const_bin : std_logic_vector(0 downto 0) := "0";
+signal U662_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U663_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U664_out_0 : std_logic_vector(0 downto 0);
+signal U665_hold : std_logic_vector(31 downto 0);
+signal U666_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U667_out_0 : std_logic_vector(0 downto 0);
+signal U669_OUT : STD_LOGIC_VECTOR (0 DOWNTO 0);
+signal U670_CONST : INTEGER := 0;
+signal U671_hold : std_logic_vector(31 downto 0);
+	signal BUS_CitirocCfg1_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CitirocCfg1_READ_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg1_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg1_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg1_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg1_VLD : STD_LOGIC_VECTOR(0 downto 0) := "1";
+	signal REG_CitirocCfg1_REG_CFG0_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG0_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG1_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG1_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG2_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG2_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG3_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG3_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG4_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG4_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG5_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG5_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG6_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG6_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG7_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG7_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG8_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG8_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG9_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG9_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG10_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG10_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG11_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG11_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG12_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG12_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG13_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG13_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG14_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG14_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG15_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG15_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG16_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG16_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG17_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG17_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG18_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG18_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG19_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG19_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG20_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG20_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG21_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG21_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG22_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG22_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG23_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG23_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG24_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG24_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG25_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG25_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG26_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG26_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG27_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG27_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG28_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG28_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG29_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG29_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG30_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG30_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG31_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG31_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG32_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG32_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG33_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG33_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG34_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG34_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_REG_CFG35_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_REG_CFG35_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg1_START_REG_CFG_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg1_START_REG_CFG_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg2_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CitirocCfg2_READ_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg2_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg2_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg2_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg2_VLD : STD_LOGIC_VECTOR(0 downto 0) := "1";
+	signal REG_CitirocCfg2_REG_CFG0_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG0_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG1_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG1_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG2_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG2_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG3_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG3_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG4_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG4_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG5_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG5_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG6_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG6_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG7_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG7_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG8_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG8_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG9_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG9_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG10_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG10_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG11_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG11_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG12_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG12_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG13_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG13_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG14_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG14_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG15_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG15_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG16_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG16_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG17_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG17_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG18_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG18_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG19_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG19_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG20_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG20_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG21_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG21_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG22_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG22_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG23_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG23_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG24_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG24_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG25_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG25_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG26_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG26_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG27_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG27_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG28_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG28_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG29_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG29_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG30_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG30_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG31_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG31_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG32_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG32_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG33_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG33_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG34_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG34_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_REG_CFG35_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_REG_CFG35_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg2_START_REG_CFG_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg2_START_REG_CFG_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg3_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CitirocCfg3_READ_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg3_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg3_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg3_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg3_VLD : STD_LOGIC_VECTOR(0 downto 0) := "1";
+	signal REG_CitirocCfg3_REG_CFG0_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG0_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG1_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG1_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG2_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG2_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG3_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG3_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG4_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG4_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG5_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG5_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG6_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG6_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG7_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG7_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG8_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG8_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG9_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG9_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG10_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG10_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG11_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG11_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG12_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG12_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG13_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG13_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG14_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG14_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG15_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG15_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG16_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG16_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG17_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG17_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG18_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG18_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG19_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG19_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG20_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG20_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG21_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG21_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG22_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG22_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG23_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG23_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG24_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG24_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG25_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG25_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG26_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG26_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG27_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG27_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG28_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG28_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG29_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG29_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG30_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG30_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG31_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG31_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG32_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG32_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG33_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG33_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG34_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG34_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_REG_CFG35_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_REG_CFG35_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg3_START_REG_CFG_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg3_START_REG_CFG_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg0_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CitirocCfg0_READ_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg0_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocCfg0_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg0_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocCfg0_VLD : STD_LOGIC_VECTOR(0 downto 0) := "1";
+	signal REG_CitirocCfg0_REG_CFG0_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG0_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG1_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG1_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG2_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG2_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG3_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG3_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG4_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG4_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG5_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG5_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG6_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG6_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG7_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG7_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG8_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG8_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG9_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG9_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG10_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG10_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG11_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG11_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG12_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG12_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG13_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG13_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG14_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG14_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG15_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG15_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG16_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG16_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG17_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG17_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG18_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG18_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG19_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG19_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG20_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG20_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG21_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG21_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG22_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG22_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG23_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG23_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG24_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG24_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG25_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG25_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG26_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG26_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG27_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG27_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG28_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG28_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG29_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG29_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG30_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG30_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG31_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG31_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG32_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG32_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG33_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG33_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG34_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG34_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_REG_CFG35_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_REG_CFG35_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocCfg0_START_REG_CFG_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocCfg0_START_REG_CFG_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CP_0_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CP_0_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CP_0_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CP_0_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_CP_0_READ_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_CP_0_READ_VALID_WORDS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CP_0_CONFIG_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CP_0_CONFIG_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocFrame0_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_CitirocFrame0_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_CitirocFrame0_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_CitirocFrame0_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_CitirocFrame0_CONTROL_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_CitirocFrame0_CONTROL_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_CitirocFrame0_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_DTWC_READ_ADDRESS : STD_LOGIC_VECTOR(-1 downto 0);
+	signal BUS_DTWC_READ_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_DTWC_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_DTWC_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_DTWC_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_DTWC_VLD : STD_LOGIC_VECTOR(0 downto 0) := "1";
+	signal BUS_RateMeter_2_READ_ADDRESS : STD_LOGIC_VECTOR(15 downto 0);
+	signal BUS_RateMeter_2_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_RateMeter_2_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_2_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_3_READ_ADDRESS : STD_LOGIC_VECTOR(15 downto 0);
+	signal BUS_RateMeter_3_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_RateMeter_3_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_3_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_0_READ_ADDRESS : STD_LOGIC_VECTOR(15 downto 0);
+	signal BUS_RateMeter_0_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_RateMeter_0_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_0_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_1_READ_ADDRESS : STD_LOGIC_VECTOR(15 downto 0);
+	signal BUS_RateMeter_1_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_RateMeter_1_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_RateMeter_1_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_0_READ_ADDRESS : STD_LOGIC_VECTOR(10 downto 0);
+	signal BUS_Oscilloscope_0_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_Oscilloscope_0_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_0_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_0_READ_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_0_READ_POSITION_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_0_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_0_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_0_CONFIG_ARM_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_0_CONFIG_ARM_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_0_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_0_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_1_READ_ADDRESS : STD_LOGIC_VECTOR(10 downto 0);
+	signal BUS_Oscilloscope_1_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_Oscilloscope_1_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_1_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_1_READ_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_1_READ_POSITION_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_1_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_1_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_1_CONFIG_ARM_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_1_CONFIG_ARM_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_1_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_1_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_2_READ_ADDRESS : STD_LOGIC_VECTOR(10 downto 0);
+	signal BUS_Oscilloscope_2_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_Oscilloscope_2_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_2_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_2_READ_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_2_READ_POSITION_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_2_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_2_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_2_CONFIG_ARM_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_2_CONFIG_ARM_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_2_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_2_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_3_READ_ADDRESS : STD_LOGIC_VECTOR(10 downto 0);
+	signal BUS_Oscilloscope_3_WRITE_DATA : STD_LOGIC_VECTOR(31 downto 0);
+	signal BUS_Oscilloscope_3_W_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal BUS_Oscilloscope_3_R_INT : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_3_READ_STATUS_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal INT_Oscilloscope_3_READ_POSITION_RD : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_3_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_3_CONFIG_PRETRIGGER_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_3_CONFIG_ARM_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_3_CONFIG_ARM_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_Oscilloscope_3_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(31 downto 0);
+	signal INT_Oscilloscope_3_CONFIG_DECIMATOR_WR : STD_LOGIC_VECTOR(0 downto 0);
+	signal REG_TRIG_A_SEL_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_A_SEL_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_A_SEL_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_A_SEL_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VET_A_EN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VET_A_EN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VET_A_EN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VET_A_EN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VET_B_EN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VET_B_EN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VET_B_EN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VET_B_EN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VET_C_EN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VET_C_EN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VET_C_EN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VET_C_EN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VET_D_EN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VET_D_EN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VET_D_EN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VET_D_EN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_SW_VET_A_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_SW_VET_A_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_SW_VET_A_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_SW_VET_A_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_SW_VET_B_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_SW_VET_B_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_SW_VET_B_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_SW_VET_B_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_SW_VET_C_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_SW_VET_C_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_SW_VET_C_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_SW_VET_C_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_SW_VET_D_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_SW_VET_D_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_SW_VET_D_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_SW_VET_D_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIG_GBL_SEL_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_GBL_SEL_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_GBL_SEL_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_GBL_SEL_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_EXT_DELAY_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_EXT_DELAY_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_EXT_DELAY_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_EXT_DELAY_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_SW_TRIG_FREQ_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_SW_TRIG_FREQ_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_SW_TRIG_FREQ_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_SW_TRIG_FREQ_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_A_RATE_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_A_RATE_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_A_RATE_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_A_RATE_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_B_RATE_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_B_RATE_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_B_RATE_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_B_RATE_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_C_RATE_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_C_RATE_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_C_RATE_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_C_RATE_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_D_RATE_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_D_RATE_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_D_RATE_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_D_RATE_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T0_COUNT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T0_COUNT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T0_COUNT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T0_COUNT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_A_TRG_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_A_TRG_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_A_TRG_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_A_TRG_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_B_TRG_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_B_TRG_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_B_TRG_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_B_TRG_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_C_TRG_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_C_TRG_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_C_TRG_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_C_TRG_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_D_TRG_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_D_TRG_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_D_TRG_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_D_TRG_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_RUNSTART_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_RUNSTART_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_RUNSTART_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_RUNSTART_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_RUN_TIME_LSB_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_RUN_TIME_LSB_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_RUN_TIME_LSB_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_RUN_TIME_LSB_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_RUN_TIME_MSB_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_RUN_TIME_MSB_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_RUN_TIME_MSB_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_RUN_TIME_MSB_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_DEAD_TIME_LSB_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_DEAD_TIME_LSB_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_DEAD_TIME_LSB_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_DEAD_TIME_LSB_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_DEAD_TIME_MSB_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_DEAD_TIME_MSB_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_DEAD_TIME_MSB_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_DEAD_TIME_MSB_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_A_LOST_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_A_LOST_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_A_LOST_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_A_LOST_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_B_LOST_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_B_LOST_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_B_LOST_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_B_LOST_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_C_LOST_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_C_LOST_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_C_LOST_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_C_LOST_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_D_LOST_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_D_LOST_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_D_LOST_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_D_LOST_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T0_SOFT_FREQ_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T0_SOFT_FREQ_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T0_SOFT_FREQ_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T0_SOFT_FREQ_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T0_SEL_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T0_SEL_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T0_SEL_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T0_SEL_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HOLD_TIME_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HOLD_TIME_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HOLD_TIME_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HOLD_TIME_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_IFP_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_IFP_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_IFP_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_IFP_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_LIMIT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_LIMIT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_LIMIT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_LIMIT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_IFP2_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_IFP2_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_IFP2_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_IFP2_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_MODE_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_MODE_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_MODE_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_MODE_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_DBG1_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_DBG1_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_DBG1_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_DBG1_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_FR_DBG2_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_FR_DBG2_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_FR_DBG2_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_FR_DBG2_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VALIDATION_CFG_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VALIDATION_CFG_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VALIDATION_CFG_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VALIDATION_CFG_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_ON_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_ON_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_ON_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_ON_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_EMERGENCY_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_EMERGENCY_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_EMERGENCY_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_EMERGENCY_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_VOUT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_VOUT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_VOUT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_VOUT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_ENTCOMP_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_ENTCOMP_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_ENTCOMP_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_ENTCOMP_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_TM_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_TM_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_TM_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_TM_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_TQ_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_TQ_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_TQ_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_TQ_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_TCOEF_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_TCOEF_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_TCOEF_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_TCOEF_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_IMAX_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_IMAX_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_IMAX_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_IMAX_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_RAMP_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_RAMP_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_RAMP_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_RAMP_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_VMAX_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_VMAX_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_VMAX_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_VMAX_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MSTATUS_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MSTATUS_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MSTATUS_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MSTATUS_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MVOUT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MVOUT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MVOUT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MVOUT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MTEMP_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MTEMP_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MTEMP_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MTEMP_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MVTARGET_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MVTARGET_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MVTARGET_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MVTARGET_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MAVTARGET_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MAVTARGET_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MAVTARGET_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MAVTARGET_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T_SENS1_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T_SENS1_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T_SENS1_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T_SENS1_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T_SENS2_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T_SENS2_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T_SENS2_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T_SENS2_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_HV_MIOUT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_HV_MIOUT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_HV_MIOUT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_HV_MIOUT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIGGER_OUT_W_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIGGER_OUT_W_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIGGER_OUT_W_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIGGER_OUT_W_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T0SW_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T0SW_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T0SW_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T0SW_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_GTS_RESSEL_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_GTS_RESSEL_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_GTS_RESSEL_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_GTS_RESSEL_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIG_MASK_A_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_MASK_A_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_MASK_A_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_MASK_A_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIG_MASK_B_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_MASK_B_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_MASK_B_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_MASK_B_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIG_MASK_C_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_MASK_C_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_MASK_C_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_MASK_C_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRIG_MASK_D_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRIG_MASK_D_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRIG_MASK_D_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRIG_MASK_D_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_T0_RESET_ON_START_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_T0_RESET_ON_START_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_T0_RESET_ON_START_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_T0_RESET_ON_START_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_ISRUNNING_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_ISRUNNING_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_ISRUNNING_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_ISRUNNING_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_VETO_WAIT_RUN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_VETO_WAIT_RUN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_VETO_WAIT_RUN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_VETO_WAIT_RUN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_GBL_EN_VETO_EXT_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_GBL_EN_VETO_EXT_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_GBL_EN_VETO_EXT_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_GBL_EN_VETO_EXT_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_INVETO_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_INVETO_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_INVETO_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_INVETO_RD : STD_LOGIC_VECTOR(0 downto 0); 
+	signal REG_TRG_OUT_MONOSTABLE_EN_RD : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal REG_TRG_OUT_MONOSTABLE_EN_WR : STD_LOGIC_VECTOR(31 downto 0) := x"00000000"; 
+	signal INT_TRG_OUT_MONOSTABLE_EN_WR : STD_LOGIC_VECTOR(0 downto 0); 
+	signal INT_TRG_OUT_MONOSTABLE_EN_RD : STD_LOGIC_VECTOR(0 downto 0); 
+
+	
+begin
+
+   D_CLK_LVDS : IBUFDS
+   generic map (
+      DIFF_TERM => TRUE, 
+      IBUF_LOW_PWR => TRUE,
+      IOSTANDARD => "LVDS25")
+   port map (
+      O => D_LVDS_DCLK, 
+      I => D_LVDS_DCLK_P,
+      IB => D_LVDS_DCLK_N
+   );   
+   
+   dcm_top: DTClockGenerator
+    port map
+     (
+       clk_out1 => CLK_320(0),
+       clk_out2 => CLK_160(0),
+       clk_out3 => CLK_80(0),
+       clk_out4 => CLK_40(0),
+	   clk_out5 => CLK_AUX_OUT_25,
+       locked => GlobalDCMLock,
+       clk_in1  => D_LVDS_DCLK
+     );
+     
+	RESET_DCM2 <= not GlobalDCMLock;
+	  
+	FASTCLOCKGEN : fast_clock 
+        port Map(
+            clk_100 => FAST_CLK_100(0),
+            clk_200 => FAST_CLK_200(0),
+            clk_250 => FAST_CLK_250(0),
+            clk_250_90=> FAST_CLK_250_90(0),
+            clk_500 => FAST_CLK_500(0),
+            clk_500_90 => FAST_CLK_500_90(0),
+                        
+            reset => RESET_DCM2,
+            locked => LOCKED_DCM2,
+            clk_in1 => CLK_80(0)
+        );		
+		
+
+
+	tdc_05ns_pll_IST : tdc_05ns_pll
+   port map (
+		clk_out1    => TDC_SYNC_CLK(0),
+		clk_out2    => TDC_SYNC_CLK(1),
+		clk_out3    => TDC_SYNC_CLK(2),
+		clk_out4 	=> TDC_SYNC_CLK(3),
+		clk_out5    => TDC_SYNC_CLK(4),
+		clk_out6	=> TDC_SYNC_CLK(5),
+
+		locked     => open,
+		clk_in1    => D_LVDS_DCLK
+   );
+		--125 MHz clock all logic
+	async_clk(0)   <= TDC_SYNC_CLK(0);-- D_LVDS_DCLK;
+	CLK_ACQ(0)     <= TDC_SYNC_CLK(0);-- D_LVDS_DCLK;
+	GlobalClock(0) <= TDC_SYNC_CLK(0);-- D_LVDS_DCLK;
+	BUS_CLK(0)     <= TDC_SYNC_CLK(0);-- D_LVDS_DCLK;		
+   
+     CLK_125(0)    <= TDC_SYNC_CLK(0);   
+	GlobalReset(0) <= not LOCKED_DCM2;
+
+	--LED_TEST <= license_ok and LOCKED_DCM2;		
+
+   
+   
+    xpm_cdc_single_inst: xpm_cdc_single
+      generic map (
+         DEST_SYNC_FF   => 4, -- integer; range: 2-10
+         INIT_SYNC_FF   => 0, -- integer; 0=disable simulation init values, 1=enable simulation init values
+         SIM_ASSERT_CHK => 0, -- integer; 0=disable simulation messages, 1=enable simulation messages
+         SRC_INPUT_REG  => 1  -- integer; 0=do not register input, 1=register input
+      )
+      port map (
+         src_clk  => BUS_CLK(0),  -- optional; required when SRC_INPUT_REG = 1
+         src_in   => REG_Fiforeset(0),
+         dest_clk => GlobalClock(0),
+         dest_out => cFiforeset
+      );
+
+	fifo_reset(0) <= cFiforeset;
+
+	
+	USBInterface: ft600_fifo245_wrapper PORT MAP(
+	
+	    EEMOSI => EEMOSI,
+        EEMISO => EEMISO,
+        EECLK => EECLK,
+        EECS => EECS,    
+        license_ok => license_ok,
+        
+		
+		FTDI_ADBUS => FTDI_ADBUS,
+        FTDI_RXFN => FTDI_RXFN,
+        FTDI_TXEN => FTDI_TXEN,
+        FTDI_RDN => FTDI_RDN,
+        FTDI_TXN => FTDI_TXN,
+        FTDI_CLK => FTDI_CLK,
+        FTDI_OEN => FTDI_OEN,
+        FTDI_SIWU => FTDI_SIWU,
+        FTDI_BE => FTDI_BE,
+        f_CLK => BUS_CLK(0),
+
+        REG_Fiforeset_RD => REG_Fiforeset, 
+        REG_Fiforeset_WR => REG_Fiforeset, 
+        INT_Fiforeset_RD => open, 
+        INT_Fiforeset_WR => open,
+        
+     
+      --FLASH CONTROLLER
+        BUS_Flash_0_READ_DATA => BUS_Flash_0_READ_DATA,
+        BUS_Flash_0_ADDRESS => BUS_Flash_0_ADDRESS, 
+        BUS_Flash_0_WRITE_DATA => BUS_Flash_0_WRITE_DATA, 
+        BUS_Flash_0_W_INT => BUS_Flash_0_W_INT, 
+        BUS_Flash_0_R_INT => BUS_Flash_0_R_INT, 
+        BUS_Flash_0_VLD => BUS_Flash_0_VLD, 
+        
+        REG_FLASH_CNTR_RD => REG_FLASH_CNTR_RD, 
+        REG_FLASH_CNTR_WR => REG_FLASH_CNTR_WR, 
+        INT_FLASH_CNTR_RD => INT_FLASH_CNTR_RD, 
+        INT_FLASH_CNTR_WR => INT_FLASH_CNTR_WR, 
+        
+        REG_FLASH_ADDRESS_RD => REG_FLASH_ADDRESS_RD, 
+        REG_FLASH_ADDRESS_WR => REG_FLASH_ADDRESS_WR, 
+        INT_FLASH_ADDRESS_RD => INT_FLASH_ADDRESS_RD, 
+        INT_FLASH_ADDRESS_WR => INT_FLASH_ADDRESS_WR,     
+        
+        -- Test 
+        BUS_Test_0_READ_DATA => BUS_Test_0_READ_DATA,
+        BUS_Test_0_ADDRESS => BUS_Test_0_ADDRESS, 
+        BUS_Test_0_WRITE_DATA => BUS_Test_0_WRITE_DATA, 
+        BUS_Test_0_W_INT => BUS_Test_0_W_INT, 
+        BUS_Test_0_R_INT => BUS_Test_0_R_INT, 
+        BUS_Test_0_VLD => BUS_Test_0_VLD,         
+		
+		PGB_EEPROM_KEY  => PGB_EEPROM_KEY,
+		PGB_REG_MODEL   => PGB_REG_MODEL,
+		PGB_BOARD_SN    => PGB_BOARD_SN,
+		PGB_ASIC_COUNT  => PGB_ASIC_COUNT,
+		INT_EEPROM_WR 	=> INT_EEPROM_WR,
+		REG_EEPROM_WR   => REG_EEPROM_WR,
+		REG_IIC_STATUS	=> REG_IIC_STATUS,
+   	
+		-- Register interface  
+				REG_TRIG_A_SEL_RD => REG_TRIG_A_SEL_RD,
+		REG_TRIG_A_SEL_WR => REG_TRIG_A_SEL_WR,
+		INT_TRIG_A_SEL_RD => INT_TRIG_A_SEL_RD,
+		INT_TRIG_A_SEL_WR => INT_TRIG_A_SEL_WR,
+		REG_VET_A_EN_RD => REG_VET_A_EN_RD,
+		REG_VET_A_EN_WR => REG_VET_A_EN_WR,
+		INT_VET_A_EN_RD => INT_VET_A_EN_RD,
+		INT_VET_A_EN_WR => INT_VET_A_EN_WR,
+		REG_VET_B_EN_RD => REG_VET_B_EN_RD,
+		REG_VET_B_EN_WR => REG_VET_B_EN_WR,
+		INT_VET_B_EN_RD => INT_VET_B_EN_RD,
+		INT_VET_B_EN_WR => INT_VET_B_EN_WR,
+		REG_VET_C_EN_RD => REG_VET_C_EN_RD,
+		REG_VET_C_EN_WR => REG_VET_C_EN_WR,
+		INT_VET_C_EN_RD => INT_VET_C_EN_RD,
+		INT_VET_C_EN_WR => INT_VET_C_EN_WR,
+		REG_VET_D_EN_RD => REG_VET_D_EN_RD,
+		REG_VET_D_EN_WR => REG_VET_D_EN_WR,
+		INT_VET_D_EN_RD => INT_VET_D_EN_RD,
+		INT_VET_D_EN_WR => INT_VET_D_EN_WR,
+		REG_SW_VET_A_RD => REG_SW_VET_A_RD,
+		REG_SW_VET_A_WR => REG_SW_VET_A_WR,
+		INT_SW_VET_A_RD => INT_SW_VET_A_RD,
+		INT_SW_VET_A_WR => INT_SW_VET_A_WR,
+		REG_SW_VET_B_RD => REG_SW_VET_B_RD,
+		REG_SW_VET_B_WR => REG_SW_VET_B_WR,
+		INT_SW_VET_B_RD => INT_SW_VET_B_RD,
+		INT_SW_VET_B_WR => INT_SW_VET_B_WR,
+		REG_SW_VET_C_RD => REG_SW_VET_C_RD,
+		REG_SW_VET_C_WR => REG_SW_VET_C_WR,
+		INT_SW_VET_C_RD => INT_SW_VET_C_RD,
+		INT_SW_VET_C_WR => INT_SW_VET_C_WR,
+		REG_SW_VET_D_RD => REG_SW_VET_D_RD,
+		REG_SW_VET_D_WR => REG_SW_VET_D_WR,
+		INT_SW_VET_D_RD => INT_SW_VET_D_RD,
+		INT_SW_VET_D_WR => INT_SW_VET_D_WR,
+		REG_TRIG_GBL_SEL_RD => REG_TRIG_GBL_SEL_RD,
+		REG_TRIG_GBL_SEL_WR => REG_TRIG_GBL_SEL_WR,
+		INT_TRIG_GBL_SEL_RD => INT_TRIG_GBL_SEL_RD,
+		INT_TRIG_GBL_SEL_WR => INT_TRIG_GBL_SEL_WR,
+		REG_EXT_DELAY_RD => REG_EXT_DELAY_RD,
+		REG_EXT_DELAY_WR => REG_EXT_DELAY_WR,
+		INT_EXT_DELAY_RD => INT_EXT_DELAY_RD,
+		INT_EXT_DELAY_WR => INT_EXT_DELAY_WR,
+		REG_SW_TRIG_FREQ_RD => REG_SW_TRIG_FREQ_RD,
+		REG_SW_TRIG_FREQ_WR => REG_SW_TRIG_FREQ_WR,
+		INT_SW_TRIG_FREQ_RD => INT_SW_TRIG_FREQ_RD,
+		INT_SW_TRIG_FREQ_WR => INT_SW_TRIG_FREQ_WR,
+		REG_A_RATE_RD => REG_A_RATE_RD,
+		REG_A_RATE_WR => REG_A_RATE_WR,
+		INT_A_RATE_RD => INT_A_RATE_RD,
+		INT_A_RATE_WR => INT_A_RATE_WR,
+		REG_B_RATE_RD => REG_B_RATE_RD,
+		REG_B_RATE_WR => REG_B_RATE_WR,
+		INT_B_RATE_RD => INT_B_RATE_RD,
+		INT_B_RATE_WR => INT_B_RATE_WR,
+		REG_C_RATE_RD => REG_C_RATE_RD,
+		REG_C_RATE_WR => REG_C_RATE_WR,
+		INT_C_RATE_RD => INT_C_RATE_RD,
+		INT_C_RATE_WR => INT_C_RATE_WR,
+		REG_D_RATE_RD => REG_D_RATE_RD,
+		REG_D_RATE_WR => REG_D_RATE_WR,
+		INT_D_RATE_RD => INT_D_RATE_RD,
+		INT_D_RATE_WR => INT_D_RATE_WR,
+		REG_T0_COUNT_RD => REG_T0_COUNT_RD,
+		REG_T0_COUNT_WR => REG_T0_COUNT_WR,
+		INT_T0_COUNT_RD => INT_T0_COUNT_RD,
+		INT_T0_COUNT_WR => INT_T0_COUNT_WR,
+		REG_A_TRG_RD => REG_A_TRG_RD,
+		REG_A_TRG_WR => REG_A_TRG_WR,
+		INT_A_TRG_RD => INT_A_TRG_RD,
+		INT_A_TRG_WR => INT_A_TRG_WR,
+		REG_B_TRG_RD => REG_B_TRG_RD,
+		REG_B_TRG_WR => REG_B_TRG_WR,
+		INT_B_TRG_RD => INT_B_TRG_RD,
+		INT_B_TRG_WR => INT_B_TRG_WR,
+		REG_C_TRG_RD => REG_C_TRG_RD,
+		REG_C_TRG_WR => REG_C_TRG_WR,
+		INT_C_TRG_RD => INT_C_TRG_RD,
+		INT_C_TRG_WR => INT_C_TRG_WR,
+		REG_D_TRG_RD => REG_D_TRG_RD,
+		REG_D_TRG_WR => REG_D_TRG_WR,
+		INT_D_TRG_RD => INT_D_TRG_RD,
+		INT_D_TRG_WR => INT_D_TRG_WR,
+		REG_RUNSTART_RD => REG_RUNSTART_RD,
+		REG_RUNSTART_WR => REG_RUNSTART_WR,
+		INT_RUNSTART_RD => INT_RUNSTART_RD,
+		INT_RUNSTART_WR => INT_RUNSTART_WR,
+		REG_RUN_TIME_LSB_RD => REG_RUN_TIME_LSB_RD,
+		REG_RUN_TIME_LSB_WR => REG_RUN_TIME_LSB_WR,
+		INT_RUN_TIME_LSB_RD => INT_RUN_TIME_LSB_RD,
+		INT_RUN_TIME_LSB_WR => INT_RUN_TIME_LSB_WR,
+		REG_RUN_TIME_MSB_RD => REG_RUN_TIME_MSB_RD,
+		REG_RUN_TIME_MSB_WR => REG_RUN_TIME_MSB_WR,
+		INT_RUN_TIME_MSB_RD => INT_RUN_TIME_MSB_RD,
+		INT_RUN_TIME_MSB_WR => INT_RUN_TIME_MSB_WR,
+		REG_DEAD_TIME_LSB_RD => REG_DEAD_TIME_LSB_RD,
+		REG_DEAD_TIME_LSB_WR => REG_DEAD_TIME_LSB_WR,
+		INT_DEAD_TIME_LSB_RD => INT_DEAD_TIME_LSB_RD,
+		INT_DEAD_TIME_LSB_WR => INT_DEAD_TIME_LSB_WR,
+		REG_DEAD_TIME_MSB_RD => REG_DEAD_TIME_MSB_RD,
+		REG_DEAD_TIME_MSB_WR => REG_DEAD_TIME_MSB_WR,
+		INT_DEAD_TIME_MSB_RD => INT_DEAD_TIME_MSB_RD,
+		INT_DEAD_TIME_MSB_WR => INT_DEAD_TIME_MSB_WR,
+		REG_A_LOST_RD => REG_A_LOST_RD,
+		REG_A_LOST_WR => REG_A_LOST_WR,
+		INT_A_LOST_RD => INT_A_LOST_RD,
+		INT_A_LOST_WR => INT_A_LOST_WR,
+		REG_B_LOST_RD => REG_B_LOST_RD,
+		REG_B_LOST_WR => REG_B_LOST_WR,
+		INT_B_LOST_RD => INT_B_LOST_RD,
+		INT_B_LOST_WR => INT_B_LOST_WR,
+		REG_C_LOST_RD => REG_C_LOST_RD,
+		REG_C_LOST_WR => REG_C_LOST_WR,
+		INT_C_LOST_RD => INT_C_LOST_RD,
+		INT_C_LOST_WR => INT_C_LOST_WR,
+		REG_D_LOST_RD => REG_D_LOST_RD,
+		REG_D_LOST_WR => REG_D_LOST_WR,
+		INT_D_LOST_RD => INT_D_LOST_RD,
+		INT_D_LOST_WR => INT_D_LOST_WR,
+	BUS_CitirocCfg1_READ_DATA => BUS_CitirocCfg1_READ_DATA,
+	BUS_CitirocCfg1_WRITE_DATA => BUS_CitirocCfg1_WRITE_DATA,
+	BUS_CitirocCfg1_W_INT => BUS_CitirocCfg1_W_INT,
+	BUS_CitirocCfg1_R_INT => BUS_CitirocCfg1_R_INT,
+	BUS_CitirocCfg1_VLD => BUS_CitirocCfg1_VLD,
+		REG_CitirocCfg1_REG_CFG0_WR => REG_CitirocCfg1_REG_CFG0_WR,
+		INT_CitirocCfg1_REG_CFG0_WR => INT_CitirocCfg1_REG_CFG0_WR,
+		REG_CitirocCfg1_REG_CFG1_WR => REG_CitirocCfg1_REG_CFG1_WR,
+		INT_CitirocCfg1_REG_CFG1_WR => INT_CitirocCfg1_REG_CFG1_WR,
+		REG_CitirocCfg1_REG_CFG2_WR => REG_CitirocCfg1_REG_CFG2_WR,
+		INT_CitirocCfg1_REG_CFG2_WR => INT_CitirocCfg1_REG_CFG2_WR,
+		REG_CitirocCfg1_REG_CFG3_WR => REG_CitirocCfg1_REG_CFG3_WR,
+		INT_CitirocCfg1_REG_CFG3_WR => INT_CitirocCfg1_REG_CFG3_WR,
+		REG_CitirocCfg1_REG_CFG4_WR => REG_CitirocCfg1_REG_CFG4_WR,
+		INT_CitirocCfg1_REG_CFG4_WR => INT_CitirocCfg1_REG_CFG4_WR,
+		REG_CitirocCfg1_REG_CFG5_WR => REG_CitirocCfg1_REG_CFG5_WR,
+		INT_CitirocCfg1_REG_CFG5_WR => INT_CitirocCfg1_REG_CFG5_WR,
+		REG_CitirocCfg1_REG_CFG6_WR => REG_CitirocCfg1_REG_CFG6_WR,
+		INT_CitirocCfg1_REG_CFG6_WR => INT_CitirocCfg1_REG_CFG6_WR,
+		REG_CitirocCfg1_REG_CFG7_WR => REG_CitirocCfg1_REG_CFG7_WR,
+		INT_CitirocCfg1_REG_CFG7_WR => INT_CitirocCfg1_REG_CFG7_WR,
+		REG_CitirocCfg1_REG_CFG8_WR => REG_CitirocCfg1_REG_CFG8_WR,
+		INT_CitirocCfg1_REG_CFG8_WR => INT_CitirocCfg1_REG_CFG8_WR,
+		REG_CitirocCfg1_REG_CFG9_WR => REG_CitirocCfg1_REG_CFG9_WR,
+		INT_CitirocCfg1_REG_CFG9_WR => INT_CitirocCfg1_REG_CFG9_WR,
+		REG_CitirocCfg1_REG_CFG10_WR => REG_CitirocCfg1_REG_CFG10_WR,
+		INT_CitirocCfg1_REG_CFG10_WR => INT_CitirocCfg1_REG_CFG10_WR,
+		REG_CitirocCfg1_REG_CFG11_WR => REG_CitirocCfg1_REG_CFG11_WR,
+		INT_CitirocCfg1_REG_CFG11_WR => INT_CitirocCfg1_REG_CFG11_WR,
+		REG_CitirocCfg1_REG_CFG12_WR => REG_CitirocCfg1_REG_CFG12_WR,
+		INT_CitirocCfg1_REG_CFG12_WR => INT_CitirocCfg1_REG_CFG12_WR,
+		REG_CitirocCfg1_REG_CFG13_WR => REG_CitirocCfg1_REG_CFG13_WR,
+		INT_CitirocCfg1_REG_CFG13_WR => INT_CitirocCfg1_REG_CFG13_WR,
+		REG_CitirocCfg1_REG_CFG14_WR => REG_CitirocCfg1_REG_CFG14_WR,
+		INT_CitirocCfg1_REG_CFG14_WR => INT_CitirocCfg1_REG_CFG14_WR,
+		REG_CitirocCfg1_REG_CFG15_WR => REG_CitirocCfg1_REG_CFG15_WR,
+		INT_CitirocCfg1_REG_CFG15_WR => INT_CitirocCfg1_REG_CFG15_WR,
+		REG_CitirocCfg1_REG_CFG16_WR => REG_CitirocCfg1_REG_CFG16_WR,
+		INT_CitirocCfg1_REG_CFG16_WR => INT_CitirocCfg1_REG_CFG16_WR,
+		REG_CitirocCfg1_REG_CFG17_WR => REG_CitirocCfg1_REG_CFG17_WR,
+		INT_CitirocCfg1_REG_CFG17_WR => INT_CitirocCfg1_REG_CFG17_WR,
+		REG_CitirocCfg1_REG_CFG18_WR => REG_CitirocCfg1_REG_CFG18_WR,
+		INT_CitirocCfg1_REG_CFG18_WR => INT_CitirocCfg1_REG_CFG18_WR,
+		REG_CitirocCfg1_REG_CFG19_WR => REG_CitirocCfg1_REG_CFG19_WR,
+		INT_CitirocCfg1_REG_CFG19_WR => INT_CitirocCfg1_REG_CFG19_WR,
+		REG_CitirocCfg1_REG_CFG20_WR => REG_CitirocCfg1_REG_CFG20_WR,
+		INT_CitirocCfg1_REG_CFG20_WR => INT_CitirocCfg1_REG_CFG20_WR,
+		REG_CitirocCfg1_REG_CFG21_WR => REG_CitirocCfg1_REG_CFG21_WR,
+		INT_CitirocCfg1_REG_CFG21_WR => INT_CitirocCfg1_REG_CFG21_WR,
+		REG_CitirocCfg1_REG_CFG22_WR => REG_CitirocCfg1_REG_CFG22_WR,
+		INT_CitirocCfg1_REG_CFG22_WR => INT_CitirocCfg1_REG_CFG22_WR,
+		REG_CitirocCfg1_REG_CFG23_WR => REG_CitirocCfg1_REG_CFG23_WR,
+		INT_CitirocCfg1_REG_CFG23_WR => INT_CitirocCfg1_REG_CFG23_WR,
+		REG_CitirocCfg1_REG_CFG24_WR => REG_CitirocCfg1_REG_CFG24_WR,
+		INT_CitirocCfg1_REG_CFG24_WR => INT_CitirocCfg1_REG_CFG24_WR,
+		REG_CitirocCfg1_REG_CFG25_WR => REG_CitirocCfg1_REG_CFG25_WR,
+		INT_CitirocCfg1_REG_CFG25_WR => INT_CitirocCfg1_REG_CFG25_WR,
+		REG_CitirocCfg1_REG_CFG26_WR => REG_CitirocCfg1_REG_CFG26_WR,
+		INT_CitirocCfg1_REG_CFG26_WR => INT_CitirocCfg1_REG_CFG26_WR,
+		REG_CitirocCfg1_REG_CFG27_WR => REG_CitirocCfg1_REG_CFG27_WR,
+		INT_CitirocCfg1_REG_CFG27_WR => INT_CitirocCfg1_REG_CFG27_WR,
+		REG_CitirocCfg1_REG_CFG28_WR => REG_CitirocCfg1_REG_CFG28_WR,
+		INT_CitirocCfg1_REG_CFG28_WR => INT_CitirocCfg1_REG_CFG28_WR,
+		REG_CitirocCfg1_REG_CFG29_WR => REG_CitirocCfg1_REG_CFG29_WR,
+		INT_CitirocCfg1_REG_CFG29_WR => INT_CitirocCfg1_REG_CFG29_WR,
+		REG_CitirocCfg1_REG_CFG30_WR => REG_CitirocCfg1_REG_CFG30_WR,
+		INT_CitirocCfg1_REG_CFG30_WR => INT_CitirocCfg1_REG_CFG30_WR,
+		REG_CitirocCfg1_REG_CFG31_WR => REG_CitirocCfg1_REG_CFG31_WR,
+		INT_CitirocCfg1_REG_CFG31_WR => INT_CitirocCfg1_REG_CFG31_WR,
+		REG_CitirocCfg1_REG_CFG32_WR => REG_CitirocCfg1_REG_CFG32_WR,
+		INT_CitirocCfg1_REG_CFG32_WR => INT_CitirocCfg1_REG_CFG32_WR,
+		REG_CitirocCfg1_REG_CFG33_WR => REG_CitirocCfg1_REG_CFG33_WR,
+		INT_CitirocCfg1_REG_CFG33_WR => INT_CitirocCfg1_REG_CFG33_WR,
+		REG_CitirocCfg1_REG_CFG34_WR => REG_CitirocCfg1_REG_CFG34_WR,
+		INT_CitirocCfg1_REG_CFG34_WR => INT_CitirocCfg1_REG_CFG34_WR,
+		REG_CitirocCfg1_REG_CFG35_WR => REG_CitirocCfg1_REG_CFG35_WR,
+		INT_CitirocCfg1_REG_CFG35_WR => INT_CitirocCfg1_REG_CFG35_WR,
+		REG_CitirocCfg1_START_REG_CFG_WR => REG_CitirocCfg1_START_REG_CFG_WR,
+		INT_CitirocCfg1_START_REG_CFG_WR => INT_CitirocCfg1_START_REG_CFG_WR,
+	BUS_CitirocCfg2_READ_DATA => BUS_CitirocCfg2_READ_DATA,
+	BUS_CitirocCfg2_WRITE_DATA => BUS_CitirocCfg2_WRITE_DATA,
+	BUS_CitirocCfg2_W_INT => BUS_CitirocCfg2_W_INT,
+	BUS_CitirocCfg2_R_INT => BUS_CitirocCfg2_R_INT,
+	BUS_CitirocCfg2_VLD => BUS_CitirocCfg2_VLD,
+		REG_CitirocCfg2_REG_CFG0_WR => REG_CitirocCfg2_REG_CFG0_WR,
+		INT_CitirocCfg2_REG_CFG0_WR => INT_CitirocCfg2_REG_CFG0_WR,
+		REG_CitirocCfg2_REG_CFG1_WR => REG_CitirocCfg2_REG_CFG1_WR,
+		INT_CitirocCfg2_REG_CFG1_WR => INT_CitirocCfg2_REG_CFG1_WR,
+		REG_CitirocCfg2_REG_CFG2_WR => REG_CitirocCfg2_REG_CFG2_WR,
+		INT_CitirocCfg2_REG_CFG2_WR => INT_CitirocCfg2_REG_CFG2_WR,
+		REG_CitirocCfg2_REG_CFG3_WR => REG_CitirocCfg2_REG_CFG3_WR,
+		INT_CitirocCfg2_REG_CFG3_WR => INT_CitirocCfg2_REG_CFG3_WR,
+		REG_CitirocCfg2_REG_CFG4_WR => REG_CitirocCfg2_REG_CFG4_WR,
+		INT_CitirocCfg2_REG_CFG4_WR => INT_CitirocCfg2_REG_CFG4_WR,
+		REG_CitirocCfg2_REG_CFG5_WR => REG_CitirocCfg2_REG_CFG5_WR,
+		INT_CitirocCfg2_REG_CFG5_WR => INT_CitirocCfg2_REG_CFG5_WR,
+		REG_CitirocCfg2_REG_CFG6_WR => REG_CitirocCfg2_REG_CFG6_WR,
+		INT_CitirocCfg2_REG_CFG6_WR => INT_CitirocCfg2_REG_CFG6_WR,
+		REG_CitirocCfg2_REG_CFG7_WR => REG_CitirocCfg2_REG_CFG7_WR,
+		INT_CitirocCfg2_REG_CFG7_WR => INT_CitirocCfg2_REG_CFG7_WR,
+		REG_CitirocCfg2_REG_CFG8_WR => REG_CitirocCfg2_REG_CFG8_WR,
+		INT_CitirocCfg2_REG_CFG8_WR => INT_CitirocCfg2_REG_CFG8_WR,
+		REG_CitirocCfg2_REG_CFG9_WR => REG_CitirocCfg2_REG_CFG9_WR,
+		INT_CitirocCfg2_REG_CFG9_WR => INT_CitirocCfg2_REG_CFG9_WR,
+		REG_CitirocCfg2_REG_CFG10_WR => REG_CitirocCfg2_REG_CFG10_WR,
+		INT_CitirocCfg2_REG_CFG10_WR => INT_CitirocCfg2_REG_CFG10_WR,
+		REG_CitirocCfg2_REG_CFG11_WR => REG_CitirocCfg2_REG_CFG11_WR,
+		INT_CitirocCfg2_REG_CFG11_WR => INT_CitirocCfg2_REG_CFG11_WR,
+		REG_CitirocCfg2_REG_CFG12_WR => REG_CitirocCfg2_REG_CFG12_WR,
+		INT_CitirocCfg2_REG_CFG12_WR => INT_CitirocCfg2_REG_CFG12_WR,
+		REG_CitirocCfg2_REG_CFG13_WR => REG_CitirocCfg2_REG_CFG13_WR,
+		INT_CitirocCfg2_REG_CFG13_WR => INT_CitirocCfg2_REG_CFG13_WR,
+		REG_CitirocCfg2_REG_CFG14_WR => REG_CitirocCfg2_REG_CFG14_WR,
+		INT_CitirocCfg2_REG_CFG14_WR => INT_CitirocCfg2_REG_CFG14_WR,
+		REG_CitirocCfg2_REG_CFG15_WR => REG_CitirocCfg2_REG_CFG15_WR,
+		INT_CitirocCfg2_REG_CFG15_WR => INT_CitirocCfg2_REG_CFG15_WR,
+		REG_CitirocCfg2_REG_CFG16_WR => REG_CitirocCfg2_REG_CFG16_WR,
+		INT_CitirocCfg2_REG_CFG16_WR => INT_CitirocCfg2_REG_CFG16_WR,
+		REG_CitirocCfg2_REG_CFG17_WR => REG_CitirocCfg2_REG_CFG17_WR,
+		INT_CitirocCfg2_REG_CFG17_WR => INT_CitirocCfg2_REG_CFG17_WR,
+		REG_CitirocCfg2_REG_CFG18_WR => REG_CitirocCfg2_REG_CFG18_WR,
+		INT_CitirocCfg2_REG_CFG18_WR => INT_CitirocCfg2_REG_CFG18_WR,
+		REG_CitirocCfg2_REG_CFG19_WR => REG_CitirocCfg2_REG_CFG19_WR,
+		INT_CitirocCfg2_REG_CFG19_WR => INT_CitirocCfg2_REG_CFG19_WR,
+		REG_CitirocCfg2_REG_CFG20_WR => REG_CitirocCfg2_REG_CFG20_WR,
+		INT_CitirocCfg2_REG_CFG20_WR => INT_CitirocCfg2_REG_CFG20_WR,
+		REG_CitirocCfg2_REG_CFG21_WR => REG_CitirocCfg2_REG_CFG21_WR,
+		INT_CitirocCfg2_REG_CFG21_WR => INT_CitirocCfg2_REG_CFG21_WR,
+		REG_CitirocCfg2_REG_CFG22_WR => REG_CitirocCfg2_REG_CFG22_WR,
+		INT_CitirocCfg2_REG_CFG22_WR => INT_CitirocCfg2_REG_CFG22_WR,
+		REG_CitirocCfg2_REG_CFG23_WR => REG_CitirocCfg2_REG_CFG23_WR,
+		INT_CitirocCfg2_REG_CFG23_WR => INT_CitirocCfg2_REG_CFG23_WR,
+		REG_CitirocCfg2_REG_CFG24_WR => REG_CitirocCfg2_REG_CFG24_WR,
+		INT_CitirocCfg2_REG_CFG24_WR => INT_CitirocCfg2_REG_CFG24_WR,
+		REG_CitirocCfg2_REG_CFG25_WR => REG_CitirocCfg2_REG_CFG25_WR,
+		INT_CitirocCfg2_REG_CFG25_WR => INT_CitirocCfg2_REG_CFG25_WR,
+		REG_CitirocCfg2_REG_CFG26_WR => REG_CitirocCfg2_REG_CFG26_WR,
+		INT_CitirocCfg2_REG_CFG26_WR => INT_CitirocCfg2_REG_CFG26_WR,
+		REG_CitirocCfg2_REG_CFG27_WR => REG_CitirocCfg2_REG_CFG27_WR,
+		INT_CitirocCfg2_REG_CFG27_WR => INT_CitirocCfg2_REG_CFG27_WR,
+		REG_CitirocCfg2_REG_CFG28_WR => REG_CitirocCfg2_REG_CFG28_WR,
+		INT_CitirocCfg2_REG_CFG28_WR => INT_CitirocCfg2_REG_CFG28_WR,
+		REG_CitirocCfg2_REG_CFG29_WR => REG_CitirocCfg2_REG_CFG29_WR,
+		INT_CitirocCfg2_REG_CFG29_WR => INT_CitirocCfg2_REG_CFG29_WR,
+		REG_CitirocCfg2_REG_CFG30_WR => REG_CitirocCfg2_REG_CFG30_WR,
+		INT_CitirocCfg2_REG_CFG30_WR => INT_CitirocCfg2_REG_CFG30_WR,
+		REG_CitirocCfg2_REG_CFG31_WR => REG_CitirocCfg2_REG_CFG31_WR,
+		INT_CitirocCfg2_REG_CFG31_WR => INT_CitirocCfg2_REG_CFG31_WR,
+		REG_CitirocCfg2_REG_CFG32_WR => REG_CitirocCfg2_REG_CFG32_WR,
+		INT_CitirocCfg2_REG_CFG32_WR => INT_CitirocCfg2_REG_CFG32_WR,
+		REG_CitirocCfg2_REG_CFG33_WR => REG_CitirocCfg2_REG_CFG33_WR,
+		INT_CitirocCfg2_REG_CFG33_WR => INT_CitirocCfg2_REG_CFG33_WR,
+		REG_CitirocCfg2_REG_CFG34_WR => REG_CitirocCfg2_REG_CFG34_WR,
+		INT_CitirocCfg2_REG_CFG34_WR => INT_CitirocCfg2_REG_CFG34_WR,
+		REG_CitirocCfg2_REG_CFG35_WR => REG_CitirocCfg2_REG_CFG35_WR,
+		INT_CitirocCfg2_REG_CFG35_WR => INT_CitirocCfg2_REG_CFG35_WR,
+		REG_CitirocCfg2_START_REG_CFG_WR => REG_CitirocCfg2_START_REG_CFG_WR,
+		INT_CitirocCfg2_START_REG_CFG_WR => INT_CitirocCfg2_START_REG_CFG_WR,
+	BUS_CitirocCfg3_READ_DATA => BUS_CitirocCfg3_READ_DATA,
+	BUS_CitirocCfg3_WRITE_DATA => BUS_CitirocCfg3_WRITE_DATA,
+	BUS_CitirocCfg3_W_INT => BUS_CitirocCfg3_W_INT,
+	BUS_CitirocCfg3_R_INT => BUS_CitirocCfg3_R_INT,
+	BUS_CitirocCfg3_VLD => BUS_CitirocCfg3_VLD,
+		REG_CitirocCfg3_REG_CFG0_WR => REG_CitirocCfg3_REG_CFG0_WR,
+		INT_CitirocCfg3_REG_CFG0_WR => INT_CitirocCfg3_REG_CFG0_WR,
+		REG_CitirocCfg3_REG_CFG1_WR => REG_CitirocCfg3_REG_CFG1_WR,
+		INT_CitirocCfg3_REG_CFG1_WR => INT_CitirocCfg3_REG_CFG1_WR,
+		REG_CitirocCfg3_REG_CFG2_WR => REG_CitirocCfg3_REG_CFG2_WR,
+		INT_CitirocCfg3_REG_CFG2_WR => INT_CitirocCfg3_REG_CFG2_WR,
+		REG_CitirocCfg3_REG_CFG3_WR => REG_CitirocCfg3_REG_CFG3_WR,
+		INT_CitirocCfg3_REG_CFG3_WR => INT_CitirocCfg3_REG_CFG3_WR,
+		REG_CitirocCfg3_REG_CFG4_WR => REG_CitirocCfg3_REG_CFG4_WR,
+		INT_CitirocCfg3_REG_CFG4_WR => INT_CitirocCfg3_REG_CFG4_WR,
+		REG_CitirocCfg3_REG_CFG5_WR => REG_CitirocCfg3_REG_CFG5_WR,
+		INT_CitirocCfg3_REG_CFG5_WR => INT_CitirocCfg3_REG_CFG5_WR,
+		REG_CitirocCfg3_REG_CFG6_WR => REG_CitirocCfg3_REG_CFG6_WR,
+		INT_CitirocCfg3_REG_CFG6_WR => INT_CitirocCfg3_REG_CFG6_WR,
+		REG_CitirocCfg3_REG_CFG7_WR => REG_CitirocCfg3_REG_CFG7_WR,
+		INT_CitirocCfg3_REG_CFG7_WR => INT_CitirocCfg3_REG_CFG7_WR,
+		REG_CitirocCfg3_REG_CFG8_WR => REG_CitirocCfg3_REG_CFG8_WR,
+		INT_CitirocCfg3_REG_CFG8_WR => INT_CitirocCfg3_REG_CFG8_WR,
+		REG_CitirocCfg3_REG_CFG9_WR => REG_CitirocCfg3_REG_CFG9_WR,
+		INT_CitirocCfg3_REG_CFG9_WR => INT_CitirocCfg3_REG_CFG9_WR,
+		REG_CitirocCfg3_REG_CFG10_WR => REG_CitirocCfg3_REG_CFG10_WR,
+		INT_CitirocCfg3_REG_CFG10_WR => INT_CitirocCfg3_REG_CFG10_WR,
+		REG_CitirocCfg3_REG_CFG11_WR => REG_CitirocCfg3_REG_CFG11_WR,
+		INT_CitirocCfg3_REG_CFG11_WR => INT_CitirocCfg3_REG_CFG11_WR,
+		REG_CitirocCfg3_REG_CFG12_WR => REG_CitirocCfg3_REG_CFG12_WR,
+		INT_CitirocCfg3_REG_CFG12_WR => INT_CitirocCfg3_REG_CFG12_WR,
+		REG_CitirocCfg3_REG_CFG13_WR => REG_CitirocCfg3_REG_CFG13_WR,
+		INT_CitirocCfg3_REG_CFG13_WR => INT_CitirocCfg3_REG_CFG13_WR,
+		REG_CitirocCfg3_REG_CFG14_WR => REG_CitirocCfg3_REG_CFG14_WR,
+		INT_CitirocCfg3_REG_CFG14_WR => INT_CitirocCfg3_REG_CFG14_WR,
+		REG_CitirocCfg3_REG_CFG15_WR => REG_CitirocCfg3_REG_CFG15_WR,
+		INT_CitirocCfg3_REG_CFG15_WR => INT_CitirocCfg3_REG_CFG15_WR,
+		REG_CitirocCfg3_REG_CFG16_WR => REG_CitirocCfg3_REG_CFG16_WR,
+		INT_CitirocCfg3_REG_CFG16_WR => INT_CitirocCfg3_REG_CFG16_WR,
+		REG_CitirocCfg3_REG_CFG17_WR => REG_CitirocCfg3_REG_CFG17_WR,
+		INT_CitirocCfg3_REG_CFG17_WR => INT_CitirocCfg3_REG_CFG17_WR,
+		REG_CitirocCfg3_REG_CFG18_WR => REG_CitirocCfg3_REG_CFG18_WR,
+		INT_CitirocCfg3_REG_CFG18_WR => INT_CitirocCfg3_REG_CFG18_WR,
+		REG_CitirocCfg3_REG_CFG19_WR => REG_CitirocCfg3_REG_CFG19_WR,
+		INT_CitirocCfg3_REG_CFG19_WR => INT_CitirocCfg3_REG_CFG19_WR,
+		REG_CitirocCfg3_REG_CFG20_WR => REG_CitirocCfg3_REG_CFG20_WR,
+		INT_CitirocCfg3_REG_CFG20_WR => INT_CitirocCfg3_REG_CFG20_WR,
+		REG_CitirocCfg3_REG_CFG21_WR => REG_CitirocCfg3_REG_CFG21_WR,
+		INT_CitirocCfg3_REG_CFG21_WR => INT_CitirocCfg3_REG_CFG21_WR,
+		REG_CitirocCfg3_REG_CFG22_WR => REG_CitirocCfg3_REG_CFG22_WR,
+		INT_CitirocCfg3_REG_CFG22_WR => INT_CitirocCfg3_REG_CFG22_WR,
+		REG_CitirocCfg3_REG_CFG23_WR => REG_CitirocCfg3_REG_CFG23_WR,
+		INT_CitirocCfg3_REG_CFG23_WR => INT_CitirocCfg3_REG_CFG23_WR,
+		REG_CitirocCfg3_REG_CFG24_WR => REG_CitirocCfg3_REG_CFG24_WR,
+		INT_CitirocCfg3_REG_CFG24_WR => INT_CitirocCfg3_REG_CFG24_WR,
+		REG_CitirocCfg3_REG_CFG25_WR => REG_CitirocCfg3_REG_CFG25_WR,
+		INT_CitirocCfg3_REG_CFG25_WR => INT_CitirocCfg3_REG_CFG25_WR,
+		REG_CitirocCfg3_REG_CFG26_WR => REG_CitirocCfg3_REG_CFG26_WR,
+		INT_CitirocCfg3_REG_CFG26_WR => INT_CitirocCfg3_REG_CFG26_WR,
+		REG_CitirocCfg3_REG_CFG27_WR => REG_CitirocCfg3_REG_CFG27_WR,
+		INT_CitirocCfg3_REG_CFG27_WR => INT_CitirocCfg3_REG_CFG27_WR,
+		REG_CitirocCfg3_REG_CFG28_WR => REG_CitirocCfg3_REG_CFG28_WR,
+		INT_CitirocCfg3_REG_CFG28_WR => INT_CitirocCfg3_REG_CFG28_WR,
+		REG_CitirocCfg3_REG_CFG29_WR => REG_CitirocCfg3_REG_CFG29_WR,
+		INT_CitirocCfg3_REG_CFG29_WR => INT_CitirocCfg3_REG_CFG29_WR,
+		REG_CitirocCfg3_REG_CFG30_WR => REG_CitirocCfg3_REG_CFG30_WR,
+		INT_CitirocCfg3_REG_CFG30_WR => INT_CitirocCfg3_REG_CFG30_WR,
+		REG_CitirocCfg3_REG_CFG31_WR => REG_CitirocCfg3_REG_CFG31_WR,
+		INT_CitirocCfg3_REG_CFG31_WR => INT_CitirocCfg3_REG_CFG31_WR,
+		REG_CitirocCfg3_REG_CFG32_WR => REG_CitirocCfg3_REG_CFG32_WR,
+		INT_CitirocCfg3_REG_CFG32_WR => INT_CitirocCfg3_REG_CFG32_WR,
+		REG_CitirocCfg3_REG_CFG33_WR => REG_CitirocCfg3_REG_CFG33_WR,
+		INT_CitirocCfg3_REG_CFG33_WR => INT_CitirocCfg3_REG_CFG33_WR,
+		REG_CitirocCfg3_REG_CFG34_WR => REG_CitirocCfg3_REG_CFG34_WR,
+		INT_CitirocCfg3_REG_CFG34_WR => INT_CitirocCfg3_REG_CFG34_WR,
+		REG_CitirocCfg3_REG_CFG35_WR => REG_CitirocCfg3_REG_CFG35_WR,
+		INT_CitirocCfg3_REG_CFG35_WR => INT_CitirocCfg3_REG_CFG35_WR,
+		REG_CitirocCfg3_START_REG_CFG_WR => REG_CitirocCfg3_START_REG_CFG_WR,
+		INT_CitirocCfg3_START_REG_CFG_WR => INT_CitirocCfg3_START_REG_CFG_WR,
+	BUS_CitirocCfg0_READ_DATA => BUS_CitirocCfg0_READ_DATA,
+	BUS_CitirocCfg0_WRITE_DATA => BUS_CitirocCfg0_WRITE_DATA,
+	BUS_CitirocCfg0_W_INT => BUS_CitirocCfg0_W_INT,
+	BUS_CitirocCfg0_R_INT => BUS_CitirocCfg0_R_INT,
+	BUS_CitirocCfg0_VLD => BUS_CitirocCfg0_VLD,
+		REG_CitirocCfg0_REG_CFG0_WR => REG_CitirocCfg0_REG_CFG0_WR,
+		INT_CitirocCfg0_REG_CFG0_WR => INT_CitirocCfg0_REG_CFG0_WR,
+		REG_CitirocCfg0_REG_CFG1_WR => REG_CitirocCfg0_REG_CFG1_WR,
+		INT_CitirocCfg0_REG_CFG1_WR => INT_CitirocCfg0_REG_CFG1_WR,
+		REG_CitirocCfg0_REG_CFG2_WR => REG_CitirocCfg0_REG_CFG2_WR,
+		INT_CitirocCfg0_REG_CFG2_WR => INT_CitirocCfg0_REG_CFG2_WR,
+		REG_CitirocCfg0_REG_CFG3_WR => REG_CitirocCfg0_REG_CFG3_WR,
+		INT_CitirocCfg0_REG_CFG3_WR => INT_CitirocCfg0_REG_CFG3_WR,
+		REG_CitirocCfg0_REG_CFG4_WR => REG_CitirocCfg0_REG_CFG4_WR,
+		INT_CitirocCfg0_REG_CFG4_WR => INT_CitirocCfg0_REG_CFG4_WR,
+		REG_CitirocCfg0_REG_CFG5_WR => REG_CitirocCfg0_REG_CFG5_WR,
+		INT_CitirocCfg0_REG_CFG5_WR => INT_CitirocCfg0_REG_CFG5_WR,
+		REG_CitirocCfg0_REG_CFG6_WR => REG_CitirocCfg0_REG_CFG6_WR,
+		INT_CitirocCfg0_REG_CFG6_WR => INT_CitirocCfg0_REG_CFG6_WR,
+		REG_CitirocCfg0_REG_CFG7_WR => REG_CitirocCfg0_REG_CFG7_WR,
+		INT_CitirocCfg0_REG_CFG7_WR => INT_CitirocCfg0_REG_CFG7_WR,
+		REG_CitirocCfg0_REG_CFG8_WR => REG_CitirocCfg0_REG_CFG8_WR,
+		INT_CitirocCfg0_REG_CFG8_WR => INT_CitirocCfg0_REG_CFG8_WR,
+		REG_CitirocCfg0_REG_CFG9_WR => REG_CitirocCfg0_REG_CFG9_WR,
+		INT_CitirocCfg0_REG_CFG9_WR => INT_CitirocCfg0_REG_CFG9_WR,
+		REG_CitirocCfg0_REG_CFG10_WR => REG_CitirocCfg0_REG_CFG10_WR,
+		INT_CitirocCfg0_REG_CFG10_WR => INT_CitirocCfg0_REG_CFG10_WR,
+		REG_CitirocCfg0_REG_CFG11_WR => REG_CitirocCfg0_REG_CFG11_WR,
+		INT_CitirocCfg0_REG_CFG11_WR => INT_CitirocCfg0_REG_CFG11_WR,
+		REG_CitirocCfg0_REG_CFG12_WR => REG_CitirocCfg0_REG_CFG12_WR,
+		INT_CitirocCfg0_REG_CFG12_WR => INT_CitirocCfg0_REG_CFG12_WR,
+		REG_CitirocCfg0_REG_CFG13_WR => REG_CitirocCfg0_REG_CFG13_WR,
+		INT_CitirocCfg0_REG_CFG13_WR => INT_CitirocCfg0_REG_CFG13_WR,
+		REG_CitirocCfg0_REG_CFG14_WR => REG_CitirocCfg0_REG_CFG14_WR,
+		INT_CitirocCfg0_REG_CFG14_WR => INT_CitirocCfg0_REG_CFG14_WR,
+		REG_CitirocCfg0_REG_CFG15_WR => REG_CitirocCfg0_REG_CFG15_WR,
+		INT_CitirocCfg0_REG_CFG15_WR => INT_CitirocCfg0_REG_CFG15_WR,
+		REG_CitirocCfg0_REG_CFG16_WR => REG_CitirocCfg0_REG_CFG16_WR,
+		INT_CitirocCfg0_REG_CFG16_WR => INT_CitirocCfg0_REG_CFG16_WR,
+		REG_CitirocCfg0_REG_CFG17_WR => REG_CitirocCfg0_REG_CFG17_WR,
+		INT_CitirocCfg0_REG_CFG17_WR => INT_CitirocCfg0_REG_CFG17_WR,
+		REG_CitirocCfg0_REG_CFG18_WR => REG_CitirocCfg0_REG_CFG18_WR,
+		INT_CitirocCfg0_REG_CFG18_WR => INT_CitirocCfg0_REG_CFG18_WR,
+		REG_CitirocCfg0_REG_CFG19_WR => REG_CitirocCfg0_REG_CFG19_WR,
+		INT_CitirocCfg0_REG_CFG19_WR => INT_CitirocCfg0_REG_CFG19_WR,
+		REG_CitirocCfg0_REG_CFG20_WR => REG_CitirocCfg0_REG_CFG20_WR,
+		INT_CitirocCfg0_REG_CFG20_WR => INT_CitirocCfg0_REG_CFG20_WR,
+		REG_CitirocCfg0_REG_CFG21_WR => REG_CitirocCfg0_REG_CFG21_WR,
+		INT_CitirocCfg0_REG_CFG21_WR => INT_CitirocCfg0_REG_CFG21_WR,
+		REG_CitirocCfg0_REG_CFG22_WR => REG_CitirocCfg0_REG_CFG22_WR,
+		INT_CitirocCfg0_REG_CFG22_WR => INT_CitirocCfg0_REG_CFG22_WR,
+		REG_CitirocCfg0_REG_CFG23_WR => REG_CitirocCfg0_REG_CFG23_WR,
+		INT_CitirocCfg0_REG_CFG23_WR => INT_CitirocCfg0_REG_CFG23_WR,
+		REG_CitirocCfg0_REG_CFG24_WR => REG_CitirocCfg0_REG_CFG24_WR,
+		INT_CitirocCfg0_REG_CFG24_WR => INT_CitirocCfg0_REG_CFG24_WR,
+		REG_CitirocCfg0_REG_CFG25_WR => REG_CitirocCfg0_REG_CFG25_WR,
+		INT_CitirocCfg0_REG_CFG25_WR => INT_CitirocCfg0_REG_CFG25_WR,
+		REG_CitirocCfg0_REG_CFG26_WR => REG_CitirocCfg0_REG_CFG26_WR,
+		INT_CitirocCfg0_REG_CFG26_WR => INT_CitirocCfg0_REG_CFG26_WR,
+		REG_CitirocCfg0_REG_CFG27_WR => REG_CitirocCfg0_REG_CFG27_WR,
+		INT_CitirocCfg0_REG_CFG27_WR => INT_CitirocCfg0_REG_CFG27_WR,
+		REG_CitirocCfg0_REG_CFG28_WR => REG_CitirocCfg0_REG_CFG28_WR,
+		INT_CitirocCfg0_REG_CFG28_WR => INT_CitirocCfg0_REG_CFG28_WR,
+		REG_CitirocCfg0_REG_CFG29_WR => REG_CitirocCfg0_REG_CFG29_WR,
+		INT_CitirocCfg0_REG_CFG29_WR => INT_CitirocCfg0_REG_CFG29_WR,
+		REG_CitirocCfg0_REG_CFG30_WR => REG_CitirocCfg0_REG_CFG30_WR,
+		INT_CitirocCfg0_REG_CFG30_WR => INT_CitirocCfg0_REG_CFG30_WR,
+		REG_CitirocCfg0_REG_CFG31_WR => REG_CitirocCfg0_REG_CFG31_WR,
+		INT_CitirocCfg0_REG_CFG31_WR => INT_CitirocCfg0_REG_CFG31_WR,
+		REG_CitirocCfg0_REG_CFG32_WR => REG_CitirocCfg0_REG_CFG32_WR,
+		INT_CitirocCfg0_REG_CFG32_WR => INT_CitirocCfg0_REG_CFG32_WR,
+		REG_CitirocCfg0_REG_CFG33_WR => REG_CitirocCfg0_REG_CFG33_WR,
+		INT_CitirocCfg0_REG_CFG33_WR => INT_CitirocCfg0_REG_CFG33_WR,
+		REG_CitirocCfg0_REG_CFG34_WR => REG_CitirocCfg0_REG_CFG34_WR,
+		INT_CitirocCfg0_REG_CFG34_WR => INT_CitirocCfg0_REG_CFG34_WR,
+		REG_CitirocCfg0_REG_CFG35_WR => REG_CitirocCfg0_REG_CFG35_WR,
+		INT_CitirocCfg0_REG_CFG35_WR => INT_CitirocCfg0_REG_CFG35_WR,
+		REG_CitirocCfg0_START_REG_CFG_WR => REG_CitirocCfg0_START_REG_CFG_WR,
+		INT_CitirocCfg0_START_REG_CFG_WR => INT_CitirocCfg0_START_REG_CFG_WR,
+		REG_T0_SOFT_FREQ_RD => REG_T0_SOFT_FREQ_RD,
+		REG_T0_SOFT_FREQ_WR => REG_T0_SOFT_FREQ_WR,
+		INT_T0_SOFT_FREQ_RD => INT_T0_SOFT_FREQ_RD,
+		INT_T0_SOFT_FREQ_WR => INT_T0_SOFT_FREQ_WR,
+		REG_T0_SEL_RD => REG_T0_SEL_RD,
+		REG_T0_SEL_WR => REG_T0_SEL_WR,
+		INT_T0_SEL_RD => INT_T0_SEL_RD,
+		INT_T0_SEL_WR => INT_T0_SEL_WR,
+		REG_HOLD_TIME_RD => REG_HOLD_TIME_RD,
+		REG_HOLD_TIME_WR => REG_HOLD_TIME_WR,
+		INT_HOLD_TIME_RD => INT_HOLD_TIME_RD,
+		INT_HOLD_TIME_WR => INT_HOLD_TIME_WR,
+		REG_FR_IFP_RD => REG_FR_IFP_RD,
+		REG_FR_IFP_WR => REG_FR_IFP_WR,
+		INT_FR_IFP_RD => INT_FR_IFP_RD,
+		INT_FR_IFP_WR => INT_FR_IFP_WR,
+		REG_FR_LIMIT_RD => REG_FR_LIMIT_RD,
+		REG_FR_LIMIT_WR => REG_FR_LIMIT_WR,
+		INT_FR_LIMIT_RD => INT_FR_LIMIT_RD,
+		INT_FR_LIMIT_WR => INT_FR_LIMIT_WR,
+		REG_FR_IFP2_RD => REG_FR_IFP2_RD,
+		REG_FR_IFP2_WR => REG_FR_IFP2_WR,
+		INT_FR_IFP2_RD => INT_FR_IFP2_RD,
+		INT_FR_IFP2_WR => INT_FR_IFP2_WR,
+		REG_FR_MODE_RD => REG_FR_MODE_RD,
+		REG_FR_MODE_WR => REG_FR_MODE_WR,
+		INT_FR_MODE_RD => INT_FR_MODE_RD,
+		INT_FR_MODE_WR => INT_FR_MODE_WR,
+		REG_FR_DBG1_RD => REG_FR_DBG1_RD,
+		REG_FR_DBG1_WR => REG_FR_DBG1_WR,
+		INT_FR_DBG1_RD => INT_FR_DBG1_RD,
+		INT_FR_DBG1_WR => INT_FR_DBG1_WR,
+		REG_FR_DBG2_RD => REG_FR_DBG2_RD,
+		REG_FR_DBG2_WR => REG_FR_DBG2_WR,
+		INT_FR_DBG2_RD => INT_FR_DBG2_RD,
+		INT_FR_DBG2_WR => INT_FR_DBG2_WR,
+	BUS_CP_0_READ_DATA => BUS_CP_0_READ_DATA,
+	BUS_CP_0_WRITE_DATA => BUS_CP_0_WRITE_DATA,
+	BUS_CP_0_W_INT => BUS_CP_0_W_INT,
+	BUS_CP_0_R_INT => BUS_CP_0_R_INT,
+	BUS_CP_0_VLD => BUS_CP_0_VLD,
+		REG_CP_0_READ_STATUS_RD => REG_CP_0_READ_STATUS_RD,
+		INT_CP_0_READ_STATUS_RD => INT_CP_0_READ_STATUS_RD,
+		REG_CP_0_READ_VALID_WORDS_RD => REG_CP_0_READ_VALID_WORDS_RD,
+		INT_CP_0_READ_VALID_WORDS_RD => INT_CP_0_READ_VALID_WORDS_RD,
+		REG_CP_0_CONFIG_WR => REG_CP_0_CONFIG_WR,
+		INT_CP_0_CONFIG_WR => INT_CP_0_CONFIG_WR,
+	BUS_CitirocFrame0_READ_DATA => BUS_CitirocFrame0_READ_DATA,
+	BUS_CitirocFrame0_WRITE_DATA => BUS_CitirocFrame0_WRITE_DATA,
+	BUS_CitirocFrame0_W_INT => BUS_CitirocFrame0_W_INT,
+	BUS_CitirocFrame0_R_INT => BUS_CitirocFrame0_R_INT,
+	BUS_CitirocFrame0_VLD => BUS_CitirocFrame0_VLD,
+		REG_CitirocFrame0_CONTROL_WR => REG_CitirocFrame0_CONTROL_WR,
+		INT_CitirocFrame0_CONTROL_WR => INT_CitirocFrame0_CONTROL_WR,
+		REG_CitirocFrame0_STATUS_RD => REG_CitirocFrame0_STATUS_RD,
+		INT_CitirocFrame0_STATUS_RD => INT_CitirocFrame0_STATUS_RD,
+	BUS_DTWC_READ_DATA => BUS_DTWC_READ_DATA,
+	BUS_DTWC_WRITE_DATA => BUS_DTWC_WRITE_DATA,
+	BUS_DTWC_W_INT => BUS_DTWC_W_INT,
+	BUS_DTWC_R_INT => BUS_DTWC_R_INT,
+	BUS_DTWC_VLD => BUS_DTWC_VLD,
+		REG_VALIDATION_CFG_RD => REG_VALIDATION_CFG_RD,
+		REG_VALIDATION_CFG_WR => REG_VALIDATION_CFG_WR,
+		INT_VALIDATION_CFG_RD => INT_VALIDATION_CFG_RD,
+		INT_VALIDATION_CFG_WR => INT_VALIDATION_CFG_WR,
+		REG_HV_ON_RD => REG_HV_ON_RD,
+		REG_HV_ON_WR => REG_HV_ON_WR,
+		INT_HV_ON_RD => INT_HV_ON_RD,
+		INT_HV_ON_WR => INT_HV_ON_WR,
+		REG_HV_EMERGENCY_RD => REG_HV_EMERGENCY_RD,
+		REG_HV_EMERGENCY_WR => REG_HV_EMERGENCY_WR,
+		INT_HV_EMERGENCY_RD => INT_HV_EMERGENCY_RD,
+		INT_HV_EMERGENCY_WR => INT_HV_EMERGENCY_WR,
+		REG_HV_VOUT_RD => REG_HV_VOUT_RD,
+		REG_HV_VOUT_WR => REG_HV_VOUT_WR,
+		INT_HV_VOUT_RD => INT_HV_VOUT_RD,
+		INT_HV_VOUT_WR => INT_HV_VOUT_WR,
+		REG_HV_ENTCOMP_RD => REG_HV_ENTCOMP_RD,
+		REG_HV_ENTCOMP_WR => REG_HV_ENTCOMP_WR,
+		INT_HV_ENTCOMP_RD => INT_HV_ENTCOMP_RD,
+		INT_HV_ENTCOMP_WR => INT_HV_ENTCOMP_WR,
+		REG_HV_TM_RD => REG_HV_TM_RD,
+		REG_HV_TM_WR => REG_HV_TM_WR,
+		INT_HV_TM_RD => INT_HV_TM_RD,
+		INT_HV_TM_WR => INT_HV_TM_WR,
+		REG_HV_TQ_RD => REG_HV_TQ_RD,
+		REG_HV_TQ_WR => REG_HV_TQ_WR,
+		INT_HV_TQ_RD => INT_HV_TQ_RD,
+		INT_HV_TQ_WR => INT_HV_TQ_WR,
+		REG_HV_TCOEF_RD => REG_HV_TCOEF_RD,
+		REG_HV_TCOEF_WR => REG_HV_TCOEF_WR,
+		INT_HV_TCOEF_RD => INT_HV_TCOEF_RD,
+		INT_HV_TCOEF_WR => INT_HV_TCOEF_WR,
+		REG_HV_IMAX_RD => REG_HV_IMAX_RD,
+		REG_HV_IMAX_WR => REG_HV_IMAX_WR,
+		INT_HV_IMAX_RD => INT_HV_IMAX_RD,
+		INT_HV_IMAX_WR => INT_HV_IMAX_WR,
+		REG_HV_RAMP_RD => REG_HV_RAMP_RD,
+		REG_HV_RAMP_WR => REG_HV_RAMP_WR,
+		INT_HV_RAMP_RD => INT_HV_RAMP_RD,
+		INT_HV_RAMP_WR => INT_HV_RAMP_WR,
+		REG_HV_VMAX_RD => REG_HV_VMAX_RD,
+		REG_HV_VMAX_WR => REG_HV_VMAX_WR,
+		INT_HV_VMAX_RD => INT_HV_VMAX_RD,
+		INT_HV_VMAX_WR => INT_HV_VMAX_WR,
+		REG_HV_MSTATUS_RD => REG_HV_MSTATUS_RD,
+		REG_HV_MSTATUS_WR => REG_HV_MSTATUS_WR,
+		INT_HV_MSTATUS_RD => INT_HV_MSTATUS_RD,
+		INT_HV_MSTATUS_WR => INT_HV_MSTATUS_WR,
+		REG_HV_MVOUT_RD => REG_HV_MVOUT_RD,
+		REG_HV_MVOUT_WR => REG_HV_MVOUT_WR,
+		INT_HV_MVOUT_RD => INT_HV_MVOUT_RD,
+		INT_HV_MVOUT_WR => INT_HV_MVOUT_WR,
+		REG_HV_MTEMP_RD => REG_HV_MTEMP_RD,
+		REG_HV_MTEMP_WR => REG_HV_MTEMP_WR,
+		INT_HV_MTEMP_RD => INT_HV_MTEMP_RD,
+		INT_HV_MTEMP_WR => INT_HV_MTEMP_WR,
+		REG_HV_MVTARGET_RD => REG_HV_MVTARGET_RD,
+		REG_HV_MVTARGET_WR => REG_HV_MVTARGET_WR,
+		INT_HV_MVTARGET_RD => INT_HV_MVTARGET_RD,
+		INT_HV_MVTARGET_WR => INT_HV_MVTARGET_WR,
+		REG_HV_MAVTARGET_RD => REG_HV_MAVTARGET_RD,
+		REG_HV_MAVTARGET_WR => REG_HV_MAVTARGET_WR,
+		INT_HV_MAVTARGET_RD => INT_HV_MAVTARGET_RD,
+		INT_HV_MAVTARGET_WR => INT_HV_MAVTARGET_WR,
+		REG_T_SENS1_RD => REG_T_SENS1_RD,
+		REG_T_SENS1_WR => REG_T_SENS1_WR,
+		INT_T_SENS1_RD => INT_T_SENS1_RD,
+		INT_T_SENS1_WR => INT_T_SENS1_WR,
+		REG_T_SENS2_RD => REG_T_SENS2_RD,
+		REG_T_SENS2_WR => REG_T_SENS2_WR,
+		INT_T_SENS2_RD => INT_T_SENS2_RD,
+		INT_T_SENS2_WR => INT_T_SENS2_WR,
+		REG_HV_MIOUT_RD => REG_HV_MIOUT_RD,
+		REG_HV_MIOUT_WR => REG_HV_MIOUT_WR,
+		INT_HV_MIOUT_RD => INT_HV_MIOUT_RD,
+		INT_HV_MIOUT_WR => INT_HV_MIOUT_WR,
+		REG_TRIGGER_OUT_W_RD => REG_TRIGGER_OUT_W_RD,
+		REG_TRIGGER_OUT_W_WR => REG_TRIGGER_OUT_W_WR,
+		INT_TRIGGER_OUT_W_RD => INT_TRIGGER_OUT_W_RD,
+		INT_TRIGGER_OUT_W_WR => INT_TRIGGER_OUT_W_WR,
+	BUS_RateMeter_2_READ_ADDRESS => BUS_RateMeter_2_READ_ADDRESS,
+	BUS_RateMeter_2_READ_DATA => BUS_RateMeter_2_READ_DATA,
+	BUS_RateMeter_2_WRITE_DATA => BUS_RateMeter_2_WRITE_DATA,
+	BUS_RateMeter_2_W_INT => BUS_RateMeter_2_W_INT,
+	BUS_RateMeter_2_R_INT => BUS_RateMeter_2_R_INT,
+	BUS_RateMeter_2_VLD => BUS_RateMeter_2_VLD,
+	BUS_RateMeter_3_READ_ADDRESS => BUS_RateMeter_3_READ_ADDRESS,
+	BUS_RateMeter_3_READ_DATA => BUS_RateMeter_3_READ_DATA,
+	BUS_RateMeter_3_WRITE_DATA => BUS_RateMeter_3_WRITE_DATA,
+	BUS_RateMeter_3_W_INT => BUS_RateMeter_3_W_INT,
+	BUS_RateMeter_3_R_INT => BUS_RateMeter_3_R_INT,
+	BUS_RateMeter_3_VLD => BUS_RateMeter_3_VLD,
+	BUS_RateMeter_0_READ_ADDRESS => BUS_RateMeter_0_READ_ADDRESS,
+	BUS_RateMeter_0_READ_DATA => BUS_RateMeter_0_READ_DATA,
+	BUS_RateMeter_0_WRITE_DATA => BUS_RateMeter_0_WRITE_DATA,
+	BUS_RateMeter_0_W_INT => BUS_RateMeter_0_W_INT,
+	BUS_RateMeter_0_R_INT => BUS_RateMeter_0_R_INT,
+	BUS_RateMeter_0_VLD => BUS_RateMeter_0_VLD,
+	BUS_RateMeter_1_READ_ADDRESS => BUS_RateMeter_1_READ_ADDRESS,
+	BUS_RateMeter_1_READ_DATA => BUS_RateMeter_1_READ_DATA,
+	BUS_RateMeter_1_WRITE_DATA => BUS_RateMeter_1_WRITE_DATA,
+	BUS_RateMeter_1_W_INT => BUS_RateMeter_1_W_INT,
+	BUS_RateMeter_1_R_INT => BUS_RateMeter_1_R_INT,
+	BUS_RateMeter_1_VLD => BUS_RateMeter_1_VLD,
+		REG_T0SW_RD => REG_T0SW_RD,
+		REG_T0SW_WR => REG_T0SW_WR,
+		INT_T0SW_RD => INT_T0SW_RD,
+		INT_T0SW_WR => INT_T0SW_WR,
+		REG_GTS_RESSEL_RD => REG_GTS_RESSEL_RD,
+		REG_GTS_RESSEL_WR => REG_GTS_RESSEL_WR,
+		INT_GTS_RESSEL_RD => INT_GTS_RESSEL_RD,
+		INT_GTS_RESSEL_WR => INT_GTS_RESSEL_WR,
+		REG_TRIG_MASK_A_RD => REG_TRIG_MASK_A_RD,
+		REG_TRIG_MASK_A_WR => REG_TRIG_MASK_A_WR,
+		INT_TRIG_MASK_A_RD => INT_TRIG_MASK_A_RD,
+		INT_TRIG_MASK_A_WR => INT_TRIG_MASK_A_WR,
+		REG_TRIG_MASK_B_RD => REG_TRIG_MASK_B_RD,
+		REG_TRIG_MASK_B_WR => REG_TRIG_MASK_B_WR,
+		INT_TRIG_MASK_B_RD => INT_TRIG_MASK_B_RD,
+		INT_TRIG_MASK_B_WR => INT_TRIG_MASK_B_WR,
+		REG_TRIG_MASK_C_RD => REG_TRIG_MASK_C_RD,
+		REG_TRIG_MASK_C_WR => REG_TRIG_MASK_C_WR,
+		INT_TRIG_MASK_C_RD => INT_TRIG_MASK_C_RD,
+		INT_TRIG_MASK_C_WR => INT_TRIG_MASK_C_WR,
+		REG_TRIG_MASK_D_RD => REG_TRIG_MASK_D_RD,
+		REG_TRIG_MASK_D_WR => REG_TRIG_MASK_D_WR,
+		INT_TRIG_MASK_D_RD => INT_TRIG_MASK_D_RD,
+		INT_TRIG_MASK_D_WR => INT_TRIG_MASK_D_WR,
+	BUS_Oscilloscope_0_READ_ADDRESS => BUS_Oscilloscope_0_READ_ADDRESS,
+	BUS_Oscilloscope_0_READ_DATA => BUS_Oscilloscope_0_READ_DATA,
+	BUS_Oscilloscope_0_WRITE_DATA => BUS_Oscilloscope_0_WRITE_DATA,
+	BUS_Oscilloscope_0_W_INT => BUS_Oscilloscope_0_W_INT,
+	BUS_Oscilloscope_0_R_INT => BUS_Oscilloscope_0_R_INT,
+	BUS_Oscilloscope_0_VLD => BUS_Oscilloscope_0_VLD,
+		REG_Oscilloscope_0_READ_STATUS_RD => REG_Oscilloscope_0_READ_STATUS_RD,
+		INT_Oscilloscope_0_READ_STATUS_RD => INT_Oscilloscope_0_READ_STATUS_RD,
+		REG_Oscilloscope_0_READ_POSITION_RD => REG_Oscilloscope_0_READ_POSITION_RD,
+		INT_Oscilloscope_0_READ_POSITION_RD => INT_Oscilloscope_0_READ_POSITION_RD,
+		REG_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR => REG_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR,
+		INT_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR => INT_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR,
+		REG_Oscilloscope_0_CONFIG_PRETRIGGER_WR => REG_Oscilloscope_0_CONFIG_PRETRIGGER_WR,
+		INT_Oscilloscope_0_CONFIG_PRETRIGGER_WR => INT_Oscilloscope_0_CONFIG_PRETRIGGER_WR,
+		REG_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR => REG_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR,
+		INT_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR => INT_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR,
+		REG_Oscilloscope_0_CONFIG_ARM_WR => REG_Oscilloscope_0_CONFIG_ARM_WR,
+		INT_Oscilloscope_0_CONFIG_ARM_WR => INT_Oscilloscope_0_CONFIG_ARM_WR,
+		REG_Oscilloscope_0_CONFIG_DECIMATOR_WR => REG_Oscilloscope_0_CONFIG_DECIMATOR_WR,
+		INT_Oscilloscope_0_CONFIG_DECIMATOR_WR => INT_Oscilloscope_0_CONFIG_DECIMATOR_WR,
+	BUS_Oscilloscope_1_READ_ADDRESS => BUS_Oscilloscope_1_READ_ADDRESS,
+	BUS_Oscilloscope_1_READ_DATA => BUS_Oscilloscope_1_READ_DATA,
+	BUS_Oscilloscope_1_WRITE_DATA => BUS_Oscilloscope_1_WRITE_DATA,
+	BUS_Oscilloscope_1_W_INT => BUS_Oscilloscope_1_W_INT,
+	BUS_Oscilloscope_1_R_INT => BUS_Oscilloscope_1_R_INT,
+	BUS_Oscilloscope_1_VLD => BUS_Oscilloscope_1_VLD,
+		REG_Oscilloscope_1_READ_STATUS_RD => REG_Oscilloscope_1_READ_STATUS_RD,
+		INT_Oscilloscope_1_READ_STATUS_RD => INT_Oscilloscope_1_READ_STATUS_RD,
+		REG_Oscilloscope_1_READ_POSITION_RD => REG_Oscilloscope_1_READ_POSITION_RD,
+		INT_Oscilloscope_1_READ_POSITION_RD => INT_Oscilloscope_1_READ_POSITION_RD,
+		REG_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR => REG_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR,
+		INT_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR => INT_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR,
+		REG_Oscilloscope_1_CONFIG_PRETRIGGER_WR => REG_Oscilloscope_1_CONFIG_PRETRIGGER_WR,
+		INT_Oscilloscope_1_CONFIG_PRETRIGGER_WR => INT_Oscilloscope_1_CONFIG_PRETRIGGER_WR,
+		REG_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR => REG_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR,
+		INT_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR => INT_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR,
+		REG_Oscilloscope_1_CONFIG_ARM_WR => REG_Oscilloscope_1_CONFIG_ARM_WR,
+		INT_Oscilloscope_1_CONFIG_ARM_WR => INT_Oscilloscope_1_CONFIG_ARM_WR,
+		REG_Oscilloscope_1_CONFIG_DECIMATOR_WR => REG_Oscilloscope_1_CONFIG_DECIMATOR_WR,
+		INT_Oscilloscope_1_CONFIG_DECIMATOR_WR => INT_Oscilloscope_1_CONFIG_DECIMATOR_WR,
+	BUS_Oscilloscope_2_READ_ADDRESS => BUS_Oscilloscope_2_READ_ADDRESS,
+	BUS_Oscilloscope_2_READ_DATA => BUS_Oscilloscope_2_READ_DATA,
+	BUS_Oscilloscope_2_WRITE_DATA => BUS_Oscilloscope_2_WRITE_DATA,
+	BUS_Oscilloscope_2_W_INT => BUS_Oscilloscope_2_W_INT,
+	BUS_Oscilloscope_2_R_INT => BUS_Oscilloscope_2_R_INT,
+	BUS_Oscilloscope_2_VLD => BUS_Oscilloscope_2_VLD,
+		REG_Oscilloscope_2_READ_STATUS_RD => REG_Oscilloscope_2_READ_STATUS_RD,
+		INT_Oscilloscope_2_READ_STATUS_RD => INT_Oscilloscope_2_READ_STATUS_RD,
+		REG_Oscilloscope_2_READ_POSITION_RD => REG_Oscilloscope_2_READ_POSITION_RD,
+		INT_Oscilloscope_2_READ_POSITION_RD => INT_Oscilloscope_2_READ_POSITION_RD,
+		REG_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR => REG_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR,
+		INT_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR => INT_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR,
+		REG_Oscilloscope_2_CONFIG_PRETRIGGER_WR => REG_Oscilloscope_2_CONFIG_PRETRIGGER_WR,
+		INT_Oscilloscope_2_CONFIG_PRETRIGGER_WR => INT_Oscilloscope_2_CONFIG_PRETRIGGER_WR,
+		REG_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR => REG_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR,
+		INT_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR => INT_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR,
+		REG_Oscilloscope_2_CONFIG_ARM_WR => REG_Oscilloscope_2_CONFIG_ARM_WR,
+		INT_Oscilloscope_2_CONFIG_ARM_WR => INT_Oscilloscope_2_CONFIG_ARM_WR,
+		REG_Oscilloscope_2_CONFIG_DECIMATOR_WR => REG_Oscilloscope_2_CONFIG_DECIMATOR_WR,
+		INT_Oscilloscope_2_CONFIG_DECIMATOR_WR => INT_Oscilloscope_2_CONFIG_DECIMATOR_WR,
+	BUS_Oscilloscope_3_READ_ADDRESS => BUS_Oscilloscope_3_READ_ADDRESS,
+	BUS_Oscilloscope_3_READ_DATA => BUS_Oscilloscope_3_READ_DATA,
+	BUS_Oscilloscope_3_WRITE_DATA => BUS_Oscilloscope_3_WRITE_DATA,
+	BUS_Oscilloscope_3_W_INT => BUS_Oscilloscope_3_W_INT,
+	BUS_Oscilloscope_3_R_INT => BUS_Oscilloscope_3_R_INT,
+	BUS_Oscilloscope_3_VLD => BUS_Oscilloscope_3_VLD,
+		REG_Oscilloscope_3_READ_STATUS_RD => REG_Oscilloscope_3_READ_STATUS_RD,
+		INT_Oscilloscope_3_READ_STATUS_RD => INT_Oscilloscope_3_READ_STATUS_RD,
+		REG_Oscilloscope_3_READ_POSITION_RD => REG_Oscilloscope_3_READ_POSITION_RD,
+		INT_Oscilloscope_3_READ_POSITION_RD => INT_Oscilloscope_3_READ_POSITION_RD,
+		REG_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR => REG_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR,
+		INT_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR => INT_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR,
+		REG_Oscilloscope_3_CONFIG_PRETRIGGER_WR => REG_Oscilloscope_3_CONFIG_PRETRIGGER_WR,
+		INT_Oscilloscope_3_CONFIG_PRETRIGGER_WR => INT_Oscilloscope_3_CONFIG_PRETRIGGER_WR,
+		REG_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR => REG_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR,
+		INT_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR => INT_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR,
+		REG_Oscilloscope_3_CONFIG_ARM_WR => REG_Oscilloscope_3_CONFIG_ARM_WR,
+		INT_Oscilloscope_3_CONFIG_ARM_WR => INT_Oscilloscope_3_CONFIG_ARM_WR,
+		REG_Oscilloscope_3_CONFIG_DECIMATOR_WR => REG_Oscilloscope_3_CONFIG_DECIMATOR_WR,
+		INT_Oscilloscope_3_CONFIG_DECIMATOR_WR => INT_Oscilloscope_3_CONFIG_DECIMATOR_WR,
+		REG_T0_RESET_ON_START_RD => REG_T0_RESET_ON_START_RD,
+		REG_T0_RESET_ON_START_WR => REG_T0_RESET_ON_START_WR,
+		INT_T0_RESET_ON_START_RD => INT_T0_RESET_ON_START_RD,
+		INT_T0_RESET_ON_START_WR => INT_T0_RESET_ON_START_WR,
+		REG_ISRUNNING_RD => REG_ISRUNNING_RD,
+		REG_ISRUNNING_WR => REG_ISRUNNING_WR,
+		INT_ISRUNNING_RD => INT_ISRUNNING_RD,
+		INT_ISRUNNING_WR => INT_ISRUNNING_WR,
+		REG_VETO_WAIT_RUN_RD => REG_VETO_WAIT_RUN_RD,
+		REG_VETO_WAIT_RUN_WR => REG_VETO_WAIT_RUN_WR,
+		INT_VETO_WAIT_RUN_RD => INT_VETO_WAIT_RUN_RD,
+		INT_VETO_WAIT_RUN_WR => INT_VETO_WAIT_RUN_WR,
+		REG_GBL_EN_VETO_EXT_RD => REG_GBL_EN_VETO_EXT_RD,
+		REG_GBL_EN_VETO_EXT_WR => REG_GBL_EN_VETO_EXT_WR,
+		INT_GBL_EN_VETO_EXT_RD => INT_GBL_EN_VETO_EXT_RD,
+		INT_GBL_EN_VETO_EXT_WR => INT_GBL_EN_VETO_EXT_WR,
+		REG_INVETO_RD => REG_INVETO_RD,
+		REG_INVETO_WR => REG_INVETO_WR,
+		INT_INVETO_RD => INT_INVETO_RD,
+		INT_INVETO_WR => INT_INVETO_WR,
+		REG_TRG_OUT_MONOSTABLE_EN_RD => REG_TRG_OUT_MONOSTABLE_EN_RD,
+		REG_TRG_OUT_MONOSTABLE_EN_WR => REG_TRG_OUT_MONOSTABLE_EN_WR,
+		INT_TRG_OUT_MONOSTABLE_EN_RD => INT_TRG_OUT_MONOSTABLE_EN_RD,
+		INT_TRG_OUT_MONOSTABLE_EN_WR => INT_TRG_OUT_MONOSTABLE_EN_WR,
+		REG_UNIQUE_RD => x"39593604",
+		REG_UNIQUE_WR => open,
+		REG_FIRMWARE_BUILD => x"22031762",
+   
+        
+        --LATO FPGA
+        
+        f_RESET => '0'
+
+                            
+                      
+        );
+       
+	   
+
+    TBR : TestBram 
+         PORT MAP(
+           clka => BUS_CLK(0),
+           wea => BUS_Test_0_W_INT,
+           addra => BUS_Test_0_ADDRESS(9 DOWNTO 0),
+           dina => BUS_Test_0_WRITE_DATA,
+           douta => BUS_Test_0_READ_DATA
+         );
+       	   
+             
+    --ANALOG READOUT SIGNALs
+             
+	A_ANALOG_CLK <= CITIROC_A_SCLK_s(0);
+    A_ANALOG_DIN <= CITIROC_A_SRIN_s(0);
+    A_RESETB_READ <= CITIROC_A_RESET_READ_s(0);
+    A_HOLD_LG <= A_HOLD_LG_s(0);
+    A_HOLD_HG <= A_HOLD_HG_s(0);
+	CITIROC_A_CHARGE_HIT_s(0) <= A_DIG_OUT;	
+	CITIROC_A_ADC_ENERGY_LG <= ADC_A1;
+	CITIROC_A_ADC_ENERGY_HG <= ADC_A0;
+	
+    B_ANALOG_CLK <= CITIROC_B_SCLK_s(0);
+    B_ANALOG_DIN <= CITIROC_B_SRIN_s(0);
+	B_RESETB_READ <= CITIROC_B_RESET_READ_s(0);
+	CITIROC_B_CHARGE_HIT_s(0) <= B_DIG_OUT;
+    B_HOLD_LG <= B_HOLD_LG_s(0);
+    B_HOLD_HG <= B_HOLD_HG_s(0);
+	CITIROC_B_ADC_ENERGY_LG <= ADC_A3;
+	CITIROC_B_ADC_ENERGY_HG <= ADC_A2;
+
+    C_ANALOG_CLK <= CITIROC_C_SCLK_s(0);
+    C_ANALOG_DIN <= CITIROC_C_SRIN_s(0);
+    C_RESETB_READ <= CITIROC_C_RESET_READ_s(0);
+	CITIROC_C_CHARGE_HIT_s(0) <= C_DIG_OUT;
+    C_HOLD_LG <= C_HOLD_LG_s(0);
+    C_HOLD_HG <= C_HOLD_HG_s(0);	
+	CITIROC_C_ADC_ENERGY_LG <= ADC_A5;
+	CITIROC_C_ADC_ENERGY_HG <= ADC_A4;
+
+    D_ANALOG_CLK <= CITIROC_D_SCLK_s(0);
+    D_ANALOG_DIN <= CITIROC_D_SRIN_s(0);
+    D_RESETB_READ <= CITIROC_D_RESET_READ_s(0);
+    CITIROC_D_CHARGE_HIT_s(0) <= D_DIG_OUT;
+    D_HOLD_LG <= D_HOLD_LG_s(0);
+    D_HOLD_HG <= D_HOLD_HG_s(0);	
+	CITIROC_D_ADC_ENERGY_LG <= ADC_A7;
+	CITIROC_D_ADC_ENERGY_HG <= ADC_A6;
+                  
+	--EXTERNAL TRIGGER
+	D_TRIG_EXT <= TRIGGER_EXT_D_s(0);
+    C_TRIG_EXT <= TRIGGER_EXT_C_s(0);
+    B_TRIG_EXT <= TRIGGER_EXT_B_s(0);
+    A_TRIG_EXT <= TRIGGER_EXT_A_s(0);
+
+	
+	--VAL_EVT
+	a_val_evt <= A_VAL_EVT_s(0);
+	b_val_evt <= B_VAL_EVT_s(0);
+	c_val_evt <= C_VAL_EVT_s(0);
+	d_val_evt <= D_VAL_EVT_s(0);
+	
+	--RAZ_CHN
+	a_raz_chn <= A_RAZ_CHN_s(0);
+	b_raz_chn <= B_RAZ_CHN_s(0);
+	c_raz_chn <= C_RAZ_CHN_s(0);
+	d_raz_chn <= D_RAZ_CHN_s(0);
+	
+	
+	A_RESETB_PSC <='1';
+    B_RESETB_PSC <='1';
+    C_RESETB_PSC <='1';
+    D_RESETB_PSC <='1';
+    
+    A_RESETB_PA <= '1';
+    B_RESETB_PA <= '1';
+    C_RESETB_PA <= '1';
+    D_RESETB_PA <= '1';
+
+	--SLOW CONTROL
+
+    A_SR_CK     <= A_SR_CK_s(0); 
+    A_SR_IN     <= A_SR_IN_s(0);
+    A_SRLOAD    <= A_SRLOAD_s(0);
+    A_RESETB_SR <= A_RESETB_SR_s(0);
+    A_SELECT    <= A_SELECT_s(0);
+    
+
+    B_SR_CK     <= B_SR_CK_s(0); 
+    B_SR_IN     <= B_SR_IN_s(0);
+    B_SRLOAD    <= B_SRLOAD_s(0);
+    B_RESETB_SR <= B_RESETB_SR_s(0);
+    B_SELECT    <= B_SELECT_s(0);
+
+    C_SR_CK     <= C_SR_CK_s(0); 
+    C_SR_IN     <= C_SR_IN_s(0);
+    C_SRLOAD    <= C_SRLOAD_s(0);
+    C_RESETB_SR <= C_RESETB_SR_s(0);
+    C_SELECT    <= C_SELECT_s(0);
+		
+    D_SR_CK     <= D_SR_CK_s(0); 
+    D_SR_IN     <= D_SR_IN_s(0);
+    D_SRLOAD    <= D_SRLOAD_s(0);
+    D_RESETB_SR <= D_RESETB_SR_s(0);
+    D_SELECT    <= D_SELECT_s(0);
+
+	
+	
+	--VAL EVENT BUFFERS
+	A_VAL : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => A_VAL_EVT_P,
+	  OB => A_VAL_EVT_N,
+	  I => a_val_evt 
+	);
+		   
+	B_VAL : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => B_VAL_EVT_P,
+	  OB => B_VAL_EVT_N,
+	  I => b_val_evt 
+	);
+
+	c_val_evti <= not c_val_evt;
+	C_VAL : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => C_VAL_EVT_P,
+	  OB => C_VAL_EVT_N,
+	  I => c_val_evti 
+	);  
+
+	D_VAL : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => D_VAL_EVT_P,
+	  OB => D_VAL_EVT_N,
+	  I => d_val_evt 
+	);   
+
+
+
+	--RAZ BUFFERS
+	A_RAZ : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => A_RAZ_CHN_P,
+	  OB => A_RAZ_CHN_N,
+	  I => a_raz_chn 
+	);
+
+	b_raz_chn_i <= not b_raz_chn;
+	B_RAZ : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => B_RAZ_CHN_P,
+	  OB => B_RAZ_CHN_N,
+	  I => b_raz_chn_i 
+	);
+	  
+	C_RAZ : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => C_RAZ_CHN_P,
+	  OB => C_RAZ_CHN_N,
+	  I => c_raz_chn 
+	);     
+
+	d_raz_chn_i <= not d_raz_chn;   
+	D_RAZ : OBUFDS
+	generic map (
+	  IOSTANDARD => "BLVDS_25",
+	  SLEW => "SLOW")  
+	port map (
+	  O => D_RAZ_CHN_P,
+	  OB => D_RAZ_CHN_N,
+	  I => d_raz_chn_i 
+	);      
+
+   
+   
+   
+	CK_SPI_NSYNC <= '1';	
+	EXT_ready <= CK_CONFIG_DONE;
+ 
+	CDCE0 : init_clock_gen 
+   Generic map (ComponentBaseAddress => x"0000")
+   Port Map( clk => clk_100,
+		  CK_SPI_LE => CK_SPI_LE,
+		  CK_SPI_CLK => CK_SPI_CLK,
+		  CK_SPI_MOSI => CK_SPI_MOSI,
+		  CK_PD => open,
+		  CK_LOCK => '1',
+		  CK_CONFIG_DONE => CK_CONFIG_DONE,
+		  reset => '0',
+		  reset_out => sys_reset,
+		  REG_addr => x"0000",
+		  REG_din => x"00000000",
+		  REG_wrint => '0'
+		  );   
+
+
+         
+	ADCreset <=not EXT_READY;
+	adcs:   adcs_top 
+	GENERIC MAP(test_mode => '0')
+       Port map(
+           
+           reset => ADCreset,
+           sCLK_100 => clk_100,
+           ADC_1_CLK_A_P => ADC_1_CLK_A_P,
+           ADC_1_CLK_A_N => ADC_1_CLK_A_N,
+           ADC_1_FRAME_A_P => ADC_1_FRAME_A_P,
+           ADC_1_FRAME_A_N => ADC_1_FRAME_A_N,
+           ADC_1_DATA_A_P => ADC_1_DATA_A_P,
+           ADC_1_DATA_A_N => ADC_1_DATA_A_N,
+           ADC_1_DATA_B_P => ADC_1_DATA_B_P,
+           ADC_1_DATA_B_N => ADC_1_DATA_B_N,
+           SMADC_1_CSA => SMADC_1_CSA,
+           SMADC_1_CSB => open,
+           SMADC_1_CLK => SMADC_1_CLK,
+           SMADC_1_MOSI => SMADC_1_MOSI,
+           SMADC_1_RESET => SMADC_1_RESET,
+           READOUT_CLK => CLK_ACQ(0),
+           ADC_CLK_OUT => open,
+           CH0 => ADC_A0,		
+           CH1 => ADC_A1,		--CHARGE
+           CH2 => ADC_A2,	
+           CH3 => ADC_A3, 		--CHARGE
+           CH4 => ADC_A4,	
+           CH5 => ADC_A5,		--CHARGE
+           CH6 => ADC_A6,
+           CH7 => ADC_A7,		--CHARGE
+           CHv0_7 => open,
+           inversion => ANALOG_INPUT_INVERSION,
+           ADC_STATUS => open,
+           ADC_READY => open
+    );         
+	SMADC_1_PD <= '0';
+   
+   
+    
+FC : FlashController 
+    Port Map(
+            clk => BUS_CLK(0),
+            BUS_Flash_0_READ_DATA => BUS_Flash_0_READ_DATA,
+            BUS_Flash_0_ADDRESS => BUS_Flash_0_ADDRESS, 
+            BUS_Flash_0_WRITE_DATA => BUS_Flash_0_WRITE_DATA, 
+            BUS_Flash_0_W_INT => BUS_Flash_0_W_INT, 
+            BUS_Flash_0_R_INT => BUS_Flash_0_R_INT, 
+            BUS_Flash_0_VLD => BUS_Flash_0_VLD, 
+            
+            REG_FLASH_CNTR_RD => REG_FLASH_CNTR_RD, 
+            REG_FLASH_CNTR_WR => REG_FLASH_CNTR_WR, 
+            INT_FLASH_CNTR_RD => INT_FLASH_CNTR_RD, 
+            INT_FLASH_CNTR_WR => INT_FLASH_CNTR_WR,  
+            
+            REG_FLASH_ADDRESS_RD => REG_FLASH_ADDRESS_RD, 
+            REG_FLASH_ADDRESS_WR => REG_FLASH_ADDRESS_WR, 
+            INT_FLASH_ADDRESS_RD => INT_FLASH_ADDRESS_RD, 
+            INT_FLASH_ADDRESS_WR => INT_FLASH_ADDRESS_WR,             
+            
+            SPI_CS => FLASH_SPI_CS,
+            SPI_DIN => FLASH_SPI_DIN,
+            SPI_DOUT => FLASH_SPI_DOUT,
+            SPI_CLK => FLASH_SPI_CLK 
+    );
+    
+    
+   STARTUPE2_inst : STARTUPE2
+    generic map (
+       PROG_USR => "FALSE",  -- Activate program event security feature. Requires encrypted bitstreams.
+       SIM_CCLK_FREQ => 0.0  -- Set the Configuration Clock Frequency(ns) for simulation.
+    )
+    port map (
+       CFGCLK => OPEN,       -- 1-bit output: Configuration main clock output
+       CFGMCLK => cfg_clk,     -- 1-bit output: Configuration internal oscillator clock output
+       EOS => done_sig,             -- 1-bit output: Active high output signal indicating the End Of Startup.
+       PREQ => OPEN,           -- 1-bit output: PROGRAM request to fabric output
+       CLK => cfg_clk,             -- 1-bit input: User start-up clock input
+       GSR => '0',             -- 1-bit input: Global Set/Reset input (GSR cannot be used for the port name)
+       GTS => '0',             -- 1-bit input: Global 3-state input (GTS cannot be used for the port name)
+       KEYCLEARB => '0', -- 1-bit input: Clear AES Decrypter Key input from Battery-Backed RAM (BBRAM)
+       PACK => '0',           -- 1-bit input: PROGRAM acknowledge input
+       USRCCLKO => clock_prog_mux_out,   -- 1-bit input: User CCLK input
+       USRCCLKTS => '0', -- 1-bit input: User CCLK 3-state enable input
+       USRDONEO => '1',   -- 1-bit input: User DONE pin output control
+       USRDONETS => '0'  -- 1-bit input: User DONE 3-state enable output
+    );
+         
+     clock_prog_mux_out <= cfg_clk when done_sig = '0' else FLASH_SPI_CLK;
+
+	 
+
+	LEMO01_dir <= not LEMO_0_1_DIRECTION(0);
+	LEMO23_dir <= not LEMO_2_3_DIRECTION(0);
+	LEMO45_dir <= not LEMO_4_5_DIRECTION(0);
+	LEMO67_dir <= not LEMO_6_7_DIRECTION(0);
+
+	LEMO0_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_0_1_A_OUT(0),     
+	  IO => LEMO0,   
+	  I =>  LEMO_0_1_A_IN(0),
+	  T =>  LEMO_0_1_DIRECTION(0) 
+	); 
+
+	LEMO1_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_0_1_B_OUT(0),     
+	  IO => LEMO1,   
+	  I =>  LEMO_0_1_B_IN(0),
+	  T =>  LEMO_0_1_DIRECTION(0) 
+	);            
+
+	LEMO2_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_2_3_A_OUT(0),     
+	  IO => LEMO2,   
+	  I =>  LEMO_2_3_A_IN(0),
+	  T =>  LEMO_2_3_DIRECTION(0) 
+	); 
+
+	LEMO3_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_2_3_B_OUT(0),     
+	  IO => LEMO3,   
+	  I =>  LEMO_2_3_B_IN(0),
+	  T =>  LEMO_2_3_DIRECTION(0) 
+	);                  
+
+	LEMO4_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_4_5_A_OUT(0),     
+	  IO => LEMO4,   
+	  I =>  LEMO_4_5_A_IN(0),
+	  T =>  LEMO_4_5_DIRECTION(0) 
+	);   
+
+	LEMO5_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_4_5_B_OUT(0),     
+	  IO => LEMO5,   
+	  I =>  LEMO_4_5_B_IN(0),
+	  T =>  LEMO_4_5_DIRECTION(0) 
+	);     
+
+	LEMO6_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_6_7_A_OUT(0),     
+	  IO => LEMO6,   
+	  I =>  LEMO_6_7_A_IN(0),
+	  T =>  LEMO_6_7_DIRECTION(0) 
+	); 
+
+	LEMO7_BUFF : IOBUF
+	generic map (
+	  DRIVE => 12,
+	  IOSTANDARD => "DEFAULT",
+	  SLEW => "SLOW")
+	port map (
+	  O =>  LEMO_6_7_B_OUT(0),     
+	  IO => LEMO7,   
+	  I =>  LEMO_6_7_B_IN(0),
+	  T =>  LEMO_6_7_DIRECTION(0) 
+	);      	
+		 
+
+	A_TRIG0 (0)    <= A_TRG(0) and (not TRIGGER_MASK_A(0) );
+	A_TRIG1 (0)    <= A_TRG(1) and (not TRIGGER_MASK_A(1) );
+	A_TRIG2 (0)    <= A_TRG(2) and (not TRIGGER_MASK_A(2) );
+	A_TRIG3 (0)    <= A_TRG(3) and (not TRIGGER_MASK_A(3) );
+	A_TRIG4 (0)    <= A_TRG(4) and (not TRIGGER_MASK_A(4) );
+	A_TRIG5 (0)    <= A_TRG(5) and (not TRIGGER_MASK_A(5) );
+	A_TRIG6 (0)    <= A_TRG(6) and (not TRIGGER_MASK_A(6) );
+	A_TRIG7 (0)    <= A_TRG(7) and (not TRIGGER_MASK_A(7) );
+	A_TRIG8 (0)    <= A_TRG(8) and (not TRIGGER_MASK_A(8) );
+	A_TRIG9 (0)    <= A_TRG(9) and (not TRIGGER_MASK_A(9) );
+	A_TRIG10(0)    <= A_TRG(10)and (not TRIGGER_MASK_A(10));
+	A_TRIG11(0)    <= A_TRG(11)and (not TRIGGER_MASK_A(11));
+	A_TRIG12(0)    <= A_TRG(12)and (not TRIGGER_MASK_A(12));
+	A_TRIG13(0)    <= A_TRG(13)and (not TRIGGER_MASK_A(13));
+	A_TRIG14(0)    <= A_TRG(14)and (not TRIGGER_MASK_A(14));
+	A_TRIG15(0)    <= A_TRG(15)and (not TRIGGER_MASK_A(15));
+	A_TRIG16(0)    <= A_TRG(16)and (not TRIGGER_MASK_A(16));
+	A_TRIG17(0)    <= A_TRG(17)and (not TRIGGER_MASK_A(17));
+	A_TRIG18(0)    <= A_TRG(18)and (not TRIGGER_MASK_A(18));
+	A_TRIG19(0)    <= A_TRG(19)and (not TRIGGER_MASK_A(19));
+	A_TRIG20(0)    <= A_TRG(20)and (not TRIGGER_MASK_A(20));
+	A_TRIG21(0)    <= A_TRG(21)and (not TRIGGER_MASK_A(21));
+	A_TRIG22(0)    <= A_TRG(22)and (not TRIGGER_MASK_A(22));
+	A_TRIG23(0)    <= A_TRG(23)and (not TRIGGER_MASK_A(23));
+	A_TRIG24(0)    <= A_TRG(24)and (not TRIGGER_MASK_A(24));
+	A_TRIG25(0)    <= A_TRG(25)and (not TRIGGER_MASK_A(25));
+	A_TRIG26(0)    <= A_TRG(26)and (not TRIGGER_MASK_A(26));
+	A_TRIG27(0)    <= A_TRG(27)and (not TRIGGER_MASK_A(27));
+	A_TRIG28(0)    <= A_TRG(28)and (not TRIGGER_MASK_A(28));
+	A_TRIG29(0)    <= A_TRG(29)and (not TRIGGER_MASK_A(29));
+	A_TRIG30(0)    <= A_TRG(30)and (not TRIGGER_MASK_A(30));
+	A_TRIG31(0)    <= A_TRG(31)and (not TRIGGER_MASK_A(31));
+								   
+	B_TRIG0 (0)    <= B_TRG(0) and (not TRIGGER_MASK_B(0) );
+	B_TRIG1 (0)    <= B_TRG(1) and (not TRIGGER_MASK_B(1) );
+	B_TRIG2 (0)    <= B_TRG(2) and (not TRIGGER_MASK_B(2) );
+	B_TRIG3 (0)    <= B_TRG(3) and (not TRIGGER_MASK_B(3) );
+	B_TRIG4 (0)    <= B_TRG(4) and (not TRIGGER_MASK_B(4) );
+	B_TRIG5 (0)    <= B_TRG(5) and (not TRIGGER_MASK_B(5) );
+	B_TRIG6 (0)    <= B_TRG(6) and (not TRIGGER_MASK_B(6) );
+	B_TRIG7 (0)    <= B_TRG(7) and (not TRIGGER_MASK_B(7) );
+	B_TRIG8 (0)    <= B_TRG(8) and (not TRIGGER_MASK_B(8) );
+	B_TRIG9 (0)    <= B_TRG(9) and (not TRIGGER_MASK_B(9) );
+	B_TRIG10(0)    <= B_TRG(10)and (not TRIGGER_MASK_B(10));
+	B_TRIG11(0)    <= B_TRG(11)and (not TRIGGER_MASK_B(11));
+	B_TRIG12(0)    <= B_TRG(12)and (not TRIGGER_MASK_B(12));
+	B_TRIG13(0)    <= B_TRG(13)and (not TRIGGER_MASK_B(13));
+	B_TRIG14(0)    <= B_TRG(14)and (not TRIGGER_MASK_B(14));
+	B_TRIG15(0)    <= B_TRG(15)and (not TRIGGER_MASK_B(15));
+	B_TRIG16(0)    <= B_TRG(16)and (not TRIGGER_MASK_B(16));
+	B_TRIG17(0)    <= B_TRG(17)and (not TRIGGER_MASK_B(17));
+	B_TRIG18(0)    <= B_TRG(18)and (not TRIGGER_MASK_B(18));
+	B_TRIG19(0)    <= B_TRG(19)and (not TRIGGER_MASK_B(19));
+	B_TRIG20(0)    <= B_TRG(20)and (not TRIGGER_MASK_B(20));
+	B_TRIG21(0)    <= B_TRG(21)and (not TRIGGER_MASK_B(21));
+	B_TRIG22(0)    <= B_TRG(22)and (not TRIGGER_MASK_B(22));
+	B_TRIG23(0)    <= B_TRG(23)and (not TRIGGER_MASK_B(23));
+	B_TRIG24(0)    <= B_TRG(24)and (not TRIGGER_MASK_B(24));
+	B_TRIG25(0)    <= B_TRG(25)and (not TRIGGER_MASK_B(25));
+	B_TRIG26(0)    <= B_TRG(26)and (not TRIGGER_MASK_B(26));
+	B_TRIG27(0)    <= B_TRG(27)and (not TRIGGER_MASK_B(27));
+	B_TRIG28(0)    <= B_TRG(28)and (not TRIGGER_MASK_B(28));
+	B_TRIG29(0)    <= B_TRG(29)and (not TRIGGER_MASK_B(29));
+	B_TRIG30(0)    <= B_TRG(30)and (not TRIGGER_MASK_B(30));
+	B_TRIG31(0)    <= B_TRG(31)and (not TRIGGER_MASK_B(31));
+								   
+	C_TRIG0 (0)    <= C_TRG(0) and (not TRIGGER_MASK_C(0) );
+	C_TRIG1 (0)    <= C_TRG(1) and (not TRIGGER_MASK_C(1) );
+	C_TRIG2 (0)    <= C_TRG(2) and (not TRIGGER_MASK_C(2) );
+	C_TRIG3 (0)    <= C_TRG(3) and (not TRIGGER_MASK_C(3) );
+	C_TRIG4 (0)    <= C_TRG(4) and (not TRIGGER_MASK_C(4) );
+	C_TRIG5 (0)    <= C_TRG(5) and (not TRIGGER_MASK_C(5) );
+	C_TRIG6 (0)    <= C_TRG(6) and (not TRIGGER_MASK_C(6) );
+	C_TRIG7 (0)    <= C_TRG(7) and (not TRIGGER_MASK_C(7) );
+	C_TRIG8 (0)    <= C_TRG(8) and (not TRIGGER_MASK_C(8) );
+	C_TRIG9 (0)    <= C_TRG(9) and (not TRIGGER_MASK_C(9) );
+	C_TRIG10(0)    <= C_TRG(10)and (not TRIGGER_MASK_C(10));
+	C_TRIG11(0)    <= C_TRG(11)and (not TRIGGER_MASK_C(11));
+	C_TRIG12(0)    <= C_TRG(12)and (not TRIGGER_MASK_C(12));
+	C_TRIG13(0)    <= C_TRG(13)and (not TRIGGER_MASK_C(13));
+	C_TRIG14(0)    <= C_TRG(14)and (not TRIGGER_MASK_C(14));
+	C_TRIG15(0)    <= C_TRG(15)and (not TRIGGER_MASK_C(15));
+	C_TRIG16(0)    <= C_TRG(16)and (not TRIGGER_MASK_C(16));
+	C_TRIG17(0)    <= C_TRG(17)and (not TRIGGER_MASK_C(17));
+	C_TRIG18(0)    <= C_TRG(18)and (not TRIGGER_MASK_C(18));
+	C_TRIG19(0)    <= C_TRG(19)and (not TRIGGER_MASK_C(19));
+	C_TRIG20(0)    <= C_TRG(20)and (not TRIGGER_MASK_C(20));
+	C_TRIG21(0)    <= C_TRG(21)and (not TRIGGER_MASK_C(21));
+	C_TRIG22(0)    <= C_TRG(22)and (not TRIGGER_MASK_C(22));
+	C_TRIG23(0)    <= C_TRG(23)and (not TRIGGER_MASK_C(23));
+	C_TRIG24(0)    <= C_TRG(24)and (not TRIGGER_MASK_C(24));
+	C_TRIG25(0)    <= C_TRG(25)and (not TRIGGER_MASK_C(25));
+	C_TRIG26(0)    <= C_TRG(26)and (not TRIGGER_MASK_C(26));
+	C_TRIG27(0)    <= C_TRG(27)and (not TRIGGER_MASK_C(27));
+	C_TRIG28(0)    <= C_TRG(28)and (not TRIGGER_MASK_C(28));
+	C_TRIG29(0)    <= C_TRG(29)and (not TRIGGER_MASK_C(29));
+	C_TRIG30(0)    <= C_TRG(30)and (not TRIGGER_MASK_C(30));
+	C_TRIG31(0)    <= C_TRG(31)and (not TRIGGER_MASK_C(31));
+								   
+	D_TRIG0 (0)    <= D_TRG(0) and (not TRIGGER_MASK_D(0) );
+	D_TRIG1 (0)    <= D_TRG(1) and (not TRIGGER_MASK_D(1) );
+	D_TRIG2 (0)    <= D_TRG(2) and (not TRIGGER_MASK_D(2) );
+	D_TRIG3 (0)    <= D_TRG(3) and (not TRIGGER_MASK_D(3) );
+	D_TRIG4 (0)    <= D_TRG(4) and (not TRIGGER_MASK_D(4) );
+	D_TRIG5 (0)    <= D_TRG(5) and (not TRIGGER_MASK_D(5) );
+	D_TRIG6 (0)    <= D_TRG(6) and (not TRIGGER_MASK_D(6) );
+	D_TRIG7 (0)    <= D_TRG(7) and (not TRIGGER_MASK_D(7) );
+	D_TRIG8 (0)    <= D_TRG(8) and (not TRIGGER_MASK_D(8) );
+	D_TRIG9 (0)    <= D_TRG(9) and (not TRIGGER_MASK_D(9) );
+	D_TRIG10(0)    <= D_TRG(10)and (not TRIGGER_MASK_D(10));
+	D_TRIG11(0)    <= D_TRG(11)and (not TRIGGER_MASK_D(11));
+	D_TRIG12(0)    <= D_TRG(12)and (not TRIGGER_MASK_D(12));
+	D_TRIG13(0)    <= D_TRG(13)and (not TRIGGER_MASK_D(13));
+	D_TRIG14(0)    <= D_TRG(14)and (not TRIGGER_MASK_D(14));
+	D_TRIG15(0)    <= D_TRG(15)and (not TRIGGER_MASK_D(15));
+	D_TRIG16(0)    <= D_TRG(16)and (not TRIGGER_MASK_D(16));
+	D_TRIG17(0)    <= D_TRG(17)and (not TRIGGER_MASK_D(17));
+	D_TRIG18(0)    <= D_TRG(18)and (not TRIGGER_MASK_D(18));
+	D_TRIG19(0)    <= D_TRG(19)and (not TRIGGER_MASK_D(19));
+	D_TRIG20(0)    <= D_TRG(20)and (not TRIGGER_MASK_D(20));
+	D_TRIG21(0)    <= D_TRG(21)and (not TRIGGER_MASK_D(21));
+	D_TRIG22(0)    <= D_TRG(22)and (not TRIGGER_MASK_D(22));
+	D_TRIG23(0)    <= D_TRG(23)and (not TRIGGER_MASK_D(23));
+	D_TRIG24(0)    <= D_TRG(24)and (not TRIGGER_MASK_D(24));
+	D_TRIG25(0)    <= D_TRG(25)and (not TRIGGER_MASK_D(25));
+	D_TRIG26(0)    <= D_TRG(26)and (not TRIGGER_MASK_D(26));
+	D_TRIG27(0)    <= D_TRG(27)and (not TRIGGER_MASK_D(27));
+	D_TRIG28(0)    <= D_TRG(28)and (not TRIGGER_MASK_D(28));
+	D_TRIG29(0)    <= D_TRG(29)and (not TRIGGER_MASK_D(29));
+	D_TRIG30(0)    <= D_TRG(30)and (not TRIGGER_MASK_D(30));
+	D_TRIG31(0)    <= D_TRG(31)and (not TRIGGER_MASK_D(31));
+
+	A_OR_CHARGE(0)	<=  A_OR32;
+	B_OR_CHARGE(0)	<=  B_OR32;
+	C_OR_CHARGE(0)	<=  C_OR32;
+	D_OR_CHARGE(0)	<=  D_OR32;
+	
+	A_OR_TIME(0) <= or_reduce(A_TRIGs);
+	B_OR_TIME(0) <= or_reduce(B_TRIGs);
+	C_OR_TIME(0) <= or_reduce(C_TRIGs);
+	D_OR_TIME(0) <= or_reduce(D_TRIGs);
+	
+	A_NOR_C(0) <= A_NOR_CHARGE;
+	B_NOR_C(0) <= B_NOR_CHARGE;
+	C_NOR_C(0) <= C_NOR_CHARGE;
+	D_NOR_C(0) <= D_NOR_CHARGE;
+		
+	A_NOR_T(0) <= A_NOR_TIME;
+	B_NOR_T(0) <= B_NOR_TIME;
+	C_NOR_T(0) <= C_NOR_TIME; 
+	D_NOR_T(0) <= D_NOR_TIME; 	
+
+	A_TRIGs <=  A_TRG and (not TRIGGER_MASK_A); 
+	B_TRIGs <=  B_TRG and (not TRIGGER_MASK_B); 
+	C_TRIGs <=  C_TRG and (not TRIGGER_MASK_C); 
+	D_TRIGs <=  D_TRG and (not TRIGGER_MASK_D); 
+	
+
+	UART_TTL_TX<='1';
+	
+	U1 : CitirocSlowControl
+  Generic map(
+	CfgDefault => 	"1110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110110111111111111111111111111111111111111111111011111100111111101111001111011100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000111111110100101100010010110011111111111111011",
+	CfgMonitorDefault => 	"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	DoStartupSetup => 	"1")
+PORT MAP(
+	ASIC_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	ASIC_MONITOR_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	LOAD_CFG => "0",
+	LOAD_MONITOR => "0",
+	START_CFG => "0",
+	START_MONITOR => "0",
+	BUSY => open,
+	Citiroc_CLK => A_SR_CK_s(0),
+	Citiroc_MOSI => A_SR_IN_s(0),
+	Citiroc_SLOAD => A_SRLOAD_s(0),
+	Citiroc_RESETB => A_RESETB_SR_s(0),
+	Citiroc_SELECT => A_SELECT_s(0),
+	reset => '0',
+	clk => GlobalClock(0),
+	REG_CFG0 => REG_CitirocCfg0_REG_CFG0_WR,
+	REG_CFG1 => REG_CitirocCfg0_REG_CFG1_WR,
+	REG_CFG2 => REG_CitirocCfg0_REG_CFG2_WR,
+	REG_CFG3 => REG_CitirocCfg0_REG_CFG3_WR,
+	REG_CFG4 => REG_CitirocCfg0_REG_CFG4_WR,
+	REG_CFG5 => REG_CitirocCfg0_REG_CFG5_WR,
+	REG_CFG6 => REG_CitirocCfg0_REG_CFG6_WR,
+	REG_CFG7 => REG_CitirocCfg0_REG_CFG7_WR,
+	REG_CFG8 => REG_CitirocCfg0_REG_CFG8_WR,
+	REG_CFG9 => REG_CitirocCfg0_REG_CFG9_WR,
+	REG_CFG10 => REG_CitirocCfg0_REG_CFG10_WR,
+	REG_CFG11 => REG_CitirocCfg0_REG_CFG11_WR,
+	REG_CFG12 => REG_CitirocCfg0_REG_CFG12_WR,
+	REG_CFG13 => REG_CitirocCfg0_REG_CFG13_WR,
+	REG_CFG14 => REG_CitirocCfg0_REG_CFG14_WR,
+	REG_CFG15 => REG_CitirocCfg0_REG_CFG15_WR,
+	REG_CFG16 => REG_CitirocCfg0_REG_CFG16_WR,
+	REG_CFG17 => REG_CitirocCfg0_REG_CFG17_WR,
+	REG_CFG18 => REG_CitirocCfg0_REG_CFG18_WR,
+	REG_CFG19 => REG_CitirocCfg0_REG_CFG19_WR,
+	REG_CFG20 => REG_CitirocCfg0_REG_CFG20_WR,
+	REG_CFG21 => REG_CitirocCfg0_REG_CFG21_WR,
+	REG_CFG22 => REG_CitirocCfg0_REG_CFG22_WR,
+	REG_CFG23 => REG_CitirocCfg0_REG_CFG23_WR,
+	REG_CFG24 => REG_CitirocCfg0_REG_CFG24_WR,
+	REG_CFG25 => REG_CitirocCfg0_REG_CFG25_WR,
+	REG_CFG26 => REG_CitirocCfg0_REG_CFG26_WR,
+	REG_CFG27 => REG_CitirocCfg0_REG_CFG27_WR,
+	REG_CFG28 => REG_CitirocCfg0_REG_CFG28_WR,
+	REG_CFG29 => REG_CitirocCfg0_REG_CFG29_WR,
+	REG_CFG30 => REG_CitirocCfg0_REG_CFG30_WR,
+	REG_CFG31 => REG_CitirocCfg0_REG_CFG31_WR,
+	REG_CFG32 => REG_CitirocCfg0_REG_CFG32_WR,
+	REG_CFG33 => REG_CitirocCfg0_REG_CFG33_WR,
+	REG_CFG34 => REG_CitirocCfg0_REG_CFG34_WR,
+	REG_CFG35 => REG_CitirocCfg0_REG_CFG35_WR,
+	START_REG_CFG => REG_CitirocCfg0_START_REG_CFG_WR );
+variable_A_FRAME_DATA <= U452_P_FRAME_DATA;
+variable_A_FRAME_DV <= U452_P_FRAME_DV;
+variable_B_FRAME_DATA <= U456_P_FRAME_DATA;
+variable_B_FRAME_DV <= U456_P_FRAME_DV;
+variable_C_FRAME_DATA <= U460_P_FRAME_DATA;
+variable_C_FRAME_DV <= U460_P_FRAME_DV;
+variable_D_FRAME_DATA <= U464_P_FRAME_DATA;
+variable_D_FRAME_DV <= U464_P_FRAME_DV;
+variable_A_TRIG_T <= U448_OR_TIME;
+variable_A_TRIG_C <= U448_OR_CHARGE;
+variable_B_TRIG_T <= U449_OR_TIME;
+variable_B_TRIG_C <= U449_OR_CHARGE;
+variable_C_TRIG_T <= U450_OR_TIME;
+variable_C_TRIG_C <= U450_OR_CHARGE;
+variable_D_TRIG_T <= U451_OR_TIME;
+variable_D_TRIG_C <= U451_OR_CHARGE;
+U18_EXT_TRIG <= variable_EXT_TRIG;
+U19_GLOBAL_TRIG <= variable_GLOBAL_TRIG;
+U20_A_FRAME_DATA <= variable_A_FRAME_DATA;
+U21_B_FRAME_DATA <= variable_B_FRAME_DATA;
+U22_C_FRAME_DATA <= variable_C_FRAME_DATA;
+U23_D_FRAME_DATA <= variable_D_FRAME_DATA;
+U24_A_FRAME_DV <= variable_A_FRAME_DV;
+U25_B_FRAME_DV <= variable_B_FRAME_DV;
+U26_C_FRAME_DV <= variable_C_FRAME_DV;
+U27_D_FRAME_DV <= variable_D_FRAME_DV;
+U28_G_TS0 <= variable_G_TS0;
+U29_G_TS <= variable_G_TS;
+U30_G_TS0 <= variable_G_TS0;
+U31_G_TS <= variable_G_TS;
+U32_G_TS0 <= variable_G_TS0;
+U33_G_TS <= variable_G_TS;
+U34_G_TS0 <= variable_G_TS0;
+U35_G_TS <= variable_G_TS;
+variable_A_TS <= U452_TS_OUT;
+variable_A_TS0 <= U452_TS0_OUT;
+variable_B_TS <= U456_TS_OUT;
+variable_B_TS0 <= U456_TS0_OUT;
+variable_C_TS <= U460_TS_OUT;
+variable_C_TS0 <= U460_TS0_OUT;
+variable_D_TS <= U464_TS_OUT;
+variable_D_TS0 <= U464_TS0_OUT;
+U44_A_TS <= variable_A_TS;
+U45_A_TS0 <= variable_A_TS0;
+U46_B_TS <= variable_B_TS;
+U47_B_TS0 <= variable_B_TS0;
+U48_C_TS <= variable_C_TS;
+U49_C_TS0 <= variable_C_TS0;
+U50_D_TS <= variable_D_TS;
+U51_D_TS0 <= variable_D_TS0;
+U52_SELF_TRIG <= variable_SELF_TRIG;
+U53_out_0 <= REG_TRIG_A_SEL_WR(2 downto 0);
+U54_EXT_VETO <= variable_EXT_VETO;
+U55_EXT_TRIG <= variable_EXT_TRIG;
+U56_GLOBAL_TRIG <= variable_GLOBAL_TRIG;
+U57_SELF_TRIG <= variable_SELF_TRIG;
+U58_EXT_VETO <= variable_EXT_VETO;
+U59_EXT_TRIG <= variable_EXT_TRIG;
+U60_GLOBAL_TRIG <= variable_GLOBAL_TRIG;
+U61_SELF_TRIG <= variable_SELF_TRIG;
+U62_EXT_VETO <= variable_EXT_VETO;
+U63_EXT_TRIG <= variable_EXT_TRIG;
+U64_GLOBAL_TRIG <= variable_GLOBAL_TRIG;
+U65_SELF_TRIG <= variable_SELF_TRIG;
+U66_EXT_VETO <= variable_EXT_VETO;
+U67_out_0 <= REG_TRIG_A_SEL_WR(2 downto 0);
+U68_out_0 <= REG_TRIG_A_SEL_WR(2 downto 0);
+U69_out_0 <= REG_TRIG_A_SEL_WR(2 downto 0);
+U70_out_0 <= REG_VET_A_EN_WR(0 downto 0);
+U71_out_0 <= REG_VET_B_EN_WR(0 downto 0);
+U72_out_0 <= REG_VET_C_EN_WR(0 downto 0);
+U73_out_0 <= REG_VET_D_EN_WR(0 downto 0);
+U74_out_0 <= REG_SW_VET_A_WR(0 downto 0);
+U75_out_0 <= REG_SW_VET_B_WR(0 downto 0);
+U76_out_0 <= REG_SW_VET_C_WR(0 downto 0);
+U77_out_0 <= REG_SW_VET_D_WR(0 downto 0);
+U78_OUT <= U583_OUT OR U584_OUT OR U585_OUT OR U586_OUT;
+U79_OUT <= U587_OUT OR U588_OUT OR U589_OUT OR U590_OUT;
+
+U80 : block
+begin
+U80_out <= U78_OUT when U82_out_0 = "0" else U79_OUT when U82_out_0 = "1"  else (others=>'0');
+
+end block;
+variable_GLOBAL_TRIG <= U80_out;
+U82_out_0 <= REG_TRIG_GBL_SEL_WR(0 downto 0);
+LEMO_4_5_DIRECTION <= U84_const_bin;
+U83_LEMO_4_5_A_OUT <= LEMO_4_5_A_OUT;
+U83_LEMO_4_5_A_OUT <= LEMO_4_5_A_OUT;
+U83_LEMO_4_5_B_OUT <= LEMO_4_5_B_OUT;
+
+U85:SW_GATE_AND_DELAY
+GENERIC MAP(
+    maxDelay => 1024)
+PORT MAP(
+    RESET => GlobalReset,
+    CLK => async_clk,
+    PORT_IN => U83_LEMO_4_5_A_OUT,
+    DELAY => U86_out_0,
+    GATE => U87_CONST,
+    PORT_OUT => U85_out
+);
+U86_out_0 <= conv_integer(REG_EXT_DELAY_WR);
+U87_CONST <= 8;
+variable_EXT_TRIG <= U85_out;
+U90 : d_latch
+  Generic map(
+	IN_SIZE => 	1,
+	EDGE => 	"rising")
+PORT MAP(
+	a => U83_LEMO_4_5_B_OUT,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	reset_val => "0",
+	b => U90_OUT );
+U91 : PULSE_GENERATOR
+PORT MAP(
+	PULSE_OUT => U91_PULSE,
+	PULSE_PERIOD => U92_out_0,
+	PULSE_WIDTH => U93_CONST,
+	CE => "1",
+	CLK => GlobalClock,
+	RESET => "0" );
+U92_out_0 <= REG_SW_TRIG_FREQ_WR(31 downto 0);
+U93_CONST <= conv_std_logic_vector(8,32);
+variable_SELF_TRIG <= U91_PULSE;
+variable_A_M_LG <= U452_M_ENERGY_LG;
+variable_A_M_HG <= U452_M_ENERGY_HG;
+variable_A_M_CLK <= U452_M_CLK;
+variable_A_M_SR <= U452_M_DIN;
+variable_B_M_LG <= U456_M_ENERGY_LG;
+variable_B_M_HG <= U456_M_ENERGY_HG;
+variable_B_M_CLK <= U456_M_CLK;
+variable_B_M_SR <= U456_M_DIN;
+variable_C_M_LG <= U460_M_ENERGY_LG;
+variable_C_M_HG <= U460_M_ENERGY_HG;
+variable_C_M_CLK <= U460_M_CLK;
+variable_C_M_SR <= U460_M_DIN;
+variable_D_M_LG <= U464_M_ENERGY_LG;
+variable_D_M_HG <= U464_M_ENERGY_HG;
+variable_D_M_CLK <= U464_M_CLK;
+variable_D_M_SR <= U464_M_DIN;
+U111_A_M_LG <= variable_A_M_LG;
+U112_A_M_HG <= variable_A_M_HG;
+U113_A_M_CLK <= variable_A_M_CLK;
+U114_A_M_SR <= variable_A_M_SR;
+U115_B_M_LG <= variable_B_M_LG;
+U116_B_M_HG <= variable_B_M_HG;
+U117_B_M_CLK <= variable_B_M_CLK;
+U118_B_M_SR <= variable_B_M_SR;
+U119_C_M_LG <= variable_C_M_LG;
+U120_C_M_HG <= variable_C_M_HG;
+U121_C_M_CLK <= variable_C_M_CLK;
+U122_C_M_SR <= variable_C_M_SR;
+U123_D_M_LG <= variable_D_M_LG;
+U124_D_M_HG <= variable_D_M_HG;
+U125_D_M_CLK <= variable_D_M_CLK;
+U126_D_M_SR <= variable_D_M_SR;
+variable_LEMO_TRG_EXT <= U83_LEMO_4_5_A_OUT;
+U128_LEMO_TRG_EXT <= variable_LEMO_TRG_EXT;
+U129_LEMO_VET_EXT <= variable_LEMO_VET_EXT;
+U130_LEMO_TRG_EXT <= variable_LEMO_TRG_EXT;
+U131_LEMO_VET_EXT <= variable_LEMO_VET_EXT;
+U132_LEMO_TRG_EXT <= variable_LEMO_TRG_EXT;
+U133_LEMO_VET_EXT <= variable_LEMO_VET_EXT;
+U134_LEMO_TRG_EXT <= variable_LEMO_TRG_EXT;
+U135_LEMO_VET_EXT <= variable_LEMO_VET_EXT;
+U136_A_TRIG_T <= variable_A_TRIG_T;
+U137_B_TRIG_T <= variable_B_TRIG_T;
+U138_D_TRIG_T <= variable_D_TRIG_T;
+U139_A_TRIG_C <= variable_A_TRIG_C;
+U140_B_TRIG_C <= variable_B_TRIG_C;
+U141_C_TRIG_C <= variable_C_TRIG_C;
+U142_D_TRIG_C <= variable_D_TRIG_C;
+variable_A_TRG <= U623_TRIG_OUT;
+variable_B_TRG <= U624_TRIG_OUT;
+variable_C_TRG <= U625_TRIG_OUT;
+variable_D_TRG <= U626_TRIG_OUT;
+U147_A_TRG <= variable_A_TRG;
+U148_B_TRG <= variable_B_TRG;
+U149_C_TRG <= variable_C_TRG;
+U150_D_TRG <= variable_D_TRG;
+U151_C_TRIG_T <= variable_C_TRIG_T;
+U152 : FREQ_METER
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => GlobalReset, 
+        CLK => async_clk,
+        SIGIN => U156_A_TRG,
+        ENABLE => "1",
+        FREQ => U152_freq,
+        INTTIME => U489_CONST
+    );
+U153 : FREQ_METER
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => GlobalReset, 
+        CLK => async_clk,
+        SIGIN => U157_B_TRG,
+        ENABLE => "1",
+        FREQ => U153_freq,
+        INTTIME => U490_CONST
+    );
+U154 : FREQ_METER
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => GlobalReset, 
+        CLK => async_clk,
+        SIGIN => U158_C_TRG,
+        ENABLE => "1",
+        FREQ => U154_freq,
+        INTTIME => U491_CONST
+    );
+U155 : FREQ_METER
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => GlobalReset, 
+        CLK => async_clk,
+        SIGIN => U159_D_TRG,
+        ENABLE => "1",
+        FREQ => U155_freq,
+        INTTIME => U492_CONST
+    );
+U156_A_TRG <= variable_A_TRG;
+U157_B_TRG <= variable_B_TRG;
+U158_C_TRG <= variable_C_TRG;
+U159_D_TRG <= variable_D_TRG;
+PROCESS_REG_U160 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U160_hold <= EXT(U152_freq,32);
+    end if;
+end process;
+REG_A_RATE_RD <= EXT(U152_freq,32);
+PROCESS_REG_U161 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U161_hold <= EXT(U153_freq,32);
+    end if;
+end process;
+REG_B_RATE_RD <= EXT(U153_freq,32);
+PROCESS_REG_U162 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U162_hold <= EXT(U154_freq,32);
+    end if;
+end process;
+REG_C_RATE_RD <= EXT(U154_freq,32);
+PROCESS_REG_U163 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U163_hold <= EXT(U155_freq,32);
+    end if;
+end process;
+REG_D_RATE_RD <= EXT(U155_freq,32);
+U164_CONST <= 16;
+U165_GLOBAL_TRIG <= variable_GLOBAL_TRIG;
+LEMO_2_3_A_IN <= U609_out;
+LEMO_2_3_B_IN <= U606_OUT;
+U167 : TimestampGenerator
+  Generic map(
+	nbits => 	64)
+PORT MAP(
+	TIMESTAMP => U167_TIMESTAMP,
+	T0 => U645_out(0),
+	CLK_READ => GlobalClock(0),
+	ClkCounter => GlobalClock(0) );
+variable_G_TS <= U167_TIMESTAMP;
+variable_G_TS0 <= U644_TIMESTAMP;
+LEMO_6_7_DIRECTION <= U171_const_bin;
+U170_LEMO_6_7_A_OUT <= LEMO_6_7_A_OUT;
+U170_LEMO_6_7_A_OUT <= LEMO_6_7_A_OUT;
+U170_LEMO_6_7_A_OUT <= LEMO_6_7_A_OUT;
+U170_LEMO_6_7_A_OUT <= LEMO_6_7_A_OUT;
+U170_LEMO_6_7_B_OUT <= LEMO_6_7_B_OUT;
+U170_LEMO_6_7_B_OUT <= LEMO_6_7_B_OUT;
+U172 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U187_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U619_out,
+        ENABLE => "1",
+        COUNTER => U172_counts,
+        OVERFLOW => open
+    );
+PROCESS_REG_U173 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U173_hold <= EXT(U172_counts,32);
+    end if;
+end process;
+REG_T0_COUNT_RD <= EXT(U172_counts,32);
+U174 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U188_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U178_A_TRG,
+        ENABLE => "1",
+        COUNTER => U174_counts,
+        OVERFLOW => open
+    );
+U175 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U189_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U179_B_TRG,
+        ENABLE => "1",
+        COUNTER => U175_counts,
+        OVERFLOW => open
+    );
+U176 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U190_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U180_C_TRG,
+        ENABLE => "1",
+        COUNTER => U176_counts,
+        OVERFLOW => open
+    );
+U177 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U191_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U181_D_TRG,
+        ENABLE => "1",
+        COUNTER => U177_counts,
+        OVERFLOW => open
+    );
+U178_A_TRG <= variable_A_TRG;
+U179_B_TRG <= variable_B_TRG;
+U180_C_TRG <= variable_C_TRG;
+U181_D_TRG <= variable_D_TRG;
+PROCESS_REG_U182 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U182_hold <= EXT(U174_counts,32);
+    end if;
+end process;
+REG_A_TRG_RD <= EXT(U174_counts,32);
+PROCESS_REG_U183 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U183_hold <= EXT(U175_counts,32);
+    end if;
+end process;
+REG_B_TRG_RD <= EXT(U175_counts,32);
+PROCESS_REG_U184 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U184_hold <= EXT(U176_counts,32);
+    end if;
+end process;
+REG_C_TRG_RD <= EXT(U176_counts,32);
+PROCESS_REG_U185 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U185_hold <= EXT(U177_counts,32);
+    end if;
+end process;
+REG_D_TRG_RD <= EXT(U177_counts,32);
+U186_int <= INT_RUNSTART_WR;
+U186_out_0 <= REG_RUNSTART_WR(0 downto 0);
+U187_RUN_START <= variable_RUN_START;
+U188_RUN_START <= variable_RUN_START;
+U189_RUN_START <= variable_RUN_START;
+U190_RUN_START <= variable_RUN_START;
+U191_RUN_START <= variable_RUN_START;
+
+U192:SW_GATE_AND_DELAY
+GENERIC MAP(
+    maxDelay => 1024)
+PORT MAP(
+    RESET => GlobalReset,
+    CLK => async_clk,
+    PORT_IN => U170_LEMO_6_7_A_OUT,
+    DELAY => 1,
+    GATE => U193_CONST,
+    PORT_OUT => U192_out
+);
+U193_CONST <= 16;
+variable_RUN_START <= U645_out;
+variable_FIFO_RESET <= U669_OUT;
+LEMO_0_1_A_IN <= U656_out;
+LEMO_0_1_B_IN <= U602_SYSbusy;
+
+U197:SUBPAGE_Timer64
+PORT MAP(
+	Enable => U198_const_bin,
+	Reset => U199_FIFO_RESET,
+	TIME_LSB => U197_TIME_LSB,
+	TIME_MSB => U197_TIME_MSB,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+U199_FIFO_RESET <= variable_FIFO_RESET;
+
+U200:SUBPAGE_Timer64
+PORT MAP(
+	Enable => U202_DEAD_SIG,
+	Reset => U201_FIFO_RESET,
+	TIME_LSB => U200_TIME_LSB,
+	TIME_MSB => U200_TIME_MSB,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+U201_FIFO_RESET <= variable_FIFO_RESET;
+U202_DEAD_SIG <= variable_DEAD_SIG;
+U203 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U211_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U216_OUT,
+        ENABLE => "1",
+        COUNTER => U203_counts,
+        OVERFLOW => open
+    );
+U204 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U212_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U217_OUT,
+        ENABLE => "1",
+        COUNTER => U204_counts,
+        OVERFLOW => open
+    );
+U205 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U213_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U218_OUT,
+        ENABLE => "1",
+        COUNTER => U205_counts,
+        OVERFLOW => open
+    );
+U206 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U214_RUN_START, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U219_OUT,
+        ENABLE => "1",
+        COUNTER => U206_counts,
+        OVERFLOW => open
+    );
+U207_A_TRG <= variable_A_TRG;
+U208_B_TRG <= variable_B_TRG;
+U209_C_TRG <= variable_C_TRG;
+U210_D_TRG <= variable_D_TRG;
+U211_RUN_START <= variable_RUN_START;
+U212_RUN_START <= variable_RUN_START;
+U213_RUN_START <= variable_RUN_START;
+U214_RUN_START <= variable_RUN_START;
+U215_DEAD_SIG <= variable_DEAD_SIG;
+U216_OUT <= U592_A_ABUSY AND U207_A_TRG;
+U217_OUT <= U593_B_ABUSY AND U208_B_TRG;
+U218_OUT <= U594_C_ABUSY AND U209_C_TRG;
+U219_OUT <= U595_D_ABUSY AND U210_D_TRG;
+PROCESS_REG_U220 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U220_hold <= EXT(U197_TIME_LSB,32);
+    end if;
+end process;
+REG_RUN_TIME_LSB_RD <= EXT(U197_TIME_LSB,32);
+PROCESS_REG_U221 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U221_hold <= EXT(U197_TIME_MSB,32);
+    end if;
+end process;
+REG_RUN_TIME_MSB_RD <= EXT(U197_TIME_MSB,32);
+PROCESS_REG_U222 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U222_hold <= EXT(U200_TIME_LSB,32);
+    end if;
+end process;
+REG_DEAD_TIME_LSB_RD <= EXT(U200_TIME_LSB,32);
+PROCESS_REG_U223 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U223_hold <= EXT(U200_TIME_MSB,32);
+    end if;
+end process;
+REG_DEAD_TIME_MSB_RD <= EXT(U200_TIME_MSB,32);
+PROCESS_REG_U224 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U224_hold <= EXT(U203_counts,32);
+    end if;
+end process;
+REG_A_LOST_RD <= EXT(U203_counts,32);
+PROCESS_REG_U225 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U225_hold <= EXT(U204_counts,32);
+    end if;
+end process;
+REG_B_LOST_RD <= EXT(U204_counts,32);
+PROCESS_REG_U226 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U226_hold <= EXT(U205_counts,32);
+    end if;
+end process;
+REG_C_LOST_RD <= EXT(U205_counts,32);
+PROCESS_REG_U227 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U227_hold <= EXT(U206_counts,32);
+    end if;
+end process;
+REG_D_LOST_RD <= EXT(U206_counts,32);
+U228_FIFO_RESET <= variable_FIFO_RESET;
+variable_A_ABUSY <= U452_BUSY;
+variable_B_ABUSY <= U456_BUSY;
+variable_C_ABUSY <= U460_BUSY;
+variable_D_ABUSY <= U464_BUSY;
+U233_A_ABUSY <= variable_A_ABUSY;
+U234_B_ABUSY <= variable_B_ABUSY;
+U235_C_ABUSY <= variable_C_ABUSY;
+U236_D_ABUSY <= variable_D_ABUSY;
+variable_A_DEAD <= U241_OUT;
+variable_B_DEAD <= U245_OUT;
+variable_C_DEAD <= U246_OUT;
+variable_D_DEAD <= U247_OUT;
+U241_OUT <= U233_A_ABUSY OR U215_DEAD_SIG;
+U242_DEAD_SIG <= variable_DEAD_SIG;
+U243_DEAD_SIG <= variable_DEAD_SIG;
+U244_DEAD_SIG <= variable_DEAD_SIG;
+U245_OUT <= U234_B_ABUSY OR U242_DEAD_SIG;
+U246_OUT <= U235_C_ABUSY OR U243_DEAD_SIG;
+U247_OUT <= U236_D_ABUSY OR U244_DEAD_SIG;
+U249 : CitirocSlowControl
+  Generic map(
+	CfgDefault => 	"1110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110110111111111111111111111111111111111111111111011111100111111101111001111011100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000111111110100101100010010110011111111111111011",
+	CfgMonitorDefault => 	"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	DoStartupSetup => 	"1")
+PORT MAP(
+	ASIC_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	ASIC_MONITOR_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	LOAD_CFG => "0",
+	LOAD_MONITOR => "0",
+	START_CFG => "0",
+	START_MONITOR => "0",
+	BUSY => open,
+	Citiroc_CLK => B_SR_CK_s(0),
+	Citiroc_MOSI => B_SR_IN_s(0),
+	Citiroc_SLOAD => B_SRLOAD_s(0),
+	Citiroc_RESETB => B_RESETB_SR_s(0),
+	Citiroc_SELECT => B_SELECT_s(0),
+	reset => '0',
+	clk => GlobalClock(0),
+	REG_CFG0 => REG_CitirocCfg1_REG_CFG0_WR,
+	REG_CFG1 => REG_CitirocCfg1_REG_CFG1_WR,
+	REG_CFG2 => REG_CitirocCfg1_REG_CFG2_WR,
+	REG_CFG3 => REG_CitirocCfg1_REG_CFG3_WR,
+	REG_CFG4 => REG_CitirocCfg1_REG_CFG4_WR,
+	REG_CFG5 => REG_CitirocCfg1_REG_CFG5_WR,
+	REG_CFG6 => REG_CitirocCfg1_REG_CFG6_WR,
+	REG_CFG7 => REG_CitirocCfg1_REG_CFG7_WR,
+	REG_CFG8 => REG_CitirocCfg1_REG_CFG8_WR,
+	REG_CFG9 => REG_CitirocCfg1_REG_CFG9_WR,
+	REG_CFG10 => REG_CitirocCfg1_REG_CFG10_WR,
+	REG_CFG11 => REG_CitirocCfg1_REG_CFG11_WR,
+	REG_CFG12 => REG_CitirocCfg1_REG_CFG12_WR,
+	REG_CFG13 => REG_CitirocCfg1_REG_CFG13_WR,
+	REG_CFG14 => REG_CitirocCfg1_REG_CFG14_WR,
+	REG_CFG15 => REG_CitirocCfg1_REG_CFG15_WR,
+	REG_CFG16 => REG_CitirocCfg1_REG_CFG16_WR,
+	REG_CFG17 => REG_CitirocCfg1_REG_CFG17_WR,
+	REG_CFG18 => REG_CitirocCfg1_REG_CFG18_WR,
+	REG_CFG19 => REG_CitirocCfg1_REG_CFG19_WR,
+	REG_CFG20 => REG_CitirocCfg1_REG_CFG20_WR,
+	REG_CFG21 => REG_CitirocCfg1_REG_CFG21_WR,
+	REG_CFG22 => REG_CitirocCfg1_REG_CFG22_WR,
+	REG_CFG23 => REG_CitirocCfg1_REG_CFG23_WR,
+	REG_CFG24 => REG_CitirocCfg1_REG_CFG24_WR,
+	REG_CFG25 => REG_CitirocCfg1_REG_CFG25_WR,
+	REG_CFG26 => REG_CitirocCfg1_REG_CFG26_WR,
+	REG_CFG27 => REG_CitirocCfg1_REG_CFG27_WR,
+	REG_CFG28 => REG_CitirocCfg1_REG_CFG28_WR,
+	REG_CFG29 => REG_CitirocCfg1_REG_CFG29_WR,
+	REG_CFG30 => REG_CitirocCfg1_REG_CFG30_WR,
+	REG_CFG31 => REG_CitirocCfg1_REG_CFG31_WR,
+	REG_CFG32 => REG_CitirocCfg1_REG_CFG32_WR,
+	REG_CFG33 => REG_CitirocCfg1_REG_CFG33_WR,
+	REG_CFG34 => REG_CitirocCfg1_REG_CFG34_WR,
+	REG_CFG35 => REG_CitirocCfg1_REG_CFG35_WR,
+	START_REG_CFG => REG_CitirocCfg1_START_REG_CFG_WR );
+U251 : CitirocSlowControl
+  Generic map(
+	CfgDefault => 	"1110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110110111111111111111111111111111111111111111111011111100111111101111001111011100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000111111110100101100010010110011111111111111011",
+	CfgMonitorDefault => 	"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	DoStartupSetup => 	"1")
+PORT MAP(
+	ASIC_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	ASIC_MONITOR_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	LOAD_CFG => "0",
+	LOAD_MONITOR => "0",
+	START_CFG => "0",
+	START_MONITOR => "0",
+	BUSY => open,
+	Citiroc_CLK => C_SR_CK_s(0),
+	Citiroc_MOSI => C_SR_IN_s(0),
+	Citiroc_SLOAD => C_SRLOAD_s(0),
+	Citiroc_RESETB => C_RESETB_SR_s(0),
+	Citiroc_SELECT => C_SELECT_s(0),
+	reset => '0',
+	clk => GlobalClock(0),
+	REG_CFG0 => REG_CitirocCfg2_REG_CFG0_WR,
+	REG_CFG1 => REG_CitirocCfg2_REG_CFG1_WR,
+	REG_CFG2 => REG_CitirocCfg2_REG_CFG2_WR,
+	REG_CFG3 => REG_CitirocCfg2_REG_CFG3_WR,
+	REG_CFG4 => REG_CitirocCfg2_REG_CFG4_WR,
+	REG_CFG5 => REG_CitirocCfg2_REG_CFG5_WR,
+	REG_CFG6 => REG_CitirocCfg2_REG_CFG6_WR,
+	REG_CFG7 => REG_CitirocCfg2_REG_CFG7_WR,
+	REG_CFG8 => REG_CitirocCfg2_REG_CFG8_WR,
+	REG_CFG9 => REG_CitirocCfg2_REG_CFG9_WR,
+	REG_CFG10 => REG_CitirocCfg2_REG_CFG10_WR,
+	REG_CFG11 => REG_CitirocCfg2_REG_CFG11_WR,
+	REG_CFG12 => REG_CitirocCfg2_REG_CFG12_WR,
+	REG_CFG13 => REG_CitirocCfg2_REG_CFG13_WR,
+	REG_CFG14 => REG_CitirocCfg2_REG_CFG14_WR,
+	REG_CFG15 => REG_CitirocCfg2_REG_CFG15_WR,
+	REG_CFG16 => REG_CitirocCfg2_REG_CFG16_WR,
+	REG_CFG17 => REG_CitirocCfg2_REG_CFG17_WR,
+	REG_CFG18 => REG_CitirocCfg2_REG_CFG18_WR,
+	REG_CFG19 => REG_CitirocCfg2_REG_CFG19_WR,
+	REG_CFG20 => REG_CitirocCfg2_REG_CFG20_WR,
+	REG_CFG21 => REG_CitirocCfg2_REG_CFG21_WR,
+	REG_CFG22 => REG_CitirocCfg2_REG_CFG22_WR,
+	REG_CFG23 => REG_CitirocCfg2_REG_CFG23_WR,
+	REG_CFG24 => REG_CitirocCfg2_REG_CFG24_WR,
+	REG_CFG25 => REG_CitirocCfg2_REG_CFG25_WR,
+	REG_CFG26 => REG_CitirocCfg2_REG_CFG26_WR,
+	REG_CFG27 => REG_CitirocCfg2_REG_CFG27_WR,
+	REG_CFG28 => REG_CitirocCfg2_REG_CFG28_WR,
+	REG_CFG29 => REG_CitirocCfg2_REG_CFG29_WR,
+	REG_CFG30 => REG_CitirocCfg2_REG_CFG30_WR,
+	REG_CFG31 => REG_CitirocCfg2_REG_CFG31_WR,
+	REG_CFG32 => REG_CitirocCfg2_REG_CFG32_WR,
+	REG_CFG33 => REG_CitirocCfg2_REG_CFG33_WR,
+	REG_CFG34 => REG_CitirocCfg2_REG_CFG34_WR,
+	REG_CFG35 => REG_CitirocCfg2_REG_CFG35_WR,
+	START_REG_CFG => REG_CitirocCfg2_START_REG_CFG_WR );
+U253 : CitirocSlowControl
+  Generic map(
+	CfgDefault => 	"1110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110111011101110110111111111111111111111111111111111111111111011111100111111101111001111011100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001100000001000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000000100000000000111111110100101100010010110011111111111111011",
+	CfgMonitorDefault => 	"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	DoStartupSetup => 	"1")
+PORT MAP(
+	ASIC_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	ASIC_MONITOR_CONFIGURATION => "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	LOAD_CFG => "0",
+	LOAD_MONITOR => "0",
+	START_CFG => "0",
+	START_MONITOR => "0",
+	BUSY => open,
+	Citiroc_CLK => D_SR_CK_s(0),
+	Citiroc_MOSI => D_SR_IN_s(0),
+	Citiroc_SLOAD => D_SRLOAD_s(0),
+	Citiroc_RESETB => D_RESETB_SR_s(0),
+	Citiroc_SELECT => D_SELECT_s(0),
+	reset => '0',
+	clk => GlobalClock(0),
+	REG_CFG0 => REG_CitirocCfg3_REG_CFG0_WR,
+	REG_CFG1 => REG_CitirocCfg3_REG_CFG1_WR,
+	REG_CFG2 => REG_CitirocCfg3_REG_CFG2_WR,
+	REG_CFG3 => REG_CitirocCfg3_REG_CFG3_WR,
+	REG_CFG4 => REG_CitirocCfg3_REG_CFG4_WR,
+	REG_CFG5 => REG_CitirocCfg3_REG_CFG5_WR,
+	REG_CFG6 => REG_CitirocCfg3_REG_CFG6_WR,
+	REG_CFG7 => REG_CitirocCfg3_REG_CFG7_WR,
+	REG_CFG8 => REG_CitirocCfg3_REG_CFG8_WR,
+	REG_CFG9 => REG_CitirocCfg3_REG_CFG9_WR,
+	REG_CFG10 => REG_CitirocCfg3_REG_CFG10_WR,
+	REG_CFG11 => REG_CitirocCfg3_REG_CFG11_WR,
+	REG_CFG12 => REG_CitirocCfg3_REG_CFG12_WR,
+	REG_CFG13 => REG_CitirocCfg3_REG_CFG13_WR,
+	REG_CFG14 => REG_CitirocCfg3_REG_CFG14_WR,
+	REG_CFG15 => REG_CitirocCfg3_REG_CFG15_WR,
+	REG_CFG16 => REG_CitirocCfg3_REG_CFG16_WR,
+	REG_CFG17 => REG_CitirocCfg3_REG_CFG17_WR,
+	REG_CFG18 => REG_CitirocCfg3_REG_CFG18_WR,
+	REG_CFG19 => REG_CitirocCfg3_REG_CFG19_WR,
+	REG_CFG20 => REG_CitirocCfg3_REG_CFG20_WR,
+	REG_CFG21 => REG_CitirocCfg3_REG_CFG21_WR,
+	REG_CFG22 => REG_CitirocCfg3_REG_CFG22_WR,
+	REG_CFG23 => REG_CitirocCfg3_REG_CFG23_WR,
+	REG_CFG24 => REG_CitirocCfg3_REG_CFG24_WR,
+	REG_CFG25 => REG_CitirocCfg3_REG_CFG25_WR,
+	REG_CFG26 => REG_CitirocCfg3_REG_CFG26_WR,
+	REG_CFG27 => REG_CitirocCfg3_REG_CFG27_WR,
+	REG_CFG28 => REG_CitirocCfg3_REG_CFG28_WR,
+	REG_CFG29 => REG_CitirocCfg3_REG_CFG29_WR,
+	REG_CFG30 => REG_CitirocCfg3_REG_CFG30_WR,
+	REG_CFG31 => REG_CitirocCfg3_REG_CFG31_WR,
+	REG_CFG32 => REG_CitirocCfg3_REG_CFG32_WR,
+	REG_CFG33 => REG_CitirocCfg3_REG_CFG33_WR,
+	REG_CFG34 => REG_CitirocCfg3_REG_CFG34_WR,
+	REG_CFG35 => REG_CitirocCfg3_REG_CFG35_WR,
+	START_REG_CFG => REG_CitirocCfg3_START_REG_CFG_WR );
+U254_A_FRAME_ACK <= variable_A_FRAME_ACK;
+U255_B_FRAME_ACK <= variable_B_FRAME_ACK;
+U256_C_FRAME_ACK <= variable_C_FRAME_ACK;
+U257_D_FRAME_ACK <= variable_D_FRAME_ACK;
+variable_A_FRAME_ACK <= U469_ACK_A;
+variable_B_FRAME_ACK <= U469_ACK_B;
+variable_C_FRAME_ACK <= U469_ACK_C;
+variable_D_FRAME_ACK <= U469_ACK_D;
+U262 : PULSE_GENERATOR
+PORT MAP(
+	PULSE_OUT => U262_PULSE,
+	PULSE_PERIOD => U264_out_0,
+	PULSE_WIDTH => U263_CONST,
+	CE => "1",
+	CLK => GlobalClock,
+	RESET => "0" );
+U263_CONST <= conv_std_logic_vector(4,32);
+U264_out_0 <= REG_T0_SOFT_FREQ_WR(31 downto 0);
+variable_A_HIT <= U452_S_HIT;
+variable_B_HIT <= U456_S_HIT;
+variable_C_HIT <= U460_S_DV;
+variable_D_HIT <= U464_S_DV;
+U269_A_HIT <= variable_A_HIT;
+U270_B_HIT <= variable_B_HIT;
+U271_C_HIT <= variable_C_HIT;
+U272_D_HIT <= variable_D_HIT;
+U273_out_0 <= REG_HOLD_TIME_WR(15 downto 0);
+U274_out_0 <= REG_HOLD_TIME_WR(15 downto 0);
+U275_out_0 <= REG_HOLD_TIME_WR(15 downto 0);
+U276_out_0 <= REG_HOLD_TIME_WR(15 downto 0);
+
+U277:SUBPAGE_Framing
+PORT MAP(
+	T_0 => U281_A_TRG_0,
+	T_1 => U282_A_TRG_1,
+	T_2 => U283_A_TRG_2,
+	T_3 => U284_A_TRG_3,
+	T_4 => U285_A_TRG_4,
+	T_5 => U286_A_TRG_5,
+	T_6 => U287_A_TRG_6,
+	T_7 => U288_A_TRG_7,
+	T_8 => U289_A_TRG_8,
+	T_9 => U290_A_TRG_9,
+	T_10 => U291_A_TRG_10,
+	T_11 => U292_A_TRG_11,
+	T_12 => U293_A_TRG_12,
+	T_13 => U294_A_TRG_13,
+	T_14 => U295_A_TRG_14,
+	T_15 => U296_A_TRG_15,
+	T_16 => U297_A_TRG_16,
+	T_17 => U298_A_TRG_17,
+	T_18 => U299_A_TRG_18,
+	T_19 => U300_A_TRG_19,
+	T_20 => U301_A_TRG_20,
+	T_21 => U302_A_TRG_21,
+	T_22 => U303_A_TRG_22,
+	T_23 => U304_A_TRG_23,
+	T_24 => U305_A_TRG_24,
+	T_25 => U306_A_TRG_25,
+	T_26 => U307_A_TRG_26,
+	T_27 => U308_A_TRG_27,
+	T_28 => U309_A_TRG_28,
+	T_29 => U310_A_TRG_29,
+	T_30 => U311_A_TRG_30,
+	T_31 => U312_A_TRG_31,
+	FRAME => U416_FR_FRAME_SIG,
+	C_0 => U277_C_0,
+	C_1 => U277_C_1,
+	C_2 => U277_C_2,
+	C_3 => U277_C_3,
+	C_4 => U277_C_4,
+	C_5 => U277_C_5,
+	C_6 => U277_C_6,
+	C_7 => U277_C_7,
+	C_8 => U277_C_8,
+	C_9 => U277_C_9,
+	C_10 => U277_C_10,
+	C_11 => U277_C_11,
+	C_12 => U277_C_12,
+	C_13 => U277_C_13,
+	C_14 => U277_C_14,
+	C_15 => U277_C_15,
+	C_16 => U277_C_16,
+	C_17 => U277_C_17,
+	C_18 => U277_C_18,
+	C_19 => U277_C_19,
+	C_20 => U277_C_20,
+	C_21 => U277_C_21,
+	C_22 => U277_C_22,
+	C_23 => U277_C_23,
+	C_24 => U277_C_24,
+	C_25 => U277_C_25,
+	C_26 => U277_C_26,
+	C_27 => U277_C_27,
+	C_28 => U277_C_28,
+	C_29 => U277_C_29,
+	C_30 => U277_C_30,
+	C_31 => U277_C_31,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U278:SUBPAGE_Framing
+PORT MAP(
+	T_0 => U345_C_TRG_0,
+	T_1 => U346_C_TRG_1,
+	T_2 => U347_C_TRG_2,
+	T_3 => U348_C_TRG_3,
+	T_4 => U349_C_TRG_4,
+	T_5 => U350_C_TRG_5,
+	T_6 => U351_C_TRG_6,
+	T_7 => U352_C_TRG_7,
+	T_8 => U353_C_TRG_8,
+	T_9 => U354_C_TRG_9,
+	T_10 => U355_C_TRG_10,
+	T_11 => U356_C_TRG_11,
+	T_12 => U357_C_TRG_12,
+	T_13 => U358_C_TRG_13,
+	T_14 => U359_C_TRG_14,
+	T_15 => U360_C_TRG_15,
+	T_16 => U361_C_TRG_16,
+	T_17 => U362_C_TRG_17,
+	T_18 => U363_C_TRG_18,
+	T_19 => U364_C_TRG_19,
+	T_20 => U365_C_TRG_20,
+	T_21 => U366_C_TRG_21,
+	T_22 => U367_C_TRG_22,
+	T_23 => U368_C_TRG_23,
+	T_24 => U369_C_TRG_24,
+	T_25 => U370_C_TRG_25,
+	T_26 => U371_C_TRG_26,
+	T_27 => U372_C_TRG_27,
+	T_28 => U373_C_TRG_28,
+	T_29 => U374_C_TRG_29,
+	T_30 => U375_C_TRG_30,
+	T_31 => U376_C_TRG_31,
+	FRAME => U414_FR_FRAME_SIG,
+	C_0 => U278_C_0,
+	C_1 => U278_C_1,
+	C_2 => U278_C_2,
+	C_3 => U278_C_3,
+	C_4 => U278_C_4,
+	C_5 => U278_C_5,
+	C_6 => U278_C_6,
+	C_7 => U278_C_7,
+	C_8 => U278_C_8,
+	C_9 => U278_C_9,
+	C_10 => U278_C_10,
+	C_11 => U278_C_11,
+	C_12 => U278_C_12,
+	C_13 => U278_C_13,
+	C_14 => U278_C_14,
+	C_15 => U278_C_15,
+	C_16 => U278_C_16,
+	C_17 => U278_C_17,
+	C_18 => U278_C_18,
+	C_19 => U278_C_19,
+	C_20 => U278_C_20,
+	C_21 => U278_C_21,
+	C_22 => U278_C_22,
+	C_23 => U278_C_23,
+	C_24 => U278_C_24,
+	C_25 => U278_C_25,
+	C_26 => U278_C_26,
+	C_27 => U278_C_27,
+	C_28 => U278_C_28,
+	C_29 => U278_C_29,
+	C_30 => U278_C_30,
+	C_31 => U278_C_31,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U279:SUBPAGE_Framing
+PORT MAP(
+	T_0 => U313_B_TRG_0,
+	T_1 => U314_B_TRG_1,
+	T_2 => U315_B_TRG_2,
+	T_3 => U316_B_TRG_3,
+	T_4 => U317_B_TRG_4,
+	T_5 => U318_B_TRG_5,
+	T_6 => U319_B_TRG_6,
+	T_7 => U320_B_TRG_7,
+	T_8 => U321_B_TRG_8,
+	T_9 => U322_B_TRG_9,
+	T_10 => U323_B_TRG_10,
+	T_11 => U324_B_TRG_11,
+	T_12 => U325_B_TRG_12,
+	T_13 => U326_B_TRG_13,
+	T_14 => U327_B_TRG_14,
+	T_15 => U328_B_TRG_15,
+	T_16 => U329_B_TRG_16,
+	T_17 => U330_B_TRG_17,
+	T_18 => U331_B_TRG_18,
+	T_19 => U332_B_TRG_19,
+	T_20 => U333_B_TRG_20,
+	T_21 => U334_B_TRG_21,
+	T_22 => U335_B_TRG_22,
+	T_23 => U336_B_TRG_23,
+	T_24 => U337_B_TRG_24,
+	T_25 => U338_B_TRG_25,
+	T_26 => U339_B_TRG_26,
+	T_27 => U340_B_TRG_27,
+	T_28 => U341_B_TRG_28,
+	T_29 => U342_B_TRG_29,
+	T_30 => U343_B_TRG_30,
+	T_31 => U344_B_TRG_31,
+	FRAME => U415_FR_FRAME_SIG,
+	C_0 => U279_C_0,
+	C_1 => U279_C_1,
+	C_2 => U279_C_2,
+	C_3 => U279_C_3,
+	C_4 => U279_C_4,
+	C_5 => U279_C_5,
+	C_6 => U279_C_6,
+	C_7 => U279_C_7,
+	C_8 => U279_C_8,
+	C_9 => U279_C_9,
+	C_10 => U279_C_10,
+	C_11 => U279_C_11,
+	C_12 => U279_C_12,
+	C_13 => U279_C_13,
+	C_14 => U279_C_14,
+	C_15 => U279_C_15,
+	C_16 => U279_C_16,
+	C_17 => U279_C_17,
+	C_18 => U279_C_18,
+	C_19 => U279_C_19,
+	C_20 => U279_C_20,
+	C_21 => U279_C_21,
+	C_22 => U279_C_22,
+	C_23 => U279_C_23,
+	C_24 => U279_C_24,
+	C_25 => U279_C_25,
+	C_26 => U279_C_26,
+	C_27 => U279_C_27,
+	C_28 => U279_C_28,
+	C_29 => U279_C_29,
+	C_30 => U279_C_30,
+	C_31 => U279_C_31,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U280:SUBPAGE_Framing
+PORT MAP(
+	T_0 => U377_D_TRG_0,
+	T_1 => U378_D_TRG_1,
+	T_2 => U379_D_TRG_2,
+	T_3 => U380_D_TRG_3,
+	T_4 => U381_D_TRG_4,
+	T_5 => U382_D_TRG_5,
+	T_6 => U383_D_TRG_6,
+	T_7 => U384_D_TRG_7,
+	T_8 => U385_D_TRG_8,
+	T_9 => U386_D_TRG_9,
+	T_10 => U387_D_TRG_10,
+	T_11 => U388_D_TRG_11,
+	T_12 => U389_D_TRG_12,
+	T_13 => U390_D_TRG_13,
+	T_14 => U391_D_TRG_14,
+	T_15 => U392_D_TRG_15,
+	T_16 => U393_D_TRG_16,
+	T_17 => U394_D_TRG_17,
+	T_18 => U395_D_TRG_18,
+	T_19 => U396_D_TRG_19,
+	T_20 => U397_D_TRG_20,
+	T_21 => U398_D_TRG_21,
+	T_22 => U399_D_TRG_22,
+	T_23 => U400_D_TRG_23,
+	T_24 => U401_D_TRG_24,
+	T_25 => U402_D_TRG_25,
+	T_26 => U403_D_TRG_26,
+	T_27 => U404_D_TRG_27,
+	T_28 => U405_D_TRG_28,
+	T_29 => U406_D_TRG_29,
+	T_30 => U407_D_TRG_30,
+	T_31 => U408_D_TRG_31,
+	FRAME => U413_FR_FRAME_SIG,
+	C_0 => U280_C_0,
+	C_1 => U280_C_1,
+	C_2 => U280_C_2,
+	C_3 => U280_C_3,
+	C_4 => U280_C_4,
+	C_5 => U280_C_5,
+	C_6 => U280_C_6,
+	C_7 => U280_C_7,
+	C_8 => U280_C_8,
+	C_9 => U280_C_9,
+	C_10 => U280_C_10,
+	C_11 => U280_C_11,
+	C_12 => U280_C_12,
+	C_13 => U280_C_13,
+	C_14 => U280_C_14,
+	C_15 => U280_C_15,
+	C_16 => U280_C_16,
+	C_17 => U280_C_17,
+	C_18 => U280_C_18,
+	C_19 => U280_C_19,
+	C_20 => U280_C_20,
+	C_21 => U280_C_21,
+	C_22 => U280_C_22,
+	C_23 => U280_C_23,
+	C_24 => U280_C_24,
+	C_25 => U280_C_25,
+	C_26 => U280_C_26,
+	C_27 => U280_C_27,
+	C_28 => U280_C_28,
+	C_29 => U280_C_29,
+	C_30 => U280_C_30,
+	C_31 => U280_C_31,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+U281_A_TRG_0 <= A_TRIG0;
+U282_A_TRG_1 <= A_TRIG1;
+U283_A_TRG_2 <= A_TRIG2;
+U284_A_TRG_3 <= A_TRIG3;
+U285_A_TRG_4 <= A_TRIG4;
+U286_A_TRG_5 <= A_TRIG5;
+U287_A_TRG_6 <= A_TRIG6;
+U288_A_TRG_7 <= A_TRIG7;
+U289_A_TRG_8 <= A_TRIG8;
+U290_A_TRG_9 <= A_TRIG9;
+U291_A_TRG_10 <= A_TRIG10;
+U292_A_TRG_11 <= A_TRIG11;
+U293_A_TRG_12 <= A_TRIG12;
+U294_A_TRG_13 <= A_TRIG13;
+U295_A_TRG_14 <= A_TRIG14;
+U296_A_TRG_15 <= A_TRIG15;
+U297_A_TRG_16 <= A_TRIG16;
+U298_A_TRG_17 <= A_TRIG17;
+U299_A_TRG_18 <= A_TRIG18;
+U300_A_TRG_19 <= A_TRIG19;
+U301_A_TRG_20 <= A_TRIG20;
+U302_A_TRG_21 <= A_TRIG21;
+U303_A_TRG_22 <= A_TRIG22;
+U304_A_TRG_23 <= A_TRIG23;
+U305_A_TRG_24 <= A_TRIG24;
+U306_A_TRG_25 <= A_TRIG25;
+U307_A_TRG_26 <= A_TRIG26;
+U308_A_TRG_27 <= A_TRIG27;
+U309_A_TRG_28 <= A_TRIG28;
+U310_A_TRG_29 <= A_TRIG29;
+U311_A_TRG_30 <= A_TRIG30;
+U312_A_TRG_31 <= A_TRIG31;
+U313_B_TRG_0 <= B_TRIG0;
+U314_B_TRG_1 <= B_TRIG1;
+U315_B_TRG_2 <= B_TRIG2;
+U316_B_TRG_3 <= B_TRIG3;
+U317_B_TRG_4 <= B_TRIG4;
+U318_B_TRG_5 <= B_TRIG5;
+U319_B_TRG_6 <= B_TRIG6;
+U320_B_TRG_7 <= B_TRIG7;
+U321_B_TRG_8 <= B_TRIG8;
+U322_B_TRG_9 <= B_TRIG9;
+U323_B_TRG_10 <= B_TRIG10;
+U324_B_TRG_11 <= B_TRIG11;
+U325_B_TRG_12 <= B_TRIG12;
+U326_B_TRG_13 <= B_TRIG13;
+U327_B_TRG_14 <= B_TRIG14;
+U328_B_TRG_15 <= B_TRIG15;
+U329_B_TRG_16 <= B_TRIG16;
+U330_B_TRG_17 <= B_TRIG17;
+U331_B_TRG_18 <= B_TRIG18;
+U332_B_TRG_19 <= B_TRIG19;
+U333_B_TRG_20 <= B_TRIG20;
+U334_B_TRG_21 <= B_TRIG21;
+U335_B_TRG_22 <= B_TRIG22;
+U336_B_TRG_23 <= B_TRIG23;
+U337_B_TRG_24 <= B_TRIG24;
+U338_B_TRG_25 <= B_TRIG25;
+U339_B_TRG_26 <= B_TRIG26;
+U340_B_TRG_27 <= B_TRIG27;
+U341_B_TRG_28 <= B_TRIG28;
+U342_B_TRG_29 <= B_TRIG29;
+U343_B_TRG_30 <= B_TRIG30;
+U344_B_TRG_31 <= B_TRIG31;
+U345_C_TRG_0 <= C_TRIG0;
+U346_C_TRG_1 <= C_TRIG1;
+U347_C_TRG_2 <= C_TRIG2;
+U348_C_TRG_3 <= C_TRIG3;
+U349_C_TRG_4 <= C_TRIG4;
+U350_C_TRG_5 <= C_TRIG5;
+U351_C_TRG_6 <= C_TRIG6;
+U352_C_TRG_7 <= C_TRIG7;
+U353_C_TRG_8 <= C_TRIG8;
+U354_C_TRG_9 <= C_TRIG9;
+U355_C_TRG_10 <= C_TRIG10;
+U356_C_TRG_11 <= C_TRIG11;
+U357_C_TRG_12 <= C_TRIG12;
+U358_C_TRG_13 <= C_TRIG13;
+U359_C_TRG_14 <= C_TRIG14;
+U360_C_TRG_15 <= C_TRIG15;
+U361_C_TRG_16 <= C_TRIG16;
+U362_C_TRG_17 <= C_TRIG17;
+U363_C_TRG_18 <= C_TRIG18;
+U364_C_TRG_19 <= C_TRIG19;
+U365_C_TRG_20 <= C_TRIG20;
+U366_C_TRG_21 <= C_TRIG21;
+U367_C_TRG_22 <= C_TRIG22;
+U368_C_TRG_23 <= C_TRIG23;
+U369_C_TRG_24 <= C_TRIG24;
+U370_C_TRG_25 <= C_TRIG25;
+U371_C_TRG_26 <= C_TRIG26;
+U372_C_TRG_27 <= C_TRIG27;
+U373_C_TRG_28 <= C_TRIG28;
+U374_C_TRG_29 <= C_TRIG29;
+U375_C_TRG_30 <= C_TRIG30;
+U376_C_TRG_31 <= C_TRIG31;
+U377_D_TRG_0 <= D_TRIG0;
+U378_D_TRG_1 <= D_TRIG1;
+U379_D_TRG_2 <= D_TRIG2;
+U380_D_TRG_3 <= D_TRIG3;
+U381_D_TRG_4 <= D_TRIG4;
+U382_D_TRG_5 <= D_TRIG5;
+U383_D_TRG_6 <= D_TRIG6;
+U384_D_TRG_7 <= D_TRIG7;
+U385_D_TRG_8 <= D_TRIG8;
+U386_D_TRG_9 <= D_TRIG9;
+U387_D_TRG_10 <= D_TRIG10;
+U388_D_TRG_11 <= D_TRIG11;
+U389_D_TRG_12 <= D_TRIG12;
+U390_D_TRG_13 <= D_TRIG13;
+U391_D_TRG_14 <= D_TRIG14;
+U392_D_TRG_15 <= D_TRIG15;
+U393_D_TRG_16 <= D_TRIG16;
+U394_D_TRG_17 <= D_TRIG17;
+U395_D_TRG_18 <= D_TRIG18;
+U396_D_TRG_19 <= D_TRIG19;
+U397_D_TRG_20 <= D_TRIG20;
+U398_D_TRG_21 <= D_TRIG21;
+U399_D_TRG_22 <= D_TRIG22;
+U400_D_TRG_23 <= D_TRIG23;
+U401_D_TRG_24 <= D_TRIG24;
+U402_D_TRG_25 <= D_TRIG25;
+U403_D_TRG_26 <= D_TRIG26;
+U404_D_TRG_27 <= D_TRIG27;
+U405_D_TRG_28 <= D_TRIG28;
+U406_D_TRG_29 <= D_TRIG29;
+U407_D_TRG_30 <= D_TRIG30;
+U408_D_TRG_31 <= D_TRIG31;
+U409 : PULSE_GENERATOR
+PORT MAP(
+	PULSE_OUT => U409_PULSE,
+	PULSE_PERIOD => U410_out_0,
+	PULSE_WIDTH => U411_CONST,
+	CE => "1",
+	CLK => GlobalClock,
+	RESET => "0" );
+U410_out_0 <= REG_FR_IFP_WR(31 downto 0);
+U411_CONST <= conv_std_logic_vector(1,32);
+
+U412 : block
+begin
+U412_out <= U409_PULSE when U442_out_0 = "00" else U424_vLEMO_7 when U442_out_0 = "01" else U428_OUT when U442_out_0 = "10" else U428_OUT when U442_out_0 = "11"  else (others=>'0');
+
+end block;
+U413_FR_FRAME_SIG <= variable_FR_FRAME_SIG;
+U414_FR_FRAME_SIG <= variable_FR_FRAME_SIG;
+U415_FR_FRAME_SIG <= variable_FR_FRAME_SIG;
+U416_FR_FRAME_SIG <= variable_FR_FRAME_SIG;
+U417_FR_FRAME_SIG <= variable_FR_FRAME_SIG;
+U419 : d_latch
+  Generic map(
+	IN_SIZE => 	1,
+	EDGE => 	"rising")
+PORT MAP(
+	a => U417_FR_FRAME_SIG,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	reset_val => "0",
+	b => U419_OUT );
+U420_A_TS <= variable_A_TS;
+variable_FR_FRAME_SIG <= U422_out;
+U422 : EDGE_DETECTOR_RE
+    Generic map(bitSize => 1 )
+    port map( 
+        Reset => GlobalReset, 
+        CE => "1",
+        CLK => async_clk,
+        PORT_IN => U412_out,
+        PULSE_WIDTH => 1,
+        PORT_OUT => U422_out
+    );
+variable_vLEMO_7 <= U170_LEMO_6_7_B_OUT;
+U424_vLEMO_7 <= variable_vLEMO_7;
+U425 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => U432_OUT, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U422_out,
+        ENABLE => "1",
+        COUNTER => U425_counts,
+        OVERFLOW => open
+    );
+U426 : EDGE_DETECTOR_RE
+    Generic map(bitSize => 1 )
+    port map( 
+        Reset => GlobalReset, 
+        CE => "1",
+        CLK => async_clk,
+        PORT_IN => U424_vLEMO_7,
+        PULSE_WIDTH => 1,
+        PORT_OUT => U426_out
+    );
+U427 : COUNTER_RISING
+    Generic map(bitSize => 32 )
+    port map( 
+        RESET => GlobalReset, 
+        CE => "1",
+        CLK => async_clk,
+        SIGIN => U438_out,
+        ENABLE => "1",
+        COUNTER => U427_counts,
+        OVERFLOW => open
+    );
+U428_OUT <= U429_OUT AND U409_PULSE;
+U429 : comparator
+  Generic map(
+	IN_SIZE => 	32,
+	IN_SIGN => 	"unsigned",
+	REGISTER_OUT => 	"false",
+	OPERATION => 	"smaller")
+PORT MAP(
+	in1 => U425_counts,
+	in2 => U437_out_0,
+	clk => GlobalClock(0),
+	comp_out => U429_OUT );
+
+U430 : block
+begin
+U430_out <= U431_RUN_START when U442_out_0 = "00" else U431_RUN_START when U442_out_0 = "01" else U438_out when U442_out_0 = "10" else U438_out when U442_out_0 = "11"  else (others=>'0');
+
+end block;
+U431_RUN_START <= variable_RUN_START;
+U432_OUT <= U431_RUN_START OR U430_out;
+variable_FT_CNT_EXT <= U427_counts;
+variable_FT_CNT_WIN <= U425_counts;
+U435_FT_CNT_EXT <= variable_FT_CNT_EXT;
+U436_FT_CNT_WIN <= variable_FT_CNT_WIN;
+U437_out_0 <= REG_FR_LIMIT_WR(31 downto 0);
+
+U438 : block
+begin
+U438_out <= U445_const_bin when U442_out_0 = "00" else U445_const_bin when U442_out_0 = "01" else U426_out when U442_out_0 = "10" else U439_PULSE when U442_out_0 = "11"  else (others=>'0');
+
+end block;
+U439 : PULSE_GENERATOR
+PORT MAP(
+	PULSE_OUT => U439_PULSE,
+	PULSE_PERIOD => U441_out_0,
+	PULSE_WIDTH => U440_CONST,
+	CE => "1",
+	CLK => GlobalClock,
+	RESET => "0" );
+U440_CONST <= conv_std_logic_vector(1,32);
+U441_out_0 <= REG_FR_IFP2_WR(31 downto 0);
+U442_out_0 <= REG_FR_MODE_WR(1 downto 0);
+PROCESS_REG_U443 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U443_hold <= EXT(U425_counts,32);
+    end if;
+end process;
+REG_FR_DBG1_RD <= EXT(U425_counts,32);
+PROCESS_REG_U444 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U444_hold <= EXT(U427_counts,32);
+    end if;
+end process;
+REG_FR_DBG2_RD <= EXT(U427_counts,32);
+U447 : U447_custompacket
+  Generic map(
+	memLength => 	32768,
+	wordWidth => 	32)
+PORT MAP(
+	IN_1 => U277_C_0,
+	IN_2 => U277_C_1,
+	IN_3 => U277_C_2,
+	IN_4 => U277_C_3,
+	IN_5 => U277_C_4,
+	IN_6 => U277_C_5,
+	IN_7 => U277_C_6,
+	IN_8 => U277_C_7,
+	IN_9 => U277_C_8,
+	IN_10 => U277_C_9,
+	IN_11 => U277_C_10,
+	IN_12 => U277_C_11,
+	IN_13 => U277_C_12,
+	IN_14 => U277_C_13,
+	IN_15 => U277_C_14,
+	IN_16 => U277_C_15,
+	IN_17 => U277_C_16,
+	IN_18 => U277_C_17,
+	IN_19 => U277_C_18,
+	IN_20 => U277_C_19,
+	IN_21 => U277_C_20,
+	IN_22 => U277_C_21,
+	IN_23 => U277_C_22,
+	IN_24 => U277_C_23,
+	IN_25 => U277_C_24,
+	IN_26 => U277_C_25,
+	IN_27 => U277_C_26,
+	IN_28 => U277_C_27,
+	IN_29 => U277_C_28,
+	IN_30 => U277_C_29,
+	IN_31 => U277_C_30,
+	IN_32 => U277_C_31,
+	IN_33 => U279_C_0,
+	IN_34 => U279_C_1,
+	IN_35 => U279_C_2,
+	IN_36 => U279_C_3,
+	IN_37 => U279_C_4,
+	IN_38 => U279_C_5,
+	IN_39 => U279_C_6,
+	IN_40 => U279_C_7,
+	IN_41 => U279_C_8,
+	IN_42 => U279_C_9,
+	IN_43 => U279_C_10,
+	IN_44 => U279_C_11,
+	IN_45 => U279_C_12,
+	IN_46 => U279_C_13,
+	IN_47 => U279_C_14,
+	IN_48 => U279_C_15,
+	IN_49 => U279_C_16,
+	IN_50 => U279_C_17,
+	IN_51 => U279_C_18,
+	IN_52 => U279_C_19,
+	IN_53 => U279_C_20,
+	IN_54 => U279_C_21,
+	IN_55 => U279_C_22,
+	IN_56 => U279_C_23,
+	IN_57 => U279_C_24,
+	IN_58 => U279_C_25,
+	IN_59 => U279_C_26,
+	IN_60 => U279_C_27,
+	IN_61 => U279_C_28,
+	IN_62 => U279_C_29,
+	IN_63 => U279_C_30,
+	IN_64 => U279_C_31,
+	IN_65 => U278_C_0,
+	IN_66 => U278_C_1,
+	IN_67 => U278_C_2,
+	IN_68 => U278_C_3,
+	IN_69 => U278_C_4,
+	IN_70 => U278_C_5,
+	IN_71 => U278_C_6,
+	IN_72 => U278_C_7,
+	IN_73 => U278_C_8,
+	IN_74 => U278_C_9,
+	IN_75 => U278_C_10,
+	IN_76 => U278_C_11,
+	IN_77 => U278_C_12,
+	IN_78 => U278_C_13,
+	IN_79 => U278_C_14,
+	IN_80 => U278_C_15,
+	IN_81 => U278_C_16,
+	IN_82 => U278_C_17,
+	IN_83 => U278_C_18,
+	IN_84 => U278_C_19,
+	IN_85 => U278_C_20,
+	IN_86 => U278_C_21,
+	IN_87 => U278_C_22,
+	IN_88 => U278_C_23,
+	IN_89 => U278_C_24,
+	IN_90 => U278_C_25,
+	IN_91 => U278_C_26,
+	IN_92 => U278_C_27,
+	IN_93 => U278_C_28,
+	IN_94 => U278_C_29,
+	IN_95 => U278_C_30,
+	IN_96 => U278_C_31,
+	IN_97 => U280_C_0,
+	IN_98 => U280_C_1,
+	IN_99 => U280_C_2,
+	IN_100 => U280_C_3,
+	IN_101 => U280_C_4,
+	IN_102 => U280_C_5,
+	IN_103 => U280_C_6,
+	IN_104 => U280_C_7,
+	IN_105 => U280_C_8,
+	IN_106 => U280_C_9,
+	IN_107 => U280_C_10,
+	IN_108 => U280_C_11,
+	IN_109 => U280_C_12,
+	IN_110 => U280_C_13,
+	IN_111 => U280_C_14,
+	IN_112 => U280_C_15,
+	IN_113 => U280_C_16,
+	IN_114 => U280_C_17,
+	IN_115 => U280_C_18,
+	IN_116 => U280_C_19,
+	IN_117 => U280_C_20,
+	IN_118 => U280_C_21,
+	IN_119 => U280_C_22,
+	IN_120 => U280_C_23,
+	IN_121 => U280_C_24,
+	IN_122 => U280_C_25,
+	IN_123 => U280_C_26,
+	IN_124 => U280_C_27,
+	IN_125 => U280_C_28,
+	IN_126 => U280_C_29,
+	IN_127 => U280_C_30,
+	IN_128 => U280_C_31,
+	IN_129 => U420_A_TS,
+	IN_130 => U435_FT_CNT_EXT,
+	IN_131 => U436_FT_CNT_WIN,
+	TRIG => U419_OUT,
+	CLK_WRITE => CLK_ACQ,
+	SYNC_TRIG => "0",
+	SYNC_RESET => "0",
+	SYNC_CLK => "0",
+	BUSY => open,
+	FIFO_FULL => open,
+	RESET => "0",
+	CLK_READ => BUS_CLK,
+	READ_DATA => BUS_CP_0_READ_DATA,
+	READ_DATAVALID => BUS_CP_0_VLD,
+	READ_RD_INT => BUS_CP_0_R_INT,
+	READ_STATUS => REG_CP_0_READ_STATUS_RD,
+	READ_VALID_WORDS => REG_CP_0_READ_VALID_WORDS_RD,
+	CONFIG => REG_CP_0_CONFIG_WR );
+U448_TRIG0 <= A_TRIG0;
+U448_TRIG1 <= A_TRIG1;
+U448_TRIG2 <= A_TRIG2;
+U448_TRIG3 <= A_TRIG3;
+U448_TRIG4 <= A_TRIG4;
+U448_TRIG5 <= A_TRIG5;
+U448_TRIG6 <= A_TRIG6;
+U448_TRIG7 <= A_TRIG7;
+U448_TRIG8 <= A_TRIG8;
+U448_TRIG9 <= A_TRIG9;
+U448_TRIG10 <= A_TRIG10;
+U448_TRIG11 <= A_TRIG11;
+U448_TRIG12 <= A_TRIG12;
+U448_TRIG13 <= A_TRIG13;
+U448_TRIG14 <= A_TRIG14;
+U448_TRIG15 <= A_TRIG15;
+U448_TRIG16 <= A_TRIG16;
+U448_TRIG17 <= A_TRIG17;
+U448_TRIG18 <= A_TRIG18;
+U448_TRIG19 <= A_TRIG19;
+U448_TRIG20 <= A_TRIG20;
+U448_TRIG21 <= A_TRIG21;
+U448_TRIG22 <= A_TRIG22;
+U448_TRIG23 <= A_TRIG23;
+U448_TRIG24 <= A_TRIG24;
+U448_TRIG25 <= A_TRIG25;
+U448_TRIG26 <= A_TRIG26;
+U448_TRIG27 <= A_TRIG27;
+U448_TRIG28 <= A_TRIG28;
+U448_TRIG29 <= A_TRIG29;
+U448_TRIG30 <= A_TRIG30;
+U448_TRIG31 <= A_TRIG31;
+U448_OR_TIME <= A_OR_TIME;
+U448_OR_CHARGE <= A_OR_CHARGE;
+U448_TRIGs <= A_TRIGs;
+TRIGGER_EXT_A_s <= U623_TRIG_EXT_OUT;
+TRIGGER_MASK_A <= U628_out_0;
+
+U449_TRIG0 <= B_TRIG0;
+U449_TRIG1 <= B_TRIG1;
+U449_TRIG2 <= B_TRIG2;
+U449_TRIG3 <= B_TRIG3;
+U449_TRIG4 <= B_TRIG4;
+U449_TRIG5 <= B_TRIG5;
+U449_TRIG6 <= B_TRIG6;
+U449_TRIG7 <= B_TRIG7;
+U449_TRIG8 <= B_TRIG8;
+U449_TRIG9 <= B_TRIG9;
+U449_TRIG10 <= B_TRIG10;
+U449_TRIG11 <= B_TRIG11;
+U449_TRIG12 <= B_TRIG12;
+U449_TRIG13 <= B_TRIG13;
+U449_TRIG14 <= B_TRIG14;
+U449_TRIG15 <= B_TRIG15;
+U449_TRIG16 <= B_TRIG16;
+U449_TRIG17 <= B_TRIG17;
+U449_TRIG18 <= B_TRIG18;
+U449_TRIG19 <= B_TRIG19;
+U449_TRIG20 <= B_TRIG20;
+U449_TRIG21 <= B_TRIG21;
+U449_TRIG22 <= B_TRIG22;
+U449_TRIG23 <= B_TRIG23;
+U449_TRIG24 <= B_TRIG24;
+U449_TRIG25 <= B_TRIG25;
+U449_TRIG26 <= B_TRIG26;
+U449_TRIG27 <= B_TRIG27;
+U449_TRIG28 <= B_TRIG28;
+U449_TRIG29 <= B_TRIG29;
+U449_TRIG30 <= B_TRIG30;
+U449_TRIG31 <= B_TRIG31;
+U449_OR_TIME <= B_OR_TIME;
+U449_OR_CHARGE <= B_OR_CHARGE;
+U449_TRIGs <= B_TRIGs;
+TRIGGER_EXT_B_s <= U624_TRIG_EXT_OUT;
+TRIGGER_MASK_B <= U629_out_0;
+
+U450_TRIG0 <= C_TRIG0;
+U450_TRIG1 <= C_TRIG1;
+U450_TRIG2 <= C_TRIG2;
+U450_TRIG3 <= C_TRIG3;
+U450_TRIG4 <= C_TRIG4;
+U450_TRIG5 <= C_TRIG5;
+U450_TRIG6 <= C_TRIG6;
+U450_TRIG7 <= C_TRIG7;
+U450_TRIG8 <= C_TRIG8;
+U450_TRIG9 <= C_TRIG9;
+U450_TRIG10 <= C_TRIG10;
+U450_TRIG11 <= C_TRIG11;
+U450_TRIG12 <= C_TRIG12;
+U450_TRIG13 <= C_TRIG13;
+U450_TRIG14 <= C_TRIG14;
+U450_TRIG15 <= C_TRIG15;
+U450_TRIG16 <= C_TRIG16;
+U450_TRIG17 <= C_TRIG17;
+U450_TRIG18 <= C_TRIG18;
+U450_TRIG19 <= C_TRIG19;
+U450_TRIG20 <= C_TRIG20;
+U450_TRIG21 <= C_TRIG21;
+U450_TRIG22 <= C_TRIG22;
+U450_TRIG23 <= C_TRIG23;
+U450_TRIG24 <= C_TRIG24;
+U450_TRIG25 <= C_TRIG25;
+U450_TRIG26 <= C_TRIG26;
+U450_TRIG27 <= C_TRIG27;
+U450_TRIG28 <= C_TRIG28;
+U450_TRIG29 <= C_TRIG29;
+U450_TRIG30 <= C_TRIG30;
+U450_TRIG31 <= C_TRIG31;
+U450_OR_TIME <= C_OR_TIME;
+U450_OR_CHARGE <= C_OR_CHARGE;
+U450_TRIGs <= C_TRIGs;
+TRIGGER_EXT_C_s <= U625_TRIG_EXT_OUT;
+TRIGGER_MASK_C <= U630_out_0;
+
+U451_TRIG0 <= D_TRIG0;
+U451_TRIG1 <= D_TRIG1;
+U451_TRIG2 <= D_TRIG2;
+U451_TRIG3 <= D_TRIG3;
+U451_TRIG4 <= D_TRIG4;
+U451_TRIG5 <= D_TRIG5;
+U451_TRIG6 <= D_TRIG6;
+U451_TRIG7 <= D_TRIG7;
+U451_TRIG8 <= D_TRIG8;
+U451_TRIG9 <= D_TRIG9;
+U451_TRIG10 <= D_TRIG10;
+U451_TRIG11 <= D_TRIG11;
+U451_TRIG12 <= D_TRIG12;
+U451_TRIG13 <= D_TRIG13;
+U451_TRIG14 <= D_TRIG14;
+U451_TRIG15 <= D_TRIG15;
+U451_TRIG16 <= D_TRIG16;
+U451_TRIG17 <= D_TRIG17;
+U451_TRIG18 <= D_TRIG18;
+U451_TRIG19 <= D_TRIG19;
+U451_TRIG20 <= D_TRIG20;
+U451_TRIG21 <= D_TRIG21;
+U451_TRIG22 <= D_TRIG22;
+U451_TRIG23 <= D_TRIG23;
+U451_TRIG24 <= D_TRIG24;
+U451_TRIG25 <= D_TRIG25;
+U451_TRIG26 <= D_TRIG26;
+U451_TRIG27 <= D_TRIG27;
+U451_TRIG28 <= D_TRIG28;
+U451_TRIG29 <= D_TRIG29;
+U451_TRIG30 <= D_TRIG30;
+U451_TRIG31 <= D_TRIG31;
+U451_OR_TIME <= D_OR_TIME;
+U451_OR_CHARGE <= D_OR_CHARGE;
+U451_TRIGs <= D_TRIGs;
+TRIGGER_EXT_D_s <= U626_TRIG_EXT_OUT;
+TRIGGER_MASK_D <= U631_out_0;
+
+U452 : CitirocAnalogReadoutV2
+  Generic map(
+	CLKDIV => 	25)
+PORT MAP(
+	TRIG => U512_A_TRG(0),
+	reject_data => '0',
+	HOLD_WIN_LENGTH => U273_out_0,
+	BUSY => U452_BUSY(0),
+	S_CHID => open,
+	S_ENERGY_LG => open,
+	S_ENERGY_HG => open,
+	S_HIT => U452_S_HIT(0),
+	S_DV => open,
+	P_ENERGY_0_HG => open,
+	P_ENERGY_0_LG => open,
+	P_HIT_0 => open,
+	P_ENERGY_1_HG => open,
+	P_ENERGY_1_LG => open,
+	P_HIT_1 => open,
+	P_ENERGY_2_HG => open,
+	P_ENERGY_2_LG => open,
+	P_HIT_2 => open,
+	P_ENERGY_3_HG => open,
+	P_ENERGY_3_LG => open,
+	P_HIT_3 => open,
+	P_ENERGY_4_HG => open,
+	P_ENERGY_4_LG => open,
+	P_HIT_4 => open,
+	P_ENERGY_5_HG => open,
+	P_ENERGY_5_LG => open,
+	P_HIT_5 => open,
+	P_ENERGY_6_HG => open,
+	P_ENERGY_6_LG => open,
+	P_HIT_6 => open,
+	P_ENERGY_7_HG => open,
+	P_ENERGY_7_LG => open,
+	P_HIT_7 => open,
+	P_ENERGY_8_HG => open,
+	P_ENERGY_8_LG => open,
+	P_HIT_8 => open,
+	P_ENERGY_9_HG => open,
+	P_ENERGY_9_LG => open,
+	P_HIT_9 => open,
+	P_ENERGY_10_HG => open,
+	P_ENERGY_10_LG => open,
+	P_HIT_10 => open,
+	P_ENERGY_11_HG => open,
+	P_ENERGY_11_LG => open,
+	P_HIT_11 => open,
+	P_ENERGY_12_HG => open,
+	P_ENERGY_12_LG => open,
+	P_HIT_12 => open,
+	P_ENERGY_13_HG => open,
+	P_ENERGY_13_LG => open,
+	P_HIT_13 => open,
+	P_ENERGY_14_HG => open,
+	P_ENERGY_14_LG => open,
+	P_HIT_14 => open,
+	P_ENERGY_15_HG => open,
+	P_ENERGY_15_LG => open,
+	P_HIT_15 => open,
+	P_ENERGY_16_HG => open,
+	P_ENERGY_16_LG => open,
+	P_HIT_16 => open,
+	P_ENERGY_17_HG => open,
+	P_ENERGY_17_LG => open,
+	P_HIT_17 => open,
+	P_ENERGY_18_HG => open,
+	P_ENERGY_18_LG => open,
+	P_HIT_18 => open,
+	P_ENERGY_19_HG => open,
+	P_ENERGY_19_LG => open,
+	P_HIT_19 => open,
+	P_ENERGY_20_HG => open,
+	P_ENERGY_20_LG => open,
+	P_HIT_20 => open,
+	P_ENERGY_21_HG => open,
+	P_ENERGY_21_LG => open,
+	P_HIT_21 => open,
+	P_ENERGY_22_HG => open,
+	P_ENERGY_22_LG => open,
+	P_HIT_22 => open,
+	P_ENERGY_23_HG => open,
+	P_ENERGY_23_LG => open,
+	P_HIT_23 => open,
+	P_ENERGY_24_HG => open,
+	P_ENERGY_24_LG => open,
+	P_HIT_24 => open,
+	P_ENERGY_25_HG => open,
+	P_ENERGY_25_LG => open,
+	P_HIT_25 => open,
+	P_ENERGY_26_HG => open,
+	P_ENERGY_26_LG => open,
+	P_HIT_26 => open,
+	P_ENERGY_27_HG => open,
+	P_ENERGY_27_LG => open,
+	P_HIT_27 => open,
+	P_ENERGY_28_HG => open,
+	P_ENERGY_28_LG => open,
+	P_HIT_28 => open,
+	P_ENERGY_29_HG => open,
+	P_ENERGY_29_LG => open,
+	P_HIT_29 => open,
+	P_ENERGY_30_HG => open,
+	P_ENERGY_30_LG => open,
+	P_HIT_30 => open,
+	P_ENERGY_31_HG => open,
+	P_ENERGY_31_LG => open,
+	P_HIT_31 => open,
+	P_DV => open,
+	P_FRAME_DV => U452_P_FRAME_DV(0),
+	P_FRAME_ACK => U254_A_FRAME_ACK(0),
+	P_FRAME_DATA => U452_P_FRAME_DATA,
+	M_ENERGY_HG => U452_M_ENERGY_HG,
+	M_ENERGY_LG => U452_M_ENERGY_LG,
+	M_CLK => U452_M_CLK,
+	M_DIN => U452_M_DIN,
+	TS_IN => U29_G_TS,
+	TS_OUT => U452_TS_OUT,
+	TS0_IN => U28_G_TS0,
+	TS0_OUT => U452_TS0_OUT,
+	T_OR32 => U511_A_TRIG_T,
+	T0 => U520_T0,
+	VALIDATION_IN => U533_VALIDATION_IN,
+	RUNRESET => U534_FIFO_RESET,
+	SW_VETO => U535_out_0,
+	VALIDATION_REG => U484_out_0,
+	COUNTER_TRIGGER => U452_CNT_TRIGGER,
+	COUNTER_VALIDATION => U452_CNT_VAL,
+	FLAGS => U452_FLAGS,
+	ADC_IN_HG => Citiroc_A_ADC_ENERGY_HG,
+	ADC_IN_LG => Citiroc_A_ADC_ENERGY_LG,
+	CHARGE_HIT_in => Citiroc_A_CHARGE_HIT_s(0),
+	chrage_srin_a => Citiroc_A_SRIN_s(0),
+	chrage_clk_a => Citiroc_A_SCLK_s(0),
+	chrage_sr_resetb => Citiroc_A_RESET_READ_s(0),
+	val_evnt => A_VAL_EVT_s(0),
+	raz_chn => A_RAZ_CHN_s(0),
+	hold_hg => A_HOLD_HG_s(0),
+	hold_lg => A_HOLD_LG_s(0),
+	TDC_CLOCKS => TDC_SYNC_CLK,
+	clk => GlobalClock(0),
+	reset => '0' );
+variable_A_CNT_TRIG <= U452_CNT_TRIGGER;
+variable_A_CNT_VALID <= U452_CNT_VAL;
+variable_A_FLAGS <= U452_FLAGS;
+U456 : CitirocAnalogReadoutV2
+  Generic map(
+	CLKDIV => 	25)
+PORT MAP(
+	TRIG => U513_B_TRG(0),
+	reject_data => '0',
+	HOLD_WIN_LENGTH => U274_out_0,
+	BUSY => U456_BUSY(0),
+	S_CHID => open,
+	S_ENERGY_LG => open,
+	S_ENERGY_HG => open,
+	S_HIT => U456_S_HIT(0),
+	S_DV => open,
+	P_ENERGY_0_HG => open,
+	P_ENERGY_0_LG => open,
+	P_HIT_0 => open,
+	P_ENERGY_1_HG => open,
+	P_ENERGY_1_LG => open,
+	P_HIT_1 => open,
+	P_ENERGY_2_HG => open,
+	P_ENERGY_2_LG => open,
+	P_HIT_2 => open,
+	P_ENERGY_3_HG => open,
+	P_ENERGY_3_LG => open,
+	P_HIT_3 => open,
+	P_ENERGY_4_HG => open,
+	P_ENERGY_4_LG => open,
+	P_HIT_4 => open,
+	P_ENERGY_5_HG => open,
+	P_ENERGY_5_LG => open,
+	P_HIT_5 => open,
+	P_ENERGY_6_HG => open,
+	P_ENERGY_6_LG => open,
+	P_HIT_6 => open,
+	P_ENERGY_7_HG => open,
+	P_ENERGY_7_LG => open,
+	P_HIT_7 => open,
+	P_ENERGY_8_HG => open,
+	P_ENERGY_8_LG => open,
+	P_HIT_8 => open,
+	P_ENERGY_9_HG => open,
+	P_ENERGY_9_LG => open,
+	P_HIT_9 => open,
+	P_ENERGY_10_HG => open,
+	P_ENERGY_10_LG => open,
+	P_HIT_10 => open,
+	P_ENERGY_11_HG => open,
+	P_ENERGY_11_LG => open,
+	P_HIT_11 => open,
+	P_ENERGY_12_HG => open,
+	P_ENERGY_12_LG => open,
+	P_HIT_12 => open,
+	P_ENERGY_13_HG => open,
+	P_ENERGY_13_LG => open,
+	P_HIT_13 => open,
+	P_ENERGY_14_HG => open,
+	P_ENERGY_14_LG => open,
+	P_HIT_14 => open,
+	P_ENERGY_15_HG => open,
+	P_ENERGY_15_LG => open,
+	P_HIT_15 => open,
+	P_ENERGY_16_HG => open,
+	P_ENERGY_16_LG => open,
+	P_HIT_16 => open,
+	P_ENERGY_17_HG => open,
+	P_ENERGY_17_LG => open,
+	P_HIT_17 => open,
+	P_ENERGY_18_HG => open,
+	P_ENERGY_18_LG => open,
+	P_HIT_18 => open,
+	P_ENERGY_19_HG => open,
+	P_ENERGY_19_LG => open,
+	P_HIT_19 => open,
+	P_ENERGY_20_HG => open,
+	P_ENERGY_20_LG => open,
+	P_HIT_20 => open,
+	P_ENERGY_21_HG => open,
+	P_ENERGY_21_LG => open,
+	P_HIT_21 => open,
+	P_ENERGY_22_HG => open,
+	P_ENERGY_22_LG => open,
+	P_HIT_22 => open,
+	P_ENERGY_23_HG => open,
+	P_ENERGY_23_LG => open,
+	P_HIT_23 => open,
+	P_ENERGY_24_HG => open,
+	P_ENERGY_24_LG => open,
+	P_HIT_24 => open,
+	P_ENERGY_25_HG => open,
+	P_ENERGY_25_LG => open,
+	P_HIT_25 => open,
+	P_ENERGY_26_HG => open,
+	P_ENERGY_26_LG => open,
+	P_HIT_26 => open,
+	P_ENERGY_27_HG => open,
+	P_ENERGY_27_LG => open,
+	P_HIT_27 => open,
+	P_ENERGY_28_HG => open,
+	P_ENERGY_28_LG => open,
+	P_HIT_28 => open,
+	P_ENERGY_29_HG => open,
+	P_ENERGY_29_LG => open,
+	P_HIT_29 => open,
+	P_ENERGY_30_HG => open,
+	P_ENERGY_30_LG => open,
+	P_HIT_30 => open,
+	P_ENERGY_31_HG => open,
+	P_ENERGY_31_LG => open,
+	P_HIT_31 => open,
+	P_DV => open,
+	P_FRAME_DV => U456_P_FRAME_DV(0),
+	P_FRAME_ACK => U255_B_FRAME_ACK(0),
+	P_FRAME_DATA => U456_P_FRAME_DATA,
+	M_ENERGY_HG => U456_M_ENERGY_HG,
+	M_ENERGY_LG => U456_M_ENERGY_LG,
+	M_CLK => U456_M_CLK,
+	M_DIN => U456_M_DIN,
+	TS_IN => U31_G_TS,
+	TS_OUT => U456_TS_OUT,
+	TS0_IN => U30_G_TS0,
+	TS0_OUT => U456_TS0_OUT,
+	T_OR32 => U514_B_TRIG_T,
+	T0 => U521_T0,
+	VALIDATION_IN => U539_VALIDATION_IN,
+	RUNRESET => U540_FIFO_RESET,
+	SW_VETO => U536_out_0,
+	VALIDATION_REG => U486_out_0,
+	COUNTER_TRIGGER => U456_CNT_TRIGGER,
+	COUNTER_VALIDATION => U456_CNT_VAL,
+	FLAGS => U456_FLAGS,
+	ADC_IN_HG => Citiroc_B_ADC_ENERGY_HG,
+	ADC_IN_LG => Citiroc_B_ADC_ENERGY_LG,
+	CHARGE_HIT_in => Citiroc_B_CHARGE_HIT_s(0),
+	chrage_srin_a => Citiroc_B_SRIN_s(0),
+	chrage_clk_a => Citiroc_B_SCLK_s(0),
+	chrage_sr_resetb => Citiroc_B_RESET_READ_s(0),
+	val_evnt => B_VAL_EVT_s(0),
+	raz_chn => B_RAZ_CHN_s(0),
+	hold_hg => B_HOLD_HG_s(0),
+	hold_lg => B_HOLD_LG_s(0),
+	TDC_CLOCKS => TDC_SYNC_CLK,
+	clk => GlobalClock(0),
+	reset => '0' );
+variable_B_CNT_TRIG <= U456_CNT_TRIGGER;
+variable_B_CNT_VALID <= U456_CNT_VAL;
+variable_B_FLAGS <= U456_FLAGS;
+U460 : CitirocAnalogReadoutV2
+  Generic map(
+	CLKDIV => 	25)
+PORT MAP(
+	TRIG => U516_C_TRG(0),
+	reject_data => '0',
+	HOLD_WIN_LENGTH => U275_out_0,
+	BUSY => U460_BUSY(0),
+	S_CHID => open,
+	S_ENERGY_LG => open,
+	S_ENERGY_HG => open,
+	S_HIT => open,
+	S_DV => U460_S_DV(0),
+	P_ENERGY_0_HG => open,
+	P_ENERGY_0_LG => open,
+	P_HIT_0 => open,
+	P_ENERGY_1_HG => open,
+	P_ENERGY_1_LG => open,
+	P_HIT_1 => open,
+	P_ENERGY_2_HG => open,
+	P_ENERGY_2_LG => open,
+	P_HIT_2 => open,
+	P_ENERGY_3_HG => open,
+	P_ENERGY_3_LG => open,
+	P_HIT_3 => open,
+	P_ENERGY_4_HG => open,
+	P_ENERGY_4_LG => open,
+	P_HIT_4 => open,
+	P_ENERGY_5_HG => open,
+	P_ENERGY_5_LG => open,
+	P_HIT_5 => open,
+	P_ENERGY_6_HG => open,
+	P_ENERGY_6_LG => open,
+	P_HIT_6 => open,
+	P_ENERGY_7_HG => open,
+	P_ENERGY_7_LG => open,
+	P_HIT_7 => open,
+	P_ENERGY_8_HG => open,
+	P_ENERGY_8_LG => open,
+	P_HIT_8 => open,
+	P_ENERGY_9_HG => open,
+	P_ENERGY_9_LG => open,
+	P_HIT_9 => open,
+	P_ENERGY_10_HG => open,
+	P_ENERGY_10_LG => open,
+	P_HIT_10 => open,
+	P_ENERGY_11_HG => open,
+	P_ENERGY_11_LG => open,
+	P_HIT_11 => open,
+	P_ENERGY_12_HG => open,
+	P_ENERGY_12_LG => open,
+	P_HIT_12 => open,
+	P_ENERGY_13_HG => open,
+	P_ENERGY_13_LG => open,
+	P_HIT_13 => open,
+	P_ENERGY_14_HG => open,
+	P_ENERGY_14_LG => open,
+	P_HIT_14 => open,
+	P_ENERGY_15_HG => open,
+	P_ENERGY_15_LG => open,
+	P_HIT_15 => open,
+	P_ENERGY_16_HG => open,
+	P_ENERGY_16_LG => open,
+	P_HIT_16 => open,
+	P_ENERGY_17_HG => open,
+	P_ENERGY_17_LG => open,
+	P_HIT_17 => open,
+	P_ENERGY_18_HG => open,
+	P_ENERGY_18_LG => open,
+	P_HIT_18 => open,
+	P_ENERGY_19_HG => open,
+	P_ENERGY_19_LG => open,
+	P_HIT_19 => open,
+	P_ENERGY_20_HG => open,
+	P_ENERGY_20_LG => open,
+	P_HIT_20 => open,
+	P_ENERGY_21_HG => open,
+	P_ENERGY_21_LG => open,
+	P_HIT_21 => open,
+	P_ENERGY_22_HG => open,
+	P_ENERGY_22_LG => open,
+	P_HIT_22 => open,
+	P_ENERGY_23_HG => open,
+	P_ENERGY_23_LG => open,
+	P_HIT_23 => open,
+	P_ENERGY_24_HG => open,
+	P_ENERGY_24_LG => open,
+	P_HIT_24 => open,
+	P_ENERGY_25_HG => open,
+	P_ENERGY_25_LG => open,
+	P_HIT_25 => open,
+	P_ENERGY_26_HG => open,
+	P_ENERGY_26_LG => open,
+	P_HIT_26 => open,
+	P_ENERGY_27_HG => open,
+	P_ENERGY_27_LG => open,
+	P_HIT_27 => open,
+	P_ENERGY_28_HG => open,
+	P_ENERGY_28_LG => open,
+	P_HIT_28 => open,
+	P_ENERGY_29_HG => open,
+	P_ENERGY_29_LG => open,
+	P_HIT_29 => open,
+	P_ENERGY_30_HG => open,
+	P_ENERGY_30_LG => open,
+	P_HIT_30 => open,
+	P_ENERGY_31_HG => open,
+	P_ENERGY_31_LG => open,
+	P_HIT_31 => open,
+	P_DV => open,
+	P_FRAME_DV => U460_P_FRAME_DV(0),
+	P_FRAME_ACK => U256_C_FRAME_ACK(0),
+	P_FRAME_DATA => U460_P_FRAME_DATA,
+	M_ENERGY_HG => U460_M_ENERGY_HG,
+	M_ENERGY_LG => U460_M_ENERGY_LG,
+	M_CLK => U460_M_CLK,
+	M_DIN => U460_M_DIN,
+	TS_IN => U33_G_TS,
+	TS_OUT => U460_TS_OUT,
+	TS0_IN => U32_G_TS0,
+	TS0_OUT => U460_TS0_OUT,
+	T_OR32 => U515_C_TRIG_T,
+	T0 => U522_T0,
+	VALIDATION_IN => U541_VALIDATION_IN,
+	RUNRESET => U542_FIFO_RESET,
+	SW_VETO => U537_out_0,
+	VALIDATION_REG => U487_out_0,
+	COUNTER_TRIGGER => U460_CNT_TRIGGER,
+	COUNTER_VALIDATION => U460_CNT_VAL,
+	FLAGS => U460_FLAGS,
+	ADC_IN_HG => Citiroc_C_ADC_ENERGY_HG,
+	ADC_IN_LG => Citiroc_C_ADC_ENERGY_LG,
+	CHARGE_HIT_in => Citiroc_C_CHARGE_HIT_s(0),
+	chrage_srin_a => Citiroc_C_SRIN_s(0),
+	chrage_clk_a => Citiroc_C_SCLK_s(0),
+	chrage_sr_resetb => Citiroc_C_RESET_READ_s(0),
+	val_evnt => C_VAL_EVT_s(0),
+	raz_chn => C_RAZ_CHN_s(0),
+	hold_hg => C_HOLD_HG_s(0),
+	hold_lg => C_HOLD_LG_s(0),
+	TDC_CLOCKS => TDC_SYNC_CLK,
+	clk => GlobalClock(0),
+	reset => '0' );
+variable_C_CNT_TRIG <= U460_CNT_TRIGGER;
+variable_C_CNT_VALID <= U460_CNT_VAL;
+variable_C_FLAGS <= U460_FLAGS;
+U464 : CitirocAnalogReadoutV2
+  Generic map(
+	CLKDIV => 	25)
+PORT MAP(
+	TRIG => U518_D_TRG(0),
+	reject_data => '0',
+	HOLD_WIN_LENGTH => U276_out_0,
+	BUSY => U464_BUSY(0),
+	S_CHID => open,
+	S_ENERGY_LG => open,
+	S_ENERGY_HG => open,
+	S_HIT => open,
+	S_DV => U464_S_DV(0),
+	P_ENERGY_0_HG => open,
+	P_ENERGY_0_LG => open,
+	P_HIT_0 => open,
+	P_ENERGY_1_HG => open,
+	P_ENERGY_1_LG => open,
+	P_HIT_1 => open,
+	P_ENERGY_2_HG => open,
+	P_ENERGY_2_LG => open,
+	P_HIT_2 => open,
+	P_ENERGY_3_HG => open,
+	P_ENERGY_3_LG => open,
+	P_HIT_3 => open,
+	P_ENERGY_4_HG => open,
+	P_ENERGY_4_LG => open,
+	P_HIT_4 => open,
+	P_ENERGY_5_HG => open,
+	P_ENERGY_5_LG => open,
+	P_HIT_5 => open,
+	P_ENERGY_6_HG => open,
+	P_ENERGY_6_LG => open,
+	P_HIT_6 => open,
+	P_ENERGY_7_HG => open,
+	P_ENERGY_7_LG => open,
+	P_HIT_7 => open,
+	P_ENERGY_8_HG => open,
+	P_ENERGY_8_LG => open,
+	P_HIT_8 => open,
+	P_ENERGY_9_HG => open,
+	P_ENERGY_9_LG => open,
+	P_HIT_9 => open,
+	P_ENERGY_10_HG => open,
+	P_ENERGY_10_LG => open,
+	P_HIT_10 => open,
+	P_ENERGY_11_HG => open,
+	P_ENERGY_11_LG => open,
+	P_HIT_11 => open,
+	P_ENERGY_12_HG => open,
+	P_ENERGY_12_LG => open,
+	P_HIT_12 => open,
+	P_ENERGY_13_HG => open,
+	P_ENERGY_13_LG => open,
+	P_HIT_13 => open,
+	P_ENERGY_14_HG => open,
+	P_ENERGY_14_LG => open,
+	P_HIT_14 => open,
+	P_ENERGY_15_HG => open,
+	P_ENERGY_15_LG => open,
+	P_HIT_15 => open,
+	P_ENERGY_16_HG => open,
+	P_ENERGY_16_LG => open,
+	P_HIT_16 => open,
+	P_ENERGY_17_HG => open,
+	P_ENERGY_17_LG => open,
+	P_HIT_17 => open,
+	P_ENERGY_18_HG => open,
+	P_ENERGY_18_LG => open,
+	P_HIT_18 => open,
+	P_ENERGY_19_HG => open,
+	P_ENERGY_19_LG => open,
+	P_HIT_19 => open,
+	P_ENERGY_20_HG => open,
+	P_ENERGY_20_LG => open,
+	P_HIT_20 => open,
+	P_ENERGY_21_HG => open,
+	P_ENERGY_21_LG => open,
+	P_HIT_21 => open,
+	P_ENERGY_22_HG => open,
+	P_ENERGY_22_LG => open,
+	P_HIT_22 => open,
+	P_ENERGY_23_HG => open,
+	P_ENERGY_23_LG => open,
+	P_HIT_23 => open,
+	P_ENERGY_24_HG => open,
+	P_ENERGY_24_LG => open,
+	P_HIT_24 => open,
+	P_ENERGY_25_HG => open,
+	P_ENERGY_25_LG => open,
+	P_HIT_25 => open,
+	P_ENERGY_26_HG => open,
+	P_ENERGY_26_LG => open,
+	P_HIT_26 => open,
+	P_ENERGY_27_HG => open,
+	P_ENERGY_27_LG => open,
+	P_HIT_27 => open,
+	P_ENERGY_28_HG => open,
+	P_ENERGY_28_LG => open,
+	P_HIT_28 => open,
+	P_ENERGY_29_HG => open,
+	P_ENERGY_29_LG => open,
+	P_HIT_29 => open,
+	P_ENERGY_30_HG => open,
+	P_ENERGY_30_LG => open,
+	P_HIT_30 => open,
+	P_ENERGY_31_HG => open,
+	P_ENERGY_31_LG => open,
+	P_HIT_31 => open,
+	P_DV => open,
+	P_FRAME_DV => U464_P_FRAME_DV(0),
+	P_FRAME_ACK => U257_D_FRAME_ACK(0),
+	P_FRAME_DATA => U464_P_FRAME_DATA,
+	M_ENERGY_HG => U464_M_ENERGY_HG,
+	M_ENERGY_LG => U464_M_ENERGY_LG,
+	M_CLK => U464_M_CLK,
+	M_DIN => U464_M_DIN,
+	TS_IN => U35_G_TS,
+	TS_OUT => U464_TS_OUT,
+	TS0_IN => U34_G_TS0,
+	TS0_OUT => U464_TS0_OUT,
+	T_OR32 => U517_D_TRIG_T,
+	T0 => U523_T0,
+	VALIDATION_IN => U543_VALIDATION_IN,
+	RUNRESET => U544_FIFO_RESET,
+	SW_VETO => U538_out_0,
+	VALIDATION_REG => U488_out_0,
+	COUNTER_TRIGGER => U464_CNT_TRIGGER,
+	COUNTER_VALIDATION => U464_CNT_VAL,
+	FLAGS => U464_FLAGS,
+	ADC_IN_HG => Citiroc_D_ADC_ENERGY_HG,
+	ADC_IN_LG => Citiroc_D_ADC_ENERGY_LG,
+	CHARGE_HIT_in => Citiroc_D_CHARGE_HIT_s(0),
+	chrage_srin_a => Citiroc_D_SRIN_s(0),
+	chrage_clk_a => Citiroc_D_SCLK_s(0),
+	chrage_sr_resetb => Citiroc_D_RESET_READ_s(0),
+	val_evnt => D_VAL_EVT_s(0),
+	raz_chn => D_RAZ_CHN_s(0),
+	hold_hg => D_HOLD_HG_s(0),
+	hold_lg => D_HOLD_LG_s(0),
+	TDC_CLOCKS => TDC_SYNC_CLK,
+	clk => GlobalClock(0),
+	reset => '0' );
+variable_D_CNT_TRIG <= U464_CNT_TRIGGER;
+variable_D_CNT_VALID <= U464_CNT_VAL;
+variable_D_FLAGS <= U464_FLAGS;
+U469 : CitirocFrameTransferV2
+  Generic map(
+	memLength => 	32768)
+PORT MAP(
+	DATA_A => U20_A_FRAME_DATA,
+	TS_T0_A => U45_A_TS0,
+	TS_A => U44_A_TS,
+	DV_A => U24_A_FRAME_DV(0),
+	ACK_A => U469_ACK_A(0),
+	COUNTER_TRIGGER_A => U470_A_CNT_TRIG,
+	COUNTER_VALIDATION_A => U474_A_CNT_VALID,
+	FLAGS_A => U478_A_FLAGS,
+	DATA_B => U21_B_FRAME_DATA,
+	TS_T0_B => U47_B_TS0,
+	TS_B => U46_B_TS,
+	DV_B => U25_B_FRAME_DV(0),
+	ACK_B => U469_ACK_B(0),
+	COUNTER_TRIGGER_B => U471_B_CNT_TRIG,
+	COUNTER_VALIDATION_B => U475_B_CNT_VALID,
+	FLAGS_B => U479_B_FLAGS,
+	DATA_C => U22_C_FRAME_DATA,
+	TS_T0_C => U49_C_TS0,
+	TS_C => U48_C_TS,
+	DV_C => U26_C_FRAME_DV(0),
+	ACK_C => U469_ACK_C(0),
+	COUNTER_TRIGGER_C => U472_C_CNT_TRIG,
+	COUNTER_VALIDATION_C => U476_C_CNT_VALID,
+	FLAGS_C => U480_C_FLAGS,
+	DATA_D => U23_D_FRAME_DATA,
+	TS_T0_D => U51_D_TS0,
+	TS_D => U50_D_TS,
+	DV_D => U27_D_FRAME_DV(0),
+	ACK_D => U469_ACK_D(0),
+	COUNTER_TRIGGER_D => U473_D_CNT_TRIG,
+	COUNTER_VALIDATION_D => U477_D_CNT_VALID,
+	FLAGS_D => U481_D_FLAGS,
+	FIFO_FULL => U469_FULL,
+	DATA_AVAL => open,
+	BUSY => U469_BUSY,
+	READ_RESET => U228_FIFO_RESET(0),
+	VALIDATION_REG => U485_out_0,
+	READ_CLK => GlobalClock(0),
+	CLK => GlobalClock(0),
+	RESET => '0',
+	CONTROL_REG => REG_CitirocFrame0_CONTROL_WR,
+	STATUS_REG => REG_CitirocFrame0_STATUS_RD,
+	READ_DATA => BUS_CitirocFrame0_READ_DATA,
+	READ_DATAVALID => BUS_CitirocFrame0_VLD,
+	READ_RD_INT => BUS_CitirocFrame0_R_INT );
+U470_A_CNT_TRIG <= variable_A_CNT_TRIG;
+U471_B_CNT_TRIG <= variable_B_CNT_TRIG;
+U472_C_CNT_TRIG <= variable_C_CNT_TRIG;
+U473_D_CNT_TRIG <= variable_D_CNT_TRIG;
+U474_A_CNT_VALID <= variable_A_CNT_VALID;
+U475_B_CNT_VALID <= variable_B_CNT_VALID;
+U476_C_CNT_VALID <= variable_C_CNT_VALID;
+U477_D_CNT_VALID <= variable_D_CNT_VALID;
+U478_A_FLAGS <= variable_A_FLAGS;
+U479_B_FLAGS <= variable_B_FLAGS;
+U480_C_FLAGS <= variable_C_FLAGS;
+U481_D_FLAGS <= variable_D_FLAGS;
+U483 : DT5550W_iic
+PORT MAP(
+	REG_ON_OFF_WR => U493_out_0,
+	INT_ON_OFF_WR => U493_int,
+	REG_HV_EMERGENCY => U494_out_0,
+	INT_HV_EMERGENCY => U494_int,
+	REG_HV_SET_VOLTAGE_WR => U495_out_0,
+	INT_HV_SET_VOLTAGE_WR => U495_int,
+	REG_HV_ENABLE_TCOMP_WR => U496_out_0,
+	INT_HV_ENABLE_TCOMP_WR => U496_int,
+	REG_HV_T_M_WR => U497_out_0,
+	INT_HV_T_M_WR => U497_int,
+	REG_HV_T_Q_WR => U498_out_0,
+	INT_HV_T_Q_WR => U498_int,
+	REG_HV_TCOMP_COEF_WR => U499_out_0,
+	INT_HV_TCOMP_COEF_WR => U499_int,
+	REG_HV_MAX_I_WR => U500_out_0,
+	INT_HV_MAX_I_WR => U500_int,
+	REG_RAMP_SPEED_WR => U501_out_0,
+	INT_RAMP_SPEED_WR => U501_int,
+	REG_HV_MAX_V_WR => U502_out_0,
+	INT_HV_MAX_V_WR => U502_int,
+	REG_HV_STATUS_RD => U483_HV_MSTATUS,
+	REG_HV_OUTV_RD => U483_HV_MVOUT,
+	REG_HV_IOUT_RD => U483_HV_MIOUT,
+	REG_HV_TEMP_RD => U483_HV_MTEMP,
+	REG_HV_VTARGET_RD => U483_HV_MVTARGET,
+	REG_HV_AVTARGET_RD => U483_HV_MAVTARGET,
+	REG_TEMP_SENS_READ_1 => U483_T_SENS1,
+	REG_TEMP_SENS_READ_2 => U483_T_SENS2,
+	i2c_fail => open,
+	i2c_busy => open,
+	i2c_sda => IIC_SDA,
+	i2c_scl => IIC_SCL,
+	clk => GlobalClock(0),
+	reset => '0',
+	PGB_EEPROM_KEY => PGB_EEPROM_KEY,
+	PGB_REG_MODEL => PGB_REG_MODEL,
+	PGB_BOARD_SN => PGB_BOARD_SN,
+	PGB_ASIC_COUNT => PGB_ASIC_COUNT,
+	INT_EEPROM_WR => INT_EEPROM_WR,
+	REG_EEPROM_WR => REG_EEPROM_WR,
+	REG_IIC_STATUS => REG_IIC_STATUS );
+U484_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U485_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U486_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U487_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U488_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U489_CONST <= 125000000;
+U490_CONST <= 125000000;
+U491_CONST <= 125000000;
+U492_CONST <= 125000000;
+U493_int <= INT_HV_ON_WR;
+U493_out_0 <= REG_HV_ON_WR(31 downto 0);
+U494_int <= INT_HV_EMERGENCY_WR;
+U494_out_0 <= REG_HV_EMERGENCY_WR(31 downto 0);
+U495_int <= INT_HV_VOUT_WR;
+U495_out_0 <= REG_HV_VOUT_WR(31 downto 0);
+U496_int <= INT_HV_ENTCOMP_WR;
+U496_out_0 <= REG_HV_ENTCOMP_WR(31 downto 0);
+U497_int <= INT_HV_TM_WR;
+U497_out_0 <= REG_HV_TM_WR(31 downto 0);
+U498_int <= INT_HV_TQ_WR;
+U498_out_0 <= REG_HV_TQ_WR(31 downto 0);
+U499_int <= INT_HV_TCOEF_WR;
+U499_out_0 <= REG_HV_TCOEF_WR(31 downto 0);
+U500_int <= INT_HV_IMAX_WR;
+U500_out_0 <= REG_HV_IMAX_WR(31 downto 0);
+U501_int <= INT_HV_RAMP_WR;
+U501_out_0 <= REG_HV_RAMP_WR(31 downto 0);
+U502_int <= INT_HV_VMAX_WR;
+U502_out_0 <= REG_HV_VMAX_WR(31 downto 0);
+PROCESS_REG_U503 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U503_hold <= EXT(U483_HV_MSTATUS,32);
+    end if;
+end process;
+REG_HV_MSTATUS_RD <= EXT(U483_HV_MSTATUS,32);
+PROCESS_REG_U504 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U504_hold <= EXT(U483_HV_MVOUT,32);
+    end if;
+end process;
+REG_HV_MVOUT_RD <= EXT(U483_HV_MVOUT,32);
+PROCESS_REG_U505 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U505_hold <= EXT(U483_HV_MTEMP,32);
+    end if;
+end process;
+REG_HV_MTEMP_RD <= EXT(U483_HV_MTEMP,32);
+PROCESS_REG_U506 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U506_hold <= EXT(U483_HV_MVTARGET,32);
+    end if;
+end process;
+REG_HV_MVTARGET_RD <= EXT(U483_HV_MVTARGET,32);
+PROCESS_REG_U507 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U507_hold <= EXT(U483_HV_MAVTARGET,32);
+    end if;
+end process;
+REG_HV_MAVTARGET_RD <= EXT(U483_HV_MAVTARGET,32);
+PROCESS_REG_U508 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U508_hold <= EXT(U483_T_SENS1,32);
+    end if;
+end process;
+REG_T_SENS1_RD <= EXT(U483_T_SENS1,32);
+PROCESS_REG_U509 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U509_hold <= EXT(U483_T_SENS2,32);
+    end if;
+end process;
+REG_T_SENS2_RD <= EXT(U483_T_SENS2,32);
+PROCESS_REG_U510 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U510_hold <= EXT(U483_HV_MIOUT,32);
+    end if;
+end process;
+REG_HV_MIOUT_RD <= EXT(U483_HV_MIOUT,32);
+U511_A_TRIG_T <= variable_A_TRIG_T;
+U512_A_TRG <= variable_A_TRG;
+U513_B_TRG <= variable_B_TRG;
+U514_B_TRIG_T <= variable_B_TRIG_T;
+U515_C_TRIG_T <= variable_C_TRIG_T;
+U516_C_TRG <= variable_C_TRG;
+U517_D_TRIG_T <= variable_D_TRIG_T;
+U518_D_TRG <= variable_D_TRG;
+variable_T0 <= U619_out;
+U520_T0 <= variable_T0;
+U521_T0 <= variable_T0;
+U522_T0 <= variable_T0;
+U523_T0 <= variable_T0;
+U524_out_0 <= REG_VALIDATION_CFG_WR(31 downto 0);
+U525_out <= U524_out_0(0 downto 0);
+variable_VALIDATION_EN <= U525_out;
+
+U527 : block
+begin
+U527_out <= U90_OUT when U530_VALIDATION_EN = "0" else U531_const_bin when U530_VALIDATION_EN = "1"  else (others=>'0');
+
+end block;
+variable_EXT_VETO <= U653_OUT;
+variable_LEMO_VET_EXT <= U662_OUT;
+U530_VALIDATION_EN <= variable_VALIDATION_EN;
+variable_VALIDATION_IN <= U90_OUT;
+U533_VALIDATION_IN <= variable_VALIDATION_IN;
+U534_FIFO_RESET <= variable_FIFO_RESET;
+U535_out_0 <= REG_SW_VET_A_WR(0 downto 0);
+U536_out_0 <= REG_SW_VET_B_WR(0 downto 0);
+U537_out_0 <= REG_SW_VET_C_WR(0 downto 0);
+U538_out_0 <= REG_SW_VET_D_WR(0 downto 0);
+U539_VALIDATION_IN <= variable_VALIDATION_IN;
+U540_FIFO_RESET <= variable_FIFO_RESET;
+U541_VALIDATION_IN <= variable_VALIDATION_IN;
+U542_FIFO_RESET <= variable_FIFO_RESET;
+U543_VALIDATION_IN <= variable_VALIDATION_IN;
+U544_FIFO_RESET <= variable_FIFO_RESET;
+variable_GLOBAL_COINC_TRIG <= U566_OUT;
+U546_GLOBAL_COINC_TRIG <= variable_GLOBAL_COINC_TRIG;
+variable_A_COINC_TRIG <= U623_COINC_TRIG;
+U548_GLOBAL_COINC_TRIG <= variable_GLOBAL_COINC_TRIG;
+variable_B_COINC_TRIG <= U624_COINC_TRIG;
+U550_GLOBAL_COINC_TRIG <= variable_GLOBAL_COINC_TRIG;
+variable_C_COINC_TRIG <= U625_COINC_TRIG;
+U552_GLOBAL_COINC_TRIG <= variable_GLOBAL_COINC_TRIG;
+variable_D_COINC_TRIG <= U626_COINC_TRIG;
+U554_B_COINC_TRIG <= variable_B_COINC_TRIG;
+U555_C_COINC_TRIG <= variable_C_COINC_TRIG;
+U556_D_COINC_TRIG <= variable_D_COINC_TRIG;
+U557_out_0 <= REG_SW_VET_A_WR(0 downto 0);
+U558_out_0 <= REG_SW_VET_B_WR(0 downto 0);
+U559_out_0 <= REG_SW_VET_C_WR(0 downto 0);
+U560_out_0 <= REG_SW_VET_D_WR(0 downto 0);
+U561_OUT <= U562_A_COINC_TRIG AND ( NOT sxt(U557_out_0,1));
+U562_A_COINC_TRIG <= variable_A_COINC_TRIG;
+U563_OUT <= U554_B_COINC_TRIG AND ( NOT sxt(U558_out_0,1));
+U564_OUT <= U555_C_COINC_TRIG AND ( NOT sxt(U559_out_0,1));
+U565_OUT <= U556_D_COINC_TRIG AND ( NOT sxt(U560_out_0,1));
+U566_OUT <= U561_OUT OR U563_OUT OR U564_OUT OR U565_OUT;
+U567_A_TRIG_T <= variable_A_TRIG_T;
+U568_B_TRIG_T <= variable_B_TRIG_T;
+U569_C_TRIG_T <= variable_C_TRIG_T;
+U570_D_TRIG_T <= variable_D_TRIG_T;
+U571_out_0 <= REG_SW_VET_A_WR(0 downto 0);
+U572_out_0 <= REG_SW_VET_B_WR(0 downto 0);
+U573_out_0 <= REG_SW_VET_C_WR(0 downto 0);
+U574_out_0 <= REG_SW_VET_D_WR(0 downto 0);
+U575_A_TRIG_C <= variable_A_TRIG_C;
+U576_B_TRIG_C <= variable_B_TRIG_C;
+U577_C_TRIG_C <= variable_C_TRIG_C;
+U578_D_TRIG_C <= variable_D_TRIG_C;
+U579_out_0 <= REG_SW_VET_A_WR(0 downto 0);
+U580_out_0 <= REG_SW_VET_B_WR(0 downto 0);
+U581_out_0 <= REG_SW_VET_C_WR(0 downto 0);
+U582_out_0 <= REG_SW_VET_D_WR(0 downto 0);
+U583_OUT <= U567_A_TRIG_T AND ( NOT sxt(U571_out_0,1));
+U584_OUT <= U568_B_TRIG_T AND ( NOT sxt(U572_out_0,1));
+U585_OUT <= U569_C_TRIG_T AND ( NOT sxt(U573_out_0,1));
+U586_OUT <= U570_D_TRIG_T AND ( NOT sxt(U574_out_0,1));
+U587_OUT <= U575_A_TRIG_C AND ( NOT sxt(U579_out_0,1));
+U588_OUT <= U576_B_TRIG_C AND ( NOT sxt(U580_out_0,1));
+U589_OUT <= U577_C_TRIG_C AND ( NOT sxt(U581_out_0,1));
+U590_OUT <= U578_D_TRIG_C AND ( NOT sxt(U582_out_0,1));
+U591_OUT <= U469_FULL OR U469_BUSY;
+U592_A_ABUSY <= variable_A_ABUSY;
+U593_B_ABUSY <= variable_B_ABUSY;
+U594_C_ABUSY <= variable_C_ABUSY;
+U595_D_ABUSY <= variable_D_ABUSY;
+U596_A_DEAD <= variable_A_DEAD;
+U597_B_DEAD <= variable_B_DEAD;
+U598_C_DEAD <= variable_C_DEAD;
+U599_D_DEAD <= variable_D_DEAD;
+U600_OUT <= U596_A_DEAD OR U597_B_DEAD OR U598_C_DEAD OR U599_D_DEAD;
+variable_SYSbusy <= U600_OUT;
+U602_SYSbusy <= variable_SYSbusy;
+U604 : pulseshaper
+  Generic map(
+	EDGE => 	"rising",
+	NO_DELAY => 	"true")
+PORT MAP(
+	a => U165_GLOBAL_TRIG,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	width => U608_int,
+	delay => 0,
+	b => U604_OUT );
+U606 : pulseshaper
+  Generic map(
+	EDGE => 	"rising",
+	NO_DELAY => 	"true")
+PORT MAP(
+	a => U619_out,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	width => U164_CONST,
+	delay => 0,
+	b => U606_OUT );
+U607_out_0 <= REG_TRIGGER_OUT_W_WR(31 downto 0);
+U608_int <= conv_integer(U607_out_0);
+
+U609 : block
+begin
+U609_out <= U165_GLOBAL_TRIG when U667_out_0 = "0" else U604_OUT when U667_out_0 = "1"  else (others=>'0');
+
+end block;
+U611 : MCRateMeter
+  Generic map(
+	CHANNEL_COUNT => 	32,
+	CLK_FREQ => 	125000000)
+PORT MAP(
+	trigger => U449_TRIG31 & U449_TRIG30 & U449_TRIG29 & U449_TRIG28 & U449_TRIG27 & U449_TRIG26 & U449_TRIG25 & U449_TRIG24 & U449_TRIG23 & U449_TRIG22 & U449_TRIG21 & U449_TRIG20 & U449_TRIG19 & U449_TRIG18 & U449_TRIG17 & U449_TRIG16 & U449_TRIG15 & U449_TRIG14 & U449_TRIG13 & U449_TRIG12 & U449_TRIG11 & U449_TRIG10 & U449_TRIG9 & U449_TRIG8 & U449_TRIG7 & U449_TRIG6 & U449_TRIG5 & U449_TRIG4 & U449_TRIG3 & U449_TRIG2 & U449_TRIG1 & U449_TRIG0,
+	VETO => '0',
+	START => '0',
+	CLK => CLK_ACQ(0),
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_RateMeter_1_READ_ADDRESS,
+	READ_DATA => BUS_RateMeter_1_READ_DATA,
+	READ_DATAVALID => BUS_RateMeter_1_VLD );
+U613 : MCRateMeter
+  Generic map(
+	CHANNEL_COUNT => 	32,
+	CLK_FREQ => 	125000000)
+PORT MAP(
+	trigger => U448_TRIG31 & U448_TRIG30 & U448_TRIG29 & U448_TRIG28 & U448_TRIG27 & U448_TRIG26 & U448_TRIG25 & U448_TRIG24 & U448_TRIG23 & U448_TRIG22 & U448_TRIG21 & U448_TRIG20 & U448_TRIG19 & U448_TRIG18 & U448_TRIG17 & U448_TRIG16 & U448_TRIG15 & U448_TRIG14 & U448_TRIG13 & U448_TRIG12 & U448_TRIG11 & U448_TRIG10 & U448_TRIG9 & U448_TRIG8 & U448_TRIG7 & U448_TRIG6 & U448_TRIG5 & U448_TRIG4 & U448_TRIG3 & U448_TRIG2 & U448_TRIG1 & U448_TRIG0,
+	VETO => '0',
+	START => '0',
+	CLK => CLK_ACQ(0),
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_RateMeter_0_READ_ADDRESS,
+	READ_DATA => BUS_RateMeter_0_READ_DATA,
+	READ_DATAVALID => BUS_RateMeter_0_VLD );
+U615 : MCRateMeter
+  Generic map(
+	CHANNEL_COUNT => 	32,
+	CLK_FREQ => 	125000000)
+PORT MAP(
+	trigger => U450_TRIG31 & U450_TRIG30 & U450_TRIG29 & U450_TRIG28 & U450_TRIG27 & U450_TRIG26 & U450_TRIG25 & U450_TRIG24 & U450_TRIG23 & U450_TRIG22 & U450_TRIG21 & U450_TRIG20 & U450_TRIG19 & U450_TRIG18 & U450_TRIG17 & U450_TRIG16 & U450_TRIG15 & U450_TRIG14 & U450_TRIG13 & U450_TRIG12 & U450_TRIG11 & U450_TRIG10 & U450_TRIG9 & U450_TRIG8 & U450_TRIG7 & U450_TRIG6 & U450_TRIG5 & U450_TRIG4 & U450_TRIG3 & U450_TRIG2 & U450_TRIG1 & U450_TRIG0,
+	VETO => '0',
+	START => '0',
+	CLK => CLK_ACQ(0),
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_RateMeter_2_READ_ADDRESS,
+	READ_DATA => BUS_RateMeter_2_READ_DATA,
+	READ_DATAVALID => BUS_RateMeter_2_VLD );
+U617 : MCRateMeter
+  Generic map(
+	CHANNEL_COUNT => 	32,
+	CLK_FREQ => 	125000000)
+PORT MAP(
+	trigger => U451_TRIG31 & U451_TRIG30 & U451_TRIG29 & U451_TRIG28 & U451_TRIG27 & U451_TRIG26 & U451_TRIG25 & U451_TRIG24 & U451_TRIG23 & U451_TRIG22 & U451_TRIG21 & U451_TRIG20 & U451_TRIG19 & U451_TRIG18 & U451_TRIG17 & U451_TRIG16 & U451_TRIG15 & U451_TRIG14 & U451_TRIG13 & U451_TRIG12 & U451_TRIG11 & U451_TRIG10 & U451_TRIG9 & U451_TRIG8 & U451_TRIG7 & U451_TRIG6 & U451_TRIG5 & U451_TRIG4 & U451_TRIG3 & U451_TRIG2 & U451_TRIG1 & U451_TRIG0,
+	VETO => '0',
+	START => '0',
+	CLK => CLK_ACQ(0),
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_RateMeter_3_READ_ADDRESS,
+	READ_DATA => BUS_RateMeter_3_READ_DATA,
+	READ_DATAVALID => BUS_RateMeter_3_VLD );
+U618_out_0 <= REG_T0_SEL_WR(1 downto 0);
+
+U619 : block
+begin
+U619_out <= U170_LEMO_6_7_B_OUT when U618_out_0 = "00" else U262_PULSE when U618_out_0 = "01" else U621_out_0 when U618_out_0 = "10" else U620_const_bin when U618_out_0 = "11"  else (others=>'0');
+
+end block;
+U621_out_0 <= REG_T0SW_WR(0 downto 0);
+U622_RUN_START <= variable_RUN_START;
+
+U623:SUBPAGE_TriggerLogic
+PORT MAP(
+	TRIG_T => U448_OR_TIME,
+	TRIG_C => U448_OR_CHARGE,
+	EXT_TRIG => U18_EXT_TRIG,
+	GLB_TRIG => U19_GLOBAL_TRIG,
+	SELF_TRIG => U52_SELF_TRIG,
+	GBL_COINC => U546_GLOBAL_COINC_TRIG,
+	SEL_TRIG => U53_out_0,
+	EN_VETO => U70_out_0,
+	EXT_VETO => U54_EXT_VETO,
+	SW_VETO => U74_out_0,
+	TRIGs => U448_TRIGs,
+	TRIG_OUT => U623_TRIG_OUT,
+	TRIG_EXT_OUT => U623_TRIG_EXT_OUT,
+	COINC_TRIG => U623_COINC_TRIG,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U624:SUBPAGE_TriggerLogic
+PORT MAP(
+	TRIG_T => U449_OR_TIME,
+	TRIG_C => U449_OR_CHARGE,
+	EXT_TRIG => U55_EXT_TRIG,
+	GLB_TRIG => U56_GLOBAL_TRIG,
+	SELF_TRIG => U57_SELF_TRIG,
+	GBL_COINC => U548_GLOBAL_COINC_TRIG,
+	SEL_TRIG => U67_out_0,
+	EN_VETO => U71_out_0,
+	EXT_VETO => U58_EXT_VETO,
+	SW_VETO => U75_out_0,
+	TRIGs => U449_TRIGs,
+	TRIG_OUT => U624_TRIG_OUT,
+	TRIG_EXT_OUT => U624_TRIG_EXT_OUT,
+	COINC_TRIG => U624_COINC_TRIG,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U625:SUBPAGE_TriggerLogic
+PORT MAP(
+	TRIG_T => U450_OR_TIME,
+	TRIG_C => U450_OR_CHARGE,
+	EXT_TRIG => U59_EXT_TRIG,
+	GLB_TRIG => U60_GLOBAL_TRIG,
+	SELF_TRIG => U61_SELF_TRIG,
+	GBL_COINC => U550_GLOBAL_COINC_TRIG,
+	SEL_TRIG => U68_out_0,
+	EN_VETO => U72_out_0,
+	EXT_VETO => U62_EXT_VETO,
+	SW_VETO => U76_out_0,
+	TRIGs => U450_TRIGs,
+	TRIG_OUT => U625_TRIG_OUT,
+	TRIG_EXT_OUT => U625_TRIG_EXT_OUT,
+	COINC_TRIG => U625_COINC_TRIG,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+
+U626:SUBPAGE_TriggerLogic
+PORT MAP(
+	TRIG_T => U451_OR_TIME,
+	TRIG_C => U451_OR_CHARGE,
+	EXT_TRIG => U63_EXT_TRIG,
+	GLB_TRIG => U64_GLOBAL_TRIG,
+	SELF_TRIG => U65_SELF_TRIG,
+	GBL_COINC => U552_GLOBAL_COINC_TRIG,
+	SEL_TRIG => U69_out_0,
+	EN_VETO => U73_out_0,
+	EXT_VETO => U66_EXT_VETO,
+	SW_VETO => U77_out_0,
+	TRIGs => U451_TRIGs,
+	TRIG_OUT => U626_TRIG_OUT,
+	TRIG_EXT_OUT => U626_TRIG_EXT_OUT,
+	COINC_TRIG => U626_COINC_TRIG,
+    GlobalReset => GlobalReset,
+    CLK_ACQ=>CLK_ACQ ,
+    BUS_CLK=>BUS_CLK ,
+    CLK_40=>CLK_40 ,
+    CLK_50 => "0" ,
+    CLK_80=>CLK_80 ,
+    clk_160=>clk_160 ,
+    clk_320=>clk_320 ,
+    clk_125=>clk_125 ,
+    FAST_CLK_100=>FAST_CLK_100 ,
+    FAST_CLK_200=>FAST_CLK_200 ,
+    FAST_CLK_250=>FAST_CLK_250 ,
+    FAST_CLK_250_90=>FAST_CLK_250_90 ,
+    FAST_CLK_500=>FAST_CLK_500 ,
+    FAST_CLK_500_90=>FAST_CLK_500_90 ,
+    GlobalClock=>GlobalClock ,
+    async_clk => async_clk 
+);
+variable_DEAD_SIG <= U591_OUT;
+U628_out_0 <= REG_TRIG_MASK_A_WR(31 downto 0);
+U629_out_0 <= REG_TRIG_MASK_B_WR(31 downto 0);
+U630_out_0 <= REG_TRIG_MASK_C_WR(31 downto 0);
+U631_out_0 <= REG_TRIG_MASK_D_WR(31 downto 0);
+U633 : xlx_oscilloscope_sync
+  Generic map(
+	channels => 	2,
+	memLength => 	1024,
+	wordWidth => 	16)
+PORT MAP(
+	ANALOG => U112_A_M_HG & U111_A_M_LG,
+	D0 => U136_A_TRIG_T & U113_A_M_CLK,
+	D1 => U139_A_TRIG_C & U114_A_M_SR,
+	D2 => U147_A_TRG & U128_LEMO_TRG_EXT,
+	D3 => U269_A_HIT & U129_LEMO_VET_EXT,
+	TRIG => U147_A_TRG,
+	BUSY => open,
+	CE => "1",
+	CLK_WRITE => CLK_ACQ,
+	RESET => "0",
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_Oscilloscope_0_READ_ADDRESS,
+	READ_DATA => BUS_Oscilloscope_0_READ_DATA,
+	READ_DATAVALID => BUS_Oscilloscope_0_VLD,
+	READ_STATUS => REG_Oscilloscope_0_READ_STATUS_RD,
+	READ_POSITION => REG_Oscilloscope_0_READ_POSITION_RD,
+	CONFIG_TRIGGER_MODE => REG_Oscilloscope_0_CONFIG_TRIGGER_MODE_WR,
+	CONFIG_TRIGGER_LEVEL => REG_Oscilloscope_0_CONFIG_TRIGGER_LEVEL_WR,
+	CONFIG_PRETRIGGER => REG_Oscilloscope_0_CONFIG_PRETRIGGER_WR,
+	CONFIG_DECIMATOR => REG_Oscilloscope_0_CONFIG_DECIMATOR_WR,
+	CONFIG_ARM => REG_Oscilloscope_0_CONFIG_ARM_WR );
+U635 : xlx_oscilloscope_sync
+  Generic map(
+	channels => 	2,
+	memLength => 	1024,
+	wordWidth => 	16)
+PORT MAP(
+	ANALOG => U116_B_M_HG & U115_B_M_LG,
+	D0 => U137_B_TRIG_T & U117_B_M_CLK,
+	D1 => U140_B_TRIG_C & U118_B_M_SR,
+	D2 => U148_B_TRG & U130_LEMO_TRG_EXT,
+	D3 => U270_B_HIT & U131_LEMO_VET_EXT,
+	TRIG => U148_B_TRG,
+	BUSY => open,
+	CE => "1",
+	CLK_WRITE => CLK_ACQ,
+	RESET => "0",
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_Oscilloscope_1_READ_ADDRESS,
+	READ_DATA => BUS_Oscilloscope_1_READ_DATA,
+	READ_DATAVALID => BUS_Oscilloscope_1_VLD,
+	READ_STATUS => REG_Oscilloscope_1_READ_STATUS_RD,
+	READ_POSITION => REG_Oscilloscope_1_READ_POSITION_RD,
+	CONFIG_TRIGGER_MODE => REG_Oscilloscope_1_CONFIG_TRIGGER_MODE_WR,
+	CONFIG_TRIGGER_LEVEL => REG_Oscilloscope_1_CONFIG_TRIGGER_LEVEL_WR,
+	CONFIG_PRETRIGGER => REG_Oscilloscope_1_CONFIG_PRETRIGGER_WR,
+	CONFIG_DECIMATOR => REG_Oscilloscope_1_CONFIG_DECIMATOR_WR,
+	CONFIG_ARM => REG_Oscilloscope_1_CONFIG_ARM_WR );
+U637 : xlx_oscilloscope_sync
+  Generic map(
+	channels => 	2,
+	memLength => 	1024,
+	wordWidth => 	16)
+PORT MAP(
+	ANALOG => U120_C_M_HG & U119_C_M_LG,
+	D0 => U151_C_TRIG_T & U121_C_M_CLK,
+	D1 => U141_C_TRIG_C & U122_C_M_SR,
+	D2 => U149_C_TRG & U132_LEMO_TRG_EXT,
+	D3 => U271_C_HIT & U133_LEMO_VET_EXT,
+	TRIG => U149_C_TRG,
+	BUSY => open,
+	CE => "1",
+	CLK_WRITE => CLK_ACQ,
+	RESET => "0",
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_Oscilloscope_2_READ_ADDRESS,
+	READ_DATA => BUS_Oscilloscope_2_READ_DATA,
+	READ_DATAVALID => BUS_Oscilloscope_2_VLD,
+	READ_STATUS => REG_Oscilloscope_2_READ_STATUS_RD,
+	READ_POSITION => REG_Oscilloscope_2_READ_POSITION_RD,
+	CONFIG_TRIGGER_MODE => REG_Oscilloscope_2_CONFIG_TRIGGER_MODE_WR,
+	CONFIG_TRIGGER_LEVEL => REG_Oscilloscope_2_CONFIG_TRIGGER_LEVEL_WR,
+	CONFIG_PRETRIGGER => REG_Oscilloscope_2_CONFIG_PRETRIGGER_WR,
+	CONFIG_DECIMATOR => REG_Oscilloscope_2_CONFIG_DECIMATOR_WR,
+	CONFIG_ARM => REG_Oscilloscope_2_CONFIG_ARM_WR );
+U639 : xlx_oscilloscope_sync
+  Generic map(
+	channels => 	2,
+	memLength => 	1024,
+	wordWidth => 	16)
+PORT MAP(
+	ANALOG => U124_D_M_HG & U123_D_M_LG,
+	D0 => U138_D_TRIG_T & U125_D_M_CLK,
+	D1 => U142_D_TRIG_C & U126_D_M_SR,
+	D2 => U150_D_TRG & U134_LEMO_TRG_EXT,
+	D3 => U272_D_HIT & U135_LEMO_VET_EXT,
+	TRIG => U150_D_TRG,
+	BUSY => open,
+	CE => "1",
+	CLK_WRITE => CLK_ACQ,
+	RESET => "0",
+	CLK_READ => BUS_CLK,
+	READ_ADDRESS => BUS_Oscilloscope_3_READ_ADDRESS,
+	READ_DATA => BUS_Oscilloscope_3_READ_DATA,
+	READ_DATAVALID => BUS_Oscilloscope_3_VLD,
+	READ_STATUS => REG_Oscilloscope_3_READ_STATUS_RD,
+	READ_POSITION => REG_Oscilloscope_3_READ_POSITION_RD,
+	CONFIG_TRIGGER_MODE => REG_Oscilloscope_3_CONFIG_TRIGGER_MODE_WR,
+	CONFIG_TRIGGER_LEVEL => REG_Oscilloscope_3_CONFIG_TRIGGER_LEVEL_WR,
+	CONFIG_PRETRIGGER => REG_Oscilloscope_3_CONFIG_PRETRIGGER_WR,
+	CONFIG_DECIMATOR => REG_Oscilloscope_3_CONFIG_DECIMATOR_WR,
+	CONFIG_ARM => REG_Oscilloscope_3_CONFIG_ARM_WR );
+U640_OUT <= U641_OUT OR U619_out;
+U641_OUT <= U642_RUN_START AND U643_out_0;
+U642_RUN_START <= variable_RUN_START;
+U643_out_0 <= REG_T0_RESET_ON_START_WR(0 downto 0);
+U644 : TimestampGenerator
+  Generic map(
+	nbits => 	32)
+PORT MAP(
+	TIMESTAMP => U644_TIMESTAMP,
+	T0 => U640_OUT(0),
+	CLK_READ => GlobalClock(0),
+	ClkCounter => GlobalClock(0) );
+
+U645 : block
+begin
+U645_out <= U186_int when U647_out_0 = "00" else U192_out when U647_out_0 = "01" else U646_out when U647_out_0 = "10" else U648_const_bin when U647_out_0 = "11"  else (others=>'0');
+
+end block;
+U646 : FF_SR
+    port map( 
+        CE => "1",
+        RESET => U170_LEMO_6_7_A_OUT, 
+        SET => U186_int,
+        PORT_OUT => U646_out
+    );
+U647_out_0 <= REG_GTS_RESSEL_WR(1 downto 0);
+U649_OUT <= NOT U646_out;
+variable_ISRUNNING <= U649_OUT;
+PROCESS_REG_U651 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U651_hold <= EXT(U649_OUT,32);
+    end if;
+end process;
+REG_ISRUNNING_RD <= EXT(U649_OUT,32);
+U652_out_0 <= REG_VETO_WAIT_RUN_WR(0 downto 0);
+U653_OUT <= U663_OUT OR U654_OUT;
+U654_OUT <= U666_OUT AND U652_out_0;
+U655_ISRUNNING <= variable_ISRUNNING;
+
+U656 : block
+begin
+U656_out <= U659_OUT when U657_out_0 = "00" else U170_LEMO_6_7_A_OUT when U657_out_0 = "01" else U170_LEMO_6_7_A_OUT when U657_out_0 = "10" else U661_const_bin when U657_out_0 = "11"  else (others=>'0');
+
+end block;
+U657_out_0 <= REG_GTS_RESSEL_WR(1 downto 0);
+U659 : pulseshaper
+  Generic map(
+	EDGE => 	"rising",
+	NO_DELAY => 	"true")
+PORT MAP(
+	a => U622_RUN_START,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	width => U660_CONST,
+	delay => 0,
+	b => U659_OUT );
+U660_CONST <= 16;
+U662_OUT <= U527_out OR U654_OUT;
+U663_OUT <= U527_out AND U664_out_0;
+U664_out_0 <= REG_GBL_EN_VETO_EXT_WR(0 downto 0);
+PROCESS_REG_U665 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U665_hold <= EXT(U653_OUT,32);
+    end if;
+end process;
+REG_INVETO_RD <= EXT(U653_OUT,32);
+U666_OUT <= NOT U655_ISRUNNING;
+U667_out_0 <= REG_TRG_OUT_MONOSTABLE_EN_WR(0 downto 0);
+U669 : pulseshaper
+  Generic map(
+	EDGE => 	"rising",
+	NO_DELAY => 	"true")
+PORT MAP(
+	a => U186_int,
+	CE => '1',
+	clk => GlobalClock(0),
+	reset => '0',
+	width => U670_CONST,
+	delay => 0,
+	b => U669_OUT );
+U670_CONST <= 4;
+PROCESS_REG_U671 : process(BUS_CLK,GlobalReset)
+begin
+    if rising_edge(BUS_CLK(0))  then
+         U671_hold <= EXT(U186_out_0,32);
+    end if;
+end process;
+REG_RUNSTART_RD <= EXT(U186_out_0,32);
+
+		 
+end Behavioral;
+
+ 

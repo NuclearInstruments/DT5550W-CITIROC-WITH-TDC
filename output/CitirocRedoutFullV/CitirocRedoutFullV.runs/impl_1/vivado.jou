@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:54:30 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Thu Mar 17 16:42:35 2022
+# Process ID: 16495
+# Current directory: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/impl_1
+# Command line: vivado -log TOP_CitirocRedoutFullV.vdi -applog -product Vivado -messageDb vivado.pb -mode batch -source TOP_CitirocRedoutFullV.tcl -notrace
+# Log file: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/impl_1/TOP_CitirocRedoutFullV.vdi
+# Journal file: /home/utente/projects/CitirocRedoutFullV/CitirocRedoutFullV.runs/impl_1/vivado.jou
+#-----------------------------------------------------------
+source TOP_CitirocRedoutFullV.tcl -notrace

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="tdc_05ns_pll_synth_1" LaunchPart="xc7k160tffg676-2" LaunchTime="1647531182">
+  <File Type="VDS-TIMING-PB" Name="tdc_05ns_pll_timing_summary_synth.pb"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="tdc_05ns_pll_timing_summary_synth.rpt"/>
+  <File Type="RDS-DCP" Name="tdc_05ns_pll.dcp"/>
+  <File Type="REPORTS-TCL" Name="tdc_05ns_pll_reports.tcl"/>
+  <File Type="PA-TCL" Name="tdc_05ns_pll.tcl"/>
+  <File Type="RDS-RDS" Name="tdc_05ns_pll.vds"/>
+  <File Type="RDS-PROPCONSTRS" Name="tdc_05ns_pll_drc_synth.rpt"/>
+  <File Type="RDS-UTIL" Name="tdc_05ns_pll_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="tdc_05ns_pll_utilization_synth.pb"/>
+  <FileSet Name="sources" Type="BlockSrcs" RelSrcDir="$PSRCDIR/tdc_05ns_pll">
+    <File Path="$PSRCDIR/sources_1/ip/tdc_05ns_pll/tdc_05ns_pll.xci">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/tdc_05ns_pll.xci"/>
+        <Attr Name="ImportTime" Val="1647251733"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="tdc_05ns_pll"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="BlockSrcs" RelSrcDir="$PSRCDIR/tdc_05ns_pll">
+    <File Path="$PSRCDIR/sources_1/ip/tdc_05ns_pll/tdc_05ns_pll.xci">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../../HDL/pcores/tdc_05ns_pll.xci"/>
+        <Attr Name="ImportTime" Val="1647251733"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="TopModule" Val="tdc_05ns_pll"/>
+      <Option Name="UseBlackboxStub" Val="1"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2017">
+      <Desc>Vivado Synthesis Defaults</Desc>
+    </StratHandle>
+    <Step Id="synth_design"/>
+  </Strategy>
+</GenRun>
